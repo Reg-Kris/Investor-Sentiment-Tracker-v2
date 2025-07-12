@@ -50,7 +50,6 @@ class ModernSentimentTracker {
     if (!container || !this.data) return;
 
     const timeframeData = this.data.timeframes[this.currentTimeframe];
-    
     this.components.cluster = new SentimentCluster(container, {
       score: timeframeData.score,
       sentiment: timeframeData.sentiment,
@@ -66,7 +65,7 @@ class ModernSentimentTracker {
     if (!this.data) return;
 
     const indicators = this.data.indicators;
-    const timeframeData = this.data.timeframes[this.currentTimeframe];
+    // const timeframeData = this.data.timeframes[this.currentTimeframe];
 
     // Fear & Greed Index Card
     const fearGreedContainer = document.getElementById('fear-greed-card-container');
@@ -188,8 +187,9 @@ class ModernSentimentTracker {
   private updateComponents(): void {
     if (!this.data) return;
 
-    const timeframeData = this.data.timeframes[this.currentTimeframe];
-    const indicators = this.data.indicators;
+    const currentData: SentimentData = this.data;
+    const timeframeData = currentData.timeframes[this.currentTimeframe];
+    const indicators = currentData.indicators;
 
     // Update sentiment cluster
     if (this.components.cluster) {
@@ -210,7 +210,7 @@ class ModernSentimentTracker {
         if (key === 'spy' || key === 'qqq' || key === 'iwm') {
           // Get timeframe-specific data
           const baseIndicator = indicators[key as keyof typeof indicators] as any;
-          const timeframeIndicator = DataService.getIndicatorForTimeframe(this.data, this.currentTimeframe, key);
+          const timeframeIndicator = DataService.getIndicatorForTimeframe(this.data!, this.currentTimeframe, key);
           
           if (baseIndicator && timeframeIndicator) {
             updateData.value = `$${baseIndicator.price.toFixed(2)}`;
@@ -228,8 +228,8 @@ class ModernSentimentTracker {
             updateData.score = normalizedScore;
           }
         } else if (key === 'vix') {
-          const baseVix = indicators.vix;
-          const timeframeVix = DataService.getIndicatorForTimeframe(this.data, this.currentTimeframe, 'vix');
+          // const baseVix = indicators.vix;
+          const timeframeVix = DataService.getIndicatorForTimeframe(this.data!, this.currentTimeframe, 'vix');
           
           updateData.value = timeframeVix.value.toFixed(1);
           updateData.color = timeframeVix.value > 20 ? '#ef4444' : '#10b981';
@@ -279,7 +279,7 @@ class ModernSentimentTracker {
       '1m': 'this month'
     }[timeframe];
     
-    const absChange = Math.abs(change);
+    
     
     if (change > 2) {
       return `${symbolName} is up strongly ${timeframeName} (+${change.toFixed(1)}%) - bullish momentum`;

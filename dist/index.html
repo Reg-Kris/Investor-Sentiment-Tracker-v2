@@ -2,11 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="./webstorm-icon-logo.svg" />
+    <link rel="icon" type="image/svg+xml" href="/Investor-Sentiment-Tracker-v2/webstorm-icon-logo.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Market Sentiment Tracker</title>
-    <link rel="stylesheet" href="./modern-style.css" />
-    <script type="module" crossorigin src="./assets/index-BTJGYSyg.js"></script>
+    <link rel="stylesheet" href="/Investor-Sentiment-Tracker-v2/modern-style.css" />
+    <script type="module" crossorigin src="/Investor-Sentiment-Tracker-v2/assets/index-DPEPSI3I.js"></script>
   </head>
   <body>
     <div class="background-gradient"></div>
@@ -14,7 +14,7 @@
     <header class="header">
       <h1 class="main-title">Market Sentiment Tracker</h1>
       <p class="subtitle">
-        Real-time financial sentiment and market indicators
+        Check out how the US markets are feeling about equities at a glance
       </p>
     </header>
 
@@ -31,6 +31,9 @@
       <!-- Market Indicators Grid -->
       <section class="indicators-section">
         <div class="indicators-grid">
+          <!-- Fear & Greed Index -->
+          <div id="fear-greed-card-container" class="card-container"></div>
+          
           <!-- Market Indices -->
           <div id="spy-card-container" class="card-container"></div>
           <div id="qqq-card-container" class="card-container"></div>
@@ -47,10 +50,38 @@
       </section>
     </main>
 
+    <!-- Quick Guide Section -->
+    <section class="guide-section">
+      <div class="guide-content">
+        <h2 class="guide-title">📊 Quick Guide for New Investors</h2>
+        <div class="guide-grid">
+          <div class="guide-item">
+            <div class="guide-icon">😨</div>
+            <h3>Fear (0-35)</h3>
+            <p>When investors are scared, prices often drop. This can be a good time to buy quality stocks at lower prices.</p>
+          </div>
+          <div class="guide-item">
+            <div class="guide-icon">😐</div>
+            <h3>Neutral (35-65)</h3>
+            <p>Balanced market sentiment. Prices are typically stable with normal trading activity.</p>
+          </div>
+          <div class="guide-item">
+            <div class="guide-icon">🤑</div>
+            <h3>Greed (65-100)</h3>
+            <p>When investors get too excited, prices may be inflated. Consider taking profits or being more cautious.</p>
+          </div>
+        </div>
+        <div class="timeframe-explanation">
+          <p><strong>Time Frames:</strong> 1D = today's mood, 5D = this week's trend, 1M = monthly sentiment</p>
+        </div>
+      </div>
+    </section>
+
     <footer class="footer">
       <p>Market sentiment analysis • Last updated: <span id="last-update">--</span></p>
       <div class="disclaimer">
-        <p>This tool is for informational purposes only and does not constitute financial advice.</p>
+        <p><strong>Important:</strong> This tool shows market sentiment and trends but is not financial advice. Always do your own research and consider consulting a financial advisor before making investment decisions.</p>
+        <p><strong>How to use:</strong> Green gauges = positive sentiment, Red gauges = negative sentiment. Use timeframe buttons (1D, 5D, 1M) to see different time periods.</p>
       </div>
       <div class="donation-section">
         <p>

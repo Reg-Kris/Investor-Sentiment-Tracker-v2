@@ -40,7 +40,7 @@ export class DataService {
   private static enhanceWithTimeframeData(data: SentimentData): SentimentData {
     // Create timeframe-specific variations for indicators
     // This simulates how different timeframes might affect market data interpretation
-    const timeframes = ['1d', '5d', '1m'] as const;
+    
     const enhanced = { ...data };
     
     // Add timeframe-specific indicator data
