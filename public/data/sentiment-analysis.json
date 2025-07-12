@@ -1,6 +1,6 @@
 {
   "overall": {
-    "score": 65,
+    "score": 68,
     "sentiment": "GREED",
     "message": "Investors are greedy",
     "confidence": 100,
@@ -14,11 +14,11 @@
         "weight": 0.25
       },
       "volatility": {
-        "score": 74,
+        "score": 77,
         "weight": 0.2
       },
       "options": {
-        "score": 65,
+        "score": 76,
         "weight": 0.2
       }
     }
@@ -31,15 +31,15 @@
       "trend": "neutral"
     },
     "5d": {
-      "score": 67,
+      "score": 66,
       "sentiment": "GREED",
       "message": "Investors are greedy",
       "trend": "stable"
     },
     "1m": {
-      "score": 78,
-      "sentiment": "GREED",
-      "message": "Investors are greedy",
+      "score": 84,
+      "sentiment": "EXTREME GREED",
+      "message": "Markets are extremely optimistic",
       "trend": "stable"
     }
   },
@@ -69,15 +69,15 @@
       "color": "#ef4444"
     },
     "vix": {
-      "value": 16.4,
+      "value": 15.8,
       "message": "Markets are calm",
       "color": "#10b981"
     },
     "options": {
-      "spy": "SPY traders neutral",
-      "qqq": "QQQ traders bearish",
-      "iwm": "IWM traders bullish"
+      "spy": "SPY traders bullish",
+      "qqq": "QQQ traders bullish",
+      "iwm": "IWM traders neutral"
     }
   },
-  "lastAnalyzed": "2025-07-12T14:50:43.629Z"
+  "lastAnalyzed": "2025-07-12T15:20:23.105Z"
 }
