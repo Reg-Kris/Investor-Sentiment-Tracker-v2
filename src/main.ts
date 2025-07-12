@@ -1,6 +1,9 @@
 import { DataService } from './services/data-service';
 import { SentimentCluster } from './components/sentiment-cluster';
 import { MarketCard, VixCard, OptionsCard, FearGreedCard } from './components/indicator-card';
+import { EnhancedHero } from './components/enhanced-hero';
+import { EnhancedCard, CardData } from './components/enhanced-card';
+import { EnhancedFooter } from './components/enhanced-footer';
 import type { SentimentData, TimeFrame } from './types/sentiment';
 
 class ModernSentimentTracker {
@@ -8,8 +11,11 @@ class ModernSentimentTracker {
   private currentTimeframe: TimeFrame = '1d';
   private components: {
     cluster?: SentimentCluster;
+    enhancedHero?: EnhancedHero;
+    enhancedFooter?: EnhancedFooter;
     cards: { [key: string]: any };
-  } = { cards: {} };
+    enhancedCards: { [key: string]: EnhancedCard };
+  } = { cards: {}, enhancedCards: {} };
 
   constructor() {
     this.initializeApp();
@@ -25,6 +31,7 @@ class ModernSentimentTracker {
       // Initialize components
       this.setupSentimentCluster();
       this.setupIndicatorCards();
+      this.setupEnhancedComponents();
       this.setupGlobalTimeframeSwitcher();
       this.setupBackgroundGradient();
       this.setupRefreshInterval();
@@ -171,6 +178,111 @@ class ModernSentimentTracker {
     }
   }
 
+  private setupEnhancedComponents(): void {
+    try {
+      // Initialize Enhanced Hero
+      this.components.enhancedHero = new EnhancedHero('sentiment-cluster-container');
+      
+      // Initialize Enhanced Footer
+      this.components.enhancedFooter = new EnhancedFooter();
+      
+      // Initialize Enhanced Cards
+      if (this.data) {
+        this.setupEnhancedCards();
+      }
+      
+      console.log('✨ Enhanced components initialized');
+    } catch (error) {
+      console.warn('⚠️ Enhanced components failed to initialize:', error);
+      // Fallback to regular components if enhanced ones fail
+    }
+  }
+
+  private setupEnhancedCards(): void {
+    if (!this.data) return;
+
+    const indicators = this.data.indicators;
+    const timeframeData = this.data.timeframes[this.currentTimeframe];
+
+    // Enhanced Fear & Greed Card
+    try {
+      const fearGreedData: CardData = {
+        title: 'Fear & Greed Index',
+        value: timeframeData.score,
+        message: this.getFearGreedMessage(timeframeData.score, this.currentTimeframe),
+        trend: timeframeData.score > 50 ? 'up' : 'down',
+        color: this.getSentimentColor(timeframeData.score),
+        timeframe: this.currentTimeframe
+      };
+      this.components.enhancedCards.fearGreed = new EnhancedCard('fear-greed-card-container', fearGreedData);
+    } catch (error) {
+      console.warn('Enhanced Fear & Greed card failed to initialize:', error);
+    }
+
+    // Enhanced SPY Card
+    try {
+      const spyData: CardData = {
+        title: 'S&P 500 (SPY)',
+        value: `$${indicators.spy.price.toFixed(2)}`,
+        change: `${indicators.spy.change >= 0 ? '+' : ''}${indicators.spy.change.toFixed(2)}%`,
+        message: indicators.spy.message,
+        trend: indicators.spy.change >= 0 ? 'up' : 'down',
+        color: indicators.spy.change >= 0 ? '#10b981' : '#ef4444',
+        timeframe: this.currentTimeframe
+      };
+      this.components.enhancedCards.spy = new EnhancedCard('spy-card-container', spyData);
+    } catch (error) {
+      console.warn('Enhanced SPY card failed to initialize:', error);
+    }
+
+    // Enhanced QQQ Card
+    try {
+      const qqqData: CardData = {
+        title: 'Nasdaq 100 (QQQ)',
+        value: `$${indicators.qqq.price.toFixed(2)}`,
+        change: `${indicators.qqq.change >= 0 ? '+' : ''}${indicators.qqq.change.toFixed(2)}%`,
+        message: indicators.qqq.message,
+        trend: indicators.qqq.change >= 0 ? 'up' : 'down',
+        color: indicators.qqq.change >= 0 ? '#10b981' : '#ef4444',
+        timeframe: this.currentTimeframe
+      };
+      this.components.enhancedCards.qqq = new EnhancedCard('qqq-card-container', qqqData);
+    } catch (error) {
+      console.warn('Enhanced QQQ card failed to initialize:', error);
+    }
+
+    // Enhanced IWM Card
+    try {
+      const iwmData: CardData = {
+        title: 'Russell 2000 (IWM)',
+        value: `$${indicators.iwm.price.toFixed(2)}`,
+        change: `${indicators.iwm.change >= 0 ? '+' : ''}${indicators.iwm.change.toFixed(2)}%`,
+        message: indicators.iwm.message,
+        trend: indicators.iwm.change >= 0 ? 'up' : 'down',
+        color: indicators.iwm.change >= 0 ? '#10b981' : '#ef4444',
+        timeframe: this.currentTimeframe
+      };
+      this.components.enhancedCards.iwm = new EnhancedCard('iwm-card-container', iwmData);
+    } catch (error) {
+      console.warn('Enhanced IWM card failed to initialize:', error);
+    }
+
+    // Enhanced VIX Card
+    try {
+      const vixData: CardData = {
+        title: 'Volatility Index (VIX)',
+        value: indicators.vix.value.toFixed(1),
+        message: this.getVixMessage(indicators.vix.value, this.currentTimeframe),
+        trend: indicators.vix.value > 20 ? 'up' : 'down',
+        color: indicators.vix.value > 20 ? '#ef4444' : '#10b981',
+        timeframe: this.currentTimeframe
+      };
+      this.components.enhancedCards.vix = new EnhancedCard('vix-card-container', vixData);
+    } catch (error) {
+      console.warn('Enhanced VIX card failed to initialize:', error);
+    }
+  }
+
   private handleTimeframeChange(timeframe: TimeFrame): void {
     this.currentTimeframe = timeframe;
     this.updateComponents();
@@ -246,6 +358,68 @@ class ModernSentimentTracker {
 
     // Update background gradient
     this.updateBackgroundGradient(timeframeData.score);
+    
+    // Update enhanced components
+    this.updateEnhancedComponents();
+  }
+
+  private updateEnhancedComponents(): void {
+    if (!this.data) return;
+
+    const timeframeData = this.data.timeframes[this.currentTimeframe];
+    const indicators = this.data.indicators;
+
+    // Update enhanced hero with sentiment
+    if (this.components.enhancedHero) {
+      this.components.enhancedHero.updateSentiment(timeframeData.score);
+    }
+
+    // Update enhanced cards
+    Object.entries(this.components.enhancedCards).forEach(([key, card]) => {
+      if (!card) return;
+
+      try {
+        let updateData: Partial<CardData> = { timeframe: this.currentTimeframe };
+
+        if (key === 'fearGreed') {
+          updateData = {
+            value: timeframeData.score,
+            message: this.getFearGreedMessage(timeframeData.score, this.currentTimeframe),
+            trend: timeframeData.score > 50 ? 'up' : 'down',
+            color: this.getSentimentColor(timeframeData.score),
+            timeframe: this.currentTimeframe
+          };
+        } else if (key === 'spy' || key === 'qqq' || key === 'iwm') {
+          const baseIndicator = indicators[key as keyof typeof indicators] as any;
+          const timeframeIndicator = DataService.getIndicatorForTimeframe(this.data!, this.currentTimeframe, key);
+          
+          if (baseIndicator && timeframeIndicator) {
+            updateData = {
+              value: `$${baseIndicator.price.toFixed(2)}`,
+              change: `${timeframeIndicator.change >= 0 ? '+' : ''}${timeframeIndicator.change.toFixed(2)}%`,
+              message: this.getMarketMessage(key, timeframeIndicator.change, this.currentTimeframe),
+              trend: timeframeIndicator.change >= 0 ? 'up' : 'down',
+              color: timeframeIndicator.change >= 0 ? '#10b981' : '#ef4444',
+              timeframe: this.currentTimeframe
+            };
+          }
+        } else if (key === 'vix') {
+          const timeframeVix = DataService.getIndicatorForTimeframe(this.data!, this.currentTimeframe, 'vix');
+          
+          updateData = {
+            value: timeframeVix.value.toFixed(1),
+            message: this.getVixMessage(timeframeVix.value, this.currentTimeframe),
+            trend: timeframeVix.value > 20 ? 'up' : 'down',
+            color: timeframeVix.value > 20 ? '#ef4444' : '#10b981',
+            timeframe: this.currentTimeframe
+          };
+        }
+
+        card.updateData(updateData);
+      } catch (error) {
+        console.warn(`Failed to update enhanced ${key} card:`, error);
+      }
+    });
   }
 
   private getSentimentColor(score: number): string {
@@ -357,10 +531,17 @@ class ModernSentimentTracker {
   private updateLastUpdateTime(): void {
     if (!this.data) return;
     
+    const updateText = DataService.getLastUpdateText(this.data.lastAnalyzed);
+    
+    // Update regular element
     const lastUpdateElement = document.getElementById('last-update');
     if (lastUpdateElement) {
-      const updateText = DataService.getLastUpdateText(this.data.lastAnalyzed);
       lastUpdateElement.textContent = updateText;
+    }
+    
+    // Update enhanced footer
+    if (this.components.enhancedFooter) {
+      this.components.enhancedFooter.updateLastUpdated(updateText);
     }
   }
 
@@ -370,6 +551,16 @@ class ModernSentimentTracker {
       try {
         await this.loadData();
         this.updateComponents();
+        
+        // Trigger celebration on data update
+        if (this.components.enhancedFooter) {
+          this.components.enhancedFooter.celebrateUpdate();
+        }
+        
+        if (this.components.enhancedHero) {
+          this.components.enhancedHero.celebrate();
+        }
+        
         console.log('📊 Data refreshed successfully');
       } catch (error) {
         console.error('Failed to refresh data:', error);

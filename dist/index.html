@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Market Sentiment Tracker</title>
     <link rel="stylesheet" href="/Investor-Sentiment-Tracker-v2/modern-style.css" />
-    <script type="module" crossorigin src="/Investor-Sentiment-Tracker-v2/assets/index-DPEPSI3I.js"></script>
+    <script type="module" crossorigin src="/Investor-Sentiment-Tracker-v2/js/index-DBhZPlC_.js"></script>
+    <link rel="modulepreload" crossorigin href="/Investor-Sentiment-Tracker-v2/js/vendor-animation--5XxcYv7.js">
   </head>
   <body>
     <div class="background-gradient"></div>
@@ -25,6 +26,16 @@
           <div id="sentiment-cluster-container" class="sentiment-cluster-container">
             <!-- Sentiment cluster component will be injected here -->
           </div>
+          
+          <!-- Global Timeframe Switcher -->
+          <div class="global-timeframe-switcher">
+            <div class="timeframe-label">Time Period:</div>
+            <div class="timeframe-buttons">
+              <button class="timeframe-btn active" data-timeframe="1d">1 Day</button>
+              <button class="timeframe-btn" data-timeframe="5d">5 Days</button>
+              <button class="timeframe-btn" data-timeframe="1m">1 Month</button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -42,10 +53,8 @@
           <!-- Volatility -->
           <div id="vix-card-container" class="card-container"></div>
           
-          <!-- Options Sentiment -->
-          <div id="spy-options-card-container" class="card-container"></div>
-          <div id="qqq-options-card-container" class="card-container"></div>
-          <div id="iwm-options-card-container" class="card-container"></div>
+          <!-- Market Options Sentiment -->
+          <div id="market-options-card-container" class="card-container"></div>
         </div>
       </section>
     </main>
