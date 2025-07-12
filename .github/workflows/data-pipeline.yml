@@ -70,6 +70,7 @@ jobs:
         env:
           ALPHA_VANTAGE_KEY: ${{ secrets.ALPHA_VANTAGE_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
           NODE_ENV: production
         run: |
           cd scripts
@@ -190,7 +191,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
           
       - name: Download all artifacts
         uses: actions/download-artifact@v4

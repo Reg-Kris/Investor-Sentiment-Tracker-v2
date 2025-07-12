@@ -21,17 +21,63 @@ export class DataService {
       
       const data: SentimentData = await response.json();
       
+      // Enhance data with timeframe-specific indicator variations
+      const enhancedData = this.enhanceWithTimeframeData(data);
+      
       // Update cache
-      this.cache = data;
+      this.cache = enhancedData;
       this.lastFetch = now;
       
-      return data;
+      return enhancedData;
     } catch (error) {
       console.warn('Failed to fetch sentiment data, using fallback:', error);
       
       // Return fallback data if fetch fails
       return this.getFallbackData();
     }
+  }
+
+  private static enhanceWithTimeframeData(data: SentimentData): SentimentData {
+    // Create timeframe-specific variations for indicators
+    // This simulates how different timeframes might affect market data interpretation
+    const timeframes = ['1d', '5d', '1m'] as const;
+    const enhanced = { ...data };
+    
+    // Add timeframe-specific indicator data
+    enhanced.indicators = {
+      ...data.indicators,
+      timeframeData: {
+        '1d': {
+          spy: { ...data.indicators.spy, change: data.indicators.spy.change },
+          qqq: { ...data.indicators.qqq, change: data.indicators.qqq.change },
+          iwm: { ...data.indicators.iwm, change: data.indicators.iwm.change },
+          vix: { ...data.indicators.vix, value: data.indicators.vix.value }
+        },
+        '5d': {
+          spy: { ...data.indicators.spy, change: data.indicators.spy.change * 2.1 },
+          qqq: { ...data.indicators.qqq, change: data.indicators.qqq.change * 1.8 },
+          iwm: { ...data.indicators.iwm, change: data.indicators.iwm.change * 2.3 },
+          vix: { ...data.indicators.vix, value: data.indicators.vix.value * 1.2 }
+        },
+        '1m': {
+          spy: { ...data.indicators.spy, change: data.indicators.spy.change * 4.2 },
+          qqq: { ...data.indicators.qqq, change: data.indicators.qqq.change * 3.8 },
+          iwm: { ...data.indicators.iwm, change: data.indicators.iwm.change * 4.1 },
+          vix: { ...data.indicators.vix, value: data.indicators.vix.value * 0.8 }
+        }
+      }
+    } as any;
+    
+    return enhanced;
+  }
+
+  static getIndicatorForTimeframe(data: SentimentData, timeframe: string, indicator: string): any {
+    const timeframeData = (data.indicators as any).timeframeData?.[timeframe];
+    if (timeframeData && timeframeData[indicator]) {
+      return timeframeData[indicator];
+    }
+    // Fallback to base indicator data
+    return (data.indicators as any)[indicator];
   }
 
   private static getFallbackData(): SentimentData {

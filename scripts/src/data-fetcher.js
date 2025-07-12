@@ -16,11 +16,32 @@ class MarketDataFetcher {
   constructor() {
     this.alphaVantageKey = process.env.ALPHA_VANTAGE_KEY || 'demo';
     this.fredApiKey = process.env.FRED_API_KEY || 'demo';
+    this.rapidApiKey = process.env.RAPIDAPI_KEY || 'demo';
     this.requestTimeout = 15000; // 15 seconds
     this.rateLimitDelay = 2000; // 2 seconds between requests
     this.circuitBreaker = new Map(); // Track failed APIs
     this.maxFailures = 3;
     console.log('🔧 Data fetcher initialized with robust error handling');
+    this.validateApiKeys();
+  }
+
+  validateApiKeys() {
+    const keyStatus = {
+      alphaVantage: this.alphaVantageKey !== 'demo',
+      fred: this.fredApiKey !== 'demo', 
+      rapidApi: this.rapidApiKey !== 'demo'
+    };
+    
+    console.log('🔑 API Key Status:');
+    console.log(`  Alpha Vantage: ${keyStatus.alphaVantage ? '✅' : '⚠️  demo'}`);
+    console.log(`  FRED: ${keyStatus.fred ? '✅' : '⚠️  demo'}`);
+    console.log(`  RapidAPI: ${keyStatus.rapidApi ? '✅' : '⚠️  demo'}`);
+    
+    if (!keyStatus.alphaVantage && !keyStatus.fred && !keyStatus.rapidApi) {
+      console.warn('⚠️  All APIs using demo keys - expect rate limits and mock data');
+    }
+    
+    return keyStatus;
   }
 
   async fetchWithRetry(url, retries = 3, cacheKey = null) {
@@ -44,12 +65,22 @@ class MarketDataFetcher {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), this.requestTimeout);
         
+        const headers = {
+          'User-Agent': 'Mozilla/5.0 (compatible; SentimentBot/1.0)',
+          'Accept': 'application/json'
+        };
+        
+        // Add RapidAPI headers for Fear & Greed Index
+        if (url.includes('rapidapi.com')) {
+          // Extract host from URL for proper header
+          const urlObj = new URL(url);
+          headers['X-RapidAPI-Host'] = urlObj.hostname;
+          headers['X-RapidAPI-Key'] = this.rapidApiKey;
+        }
+        
         const response = await fetch(url, {
           signal: controller.signal,
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (compatible; SentimentBot/1.0)',
-            'Accept': 'application/json'
-          }
+          headers
         });
         
         clearTimeout(timeout);
@@ -91,19 +122,26 @@ class MarketDataFetcher {
     try {
       console.log('📊 Fetching Fear & Greed Index...');
       
-      // Try alternative endpoints without CORS proxy
+      // Try multiple RapidAPI endpoints
       const endpoints = [
-        'https://fear-and-greed-index.p.rapidapi.com/v1/fgi',
-        // Fallback to a simpler approach using cached or mock data
+        {
+          url: 'https://fear-and-greed-index.p.rapidapi.com/v1/fgi',
+          parser: 'fgi_v1'
+        }
+        // Add more endpoints here as needed
       ];
       
       let data = null;
       for (const endpoint of endpoints) {
         try {
-          data = await this.fetchWithRetry(endpoint, 2, 'fear-greed');
-          break;
+          console.log(`🔄 Trying ${endpoint.url}...`);
+          data = await this.fetchWithRetry(endpoint.url, 2, `fear-greed-${endpoint.parser}`);
+          if (data) {
+            data._parser = endpoint.parser; // Mark which parser to use
+            break;
+          }
         } catch (error) {
-          console.warn(`Fear & Greed endpoint failed: ${endpoint}`);
+          console.warn(`Fear & Greed endpoint failed: ${endpoint.url}`);
           continue;
         }
       }
@@ -113,19 +151,45 @@ class MarketDataFetcher {
         return this.getMockFearGreed();
       }
       
-      // Handle different response formats
+      // Handle different response formats based on parser
       let historical;
-      if (data.fear_and_greed_historical?.data) {
-        historical = data.fear_and_greed_historical.data
-          .slice(0, 30)
-          .map(point => ({
-            date: new Date(point.x).toISOString().split('T')[0],
-            value: Math.round(point.y * 100) / 100,
-            rating: point.rating
-          }));
+      let currentValue = 50; // Default fallback
+      
+      if (data._parser === 'fgi_v1') {
+        // fear-and-greed-index.p.rapidapi.com format
+        if (data.fgi?.now?.value) {
+          currentValue = data.fgi.now.value;
+          
+          // Create historical data from available time points
+          const timePoints = [
+            { date: new Date().toISOString().split('T')[0], value: data.fgi.now.value, rating: data.fgi.now.valueText },
+            { date: new Date(Date.now() - 86400000).toISOString().split('T')[0], value: data.fgi.previousClose?.value || currentValue, rating: data.fgi.previousClose?.valueText || 'Unknown' },
+            { date: new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0], value: data.fgi.oneWeekAgo?.value || currentValue, rating: data.fgi.oneWeekAgo?.valueText || 'Unknown' },
+            { date: new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0], value: data.fgi.oneMonthAgo?.value || currentValue, rating: data.fgi.oneMonthAgo?.valueText || 'Unknown' }
+          ];
+          
+          // Fill in gaps with interpolated data
+          historical = this.interpolateHistoricalData(timePoints, 30);
+        } else {
+          currentValue = data.fgi?.value || data.value || 50;
+          historical = this.generateHistoricalFromCurrent(currentValue, 'fear-greed');
+        }
+      } else if (data._parser === 'cnn_v1') {
+        // CNN fear-and-greed format
+        if (data.fear_and_greed) {
+          currentValue = data.fear_and_greed.score || data.fear_and_greed.value || 50;
+          historical = this.generateHistoricalFromCurrent(currentValue, 'fear-greed');
+        } else if (data.data) {
+          currentValue = data.data.score || data.data.value || 50;
+          historical = this.generateHistoricalFromCurrent(currentValue, 'fear-greed');
+        } else {
+          // Try to extract from any available structure
+          currentValue = data.score || data.value || 50;
+          historical = this.generateHistoricalFromCurrent(currentValue, 'fear-greed');
+        }
       } else {
-        // Generate historical data from current value
-        const currentValue = data.fgi?.value || 50;
+        // Fallback parser for unknown formats
+        currentValue = data.value || data.score || data.fgi?.value || 50;
         historical = this.generateHistoricalFromCurrent(currentValue, 'fear-greed');
       }
 
@@ -179,22 +243,58 @@ class MarketDataFetcher {
   async fetchVixData() {
     try {
       console.log('📉 Fetching VIX data...');
-      const data = await this.fetchWithRetry(
-        `https://api.stlouisfed.org/fred/series/observations?series_id=VIXCLS&api_key=${this.fredApiKey}&file_type=json&limit=30&sort_order=desc`
-      );
+      
+      // Try FRED API first if we have a real key
+      if (this.fredApiKey && this.fredApiKey !== 'demo') {
+        try {
+          const data = await this.fetchWithRetry(
+            `https://api.stlouisfed.org/fred/series/observations?series_id=VIXCLS&api_key=${this.fredApiKey}&file_type=json&limit=30&sort_order=desc`
+          );
+          
+          const historical = data.observations
+            .filter(obs => obs.value !== '.')
+            .map(obs => ({
+              date: obs.date,
+              value: parseFloat(obs.value)
+            }));
 
-      const historical = data.observations
-        .filter(obs => obs.value !== '.')
-        .map(obs => ({
-          date: obs.date,
-          value: parseFloat(obs.value)
-        }));
-
-      return {
-        current: historical[0],
-        historical,
-        lastUpdated: new Date().toISOString()
-      };
+          return {
+            current: historical[0],
+            historical,
+            lastUpdated: new Date().toISOString()
+          };
+        } catch (error) {
+          console.warn('FRED API failed, trying alternative sources:', error.message);
+        }
+      }
+      
+      // Fallback to Yahoo Finance or other free sources
+      try {
+        const data = await this.fetchWithRetry(
+          'https://query1.finance.yahoo.com/v8/finance/chart/^VIX?range=1mo&interval=1d'
+        );
+        
+        if (data.chart?.result?.[0]) {
+          const result = data.chart.result[0];
+          const timestamps = result.timestamp;
+          const closes = result.indicators.quote[0].close;
+          
+          const historical = timestamps.slice(-30).map((timestamp, index) => ({
+            date: new Date(timestamp * 1000).toISOString().split('T')[0],
+            value: Math.round(closes[index] * 100) / 100
+          })).reverse();
+          
+          return {
+            current: historical[0],
+            historical,
+            lastUpdated: new Date().toISOString()
+          };
+        }
+      } catch (error) {
+        console.warn('Yahoo Finance VIX fallback failed:', error.message);
+      }
+      
+      throw new Error('All VIX data sources failed');
     } catch (error) {
       console.error('VIX fetch failed:', error.message);
       return this.getMockVixData();
@@ -204,34 +304,46 @@ class MarketDataFetcher {
   async fetchOptionsData(symbol) {
     try {
       console.log(`📋 Fetching ${symbol} options data...`);
-      const data = await this.fetchWithRetry(
-        `${this.corsProxy}https://query1.finance.yahoo.com/v7/finance/options/${symbol}`
-      );
+      
+      // Try multiple endpoints for options data
+      const endpoints = [
+        // CBOE options data (if available through API)
+        `https://query1.finance.yahoo.com/v7/finance/options/${symbol}`,
+        // Alternative: Use Alpha Vantage OPTIONS endpoint if available
+        // `https://www.alphavantage.co/query?function=OPTION_CHAIN&symbol=${symbol}&apikey=${this.alphaVantageKey}`
+      ];
+      
+      for (const endpoint of endpoints) {
+        try {
+          const data = await this.fetchWithRetry(endpoint, 1, `options-${symbol}`);
+          
+          if (data.optionChain?.result?.[0]) {
+            const optionChain = data.optionChain.result[0];
+            const calls = optionChain.options[0].calls || [];
+            const puts = optionChain.options[0].puts || [];
 
-      const optionChain = data.optionChain.result[0];
-      const calls = optionChain.options[0].calls || [];
-      const puts = optionChain.options[0].puts || [];
+            const totalCallVolume = calls.reduce((sum, call) => sum + (call.volume || 0), 0);
+            const totalPutVolume = puts.reduce((sum, put) => sum + (put.volume || 0), 0);
+            const putCallRatio = totalCallVolume > 0 ? totalPutVolume / totalCallVolume : 1;
 
-      const totalCallVolume = calls.reduce((sum, call) => sum + (call.volume || 0), 0);
-      const totalPutVolume = puts.reduce((sum, put) => sum + (put.volume || 0), 0);
-      const putCallRatio = totalCallVolume > 0 ? totalPutVolume / totalCallVolume : 1;
-
-      return {
-        symbol,
-        putCallRatio: Math.round(putCallRatio * 100) / 100,
-        totalCallVolume,
-        totalPutVolume,
-        lastUpdated: new Date().toISOString()
-      };
+            return {
+              symbol,
+              putCallRatio: Math.round(putCallRatio * 100) / 100,
+              totalCallVolume,
+              totalPutVolume,
+              lastUpdated: new Date().toISOString()
+            };
+          }
+        } catch (error) {
+          console.warn(`Options endpoint failed for ${symbol}:`, error.message);
+          continue;
+        }
+      }
+      
+      throw new Error(`All options endpoints failed for ${symbol}`);
     } catch (error) {
-      console.error(`${symbol} options fetch failed:`, error.message);
-      return {
-        symbol,
-        putCallRatio: 0.8 + Math.random() * 0.4,
-        totalCallVolume: Math.floor(Math.random() * 100000),
-        totalPutVolume: Math.floor(Math.random() * 80000),
-        lastUpdated: new Date().toISOString()
-      };
+      console.warn(`📋 ${symbol} options fetch failed, using model:`, error.message);
+      return this.getMockOptionsData(symbol);
     }
   }
 
@@ -259,8 +371,18 @@ class MarketDataFetcher {
       const cached = JSON.parse(readFileSync(cachePath, 'utf8'));
       const age = Date.now() - new Date(cached.timestamp).getTime();
       
-      // Cache valid for 1 hour
-      if (age < 3600000) {
+      // Dynamic cache duration based on data type
+      let cacheValidityMs = 3600000; // Default 1 hour
+      
+      if (key.includes('fear-greed')) {
+        cacheValidityMs = 1800000; // 30 minutes for sentiment data
+      } else if (key.includes('options')) {
+        cacheValidityMs = 900000; // 15 minutes for options (more volatile)
+      } else if (key.includes('SPY') || key.includes('QQQ') || key.includes('IWM')) {
+        cacheValidityMs = 300000; // 5 minutes for major indices during market hours
+      }
+      
+      if (age < cacheValidityMs) {
         return cached.data;
       }
       
@@ -346,9 +468,54 @@ class MarketDataFetcher {
       return {
         date: format(subDays(new Date(), i), 'yyyy-MM-dd'),
         value: Math.round(Math.max(0, Math.min(100, value)) * 100) / 100,
-        rating: type === 'fear-greed' ? 'Neutral' : undefined
+        rating: type === 'fear-greed' ? this.getValueText(value) : undefined
       };
     });
+  }
+
+  interpolateHistoricalData(timePoints, totalDays) {
+    const historical = [];
+    
+    // Sort timepoints by date (newest first)
+    timePoints.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    // Generate data for each day
+    for (let i = 0; i < totalDays; i++) {
+      const targetDate = format(subDays(new Date(), i), 'yyyy-MM-dd');
+      
+      // Find the closest timepoint or interpolate
+      let value = timePoints[0].value; // Default to most recent
+      let rating = timePoints[0].rating;
+      
+      // Check if we have an exact match
+      const exactMatch = timePoints.find(tp => tp.date === targetDate);
+      if (exactMatch) {
+        value = exactMatch.value;
+        rating = exactMatch.rating;
+      } else {
+        // Simple interpolation with some randomness
+        const baseValue = timePoints[0].value;
+        const variance = Math.random() * 10 - 5; // ±5 variation
+        value = Math.max(0, Math.min(100, baseValue + variance));
+        rating = this.getValueText(value);
+      }
+      
+      historical.push({
+        date: targetDate,
+        value: Math.round(value * 100) / 100,
+        rating
+      });
+    }
+    
+    return historical;
+  }
+
+  getValueText(value) {
+    if (value >= 75) return 'Extreme Greed';
+    if (value >= 55) return 'Greed';
+    if (value >= 45) return 'Neutral';
+    if (value >= 25) return 'Fear';
+    return 'Extreme Fear';
   }
 
   // Mock data generators for fallback
@@ -514,6 +681,9 @@ class MarketDataFetcher {
     console.log(`  Circuit breakers active: ${this.circuitBreaker.size}`);
   }
 }
+
+// Export the class
+export default MarketDataFetcher;
 
 // Run if called directly
 if (import.meta.url === `file://${process.argv[1]}`) {

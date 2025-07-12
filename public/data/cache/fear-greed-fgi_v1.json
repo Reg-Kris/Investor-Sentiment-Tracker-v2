@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-07-12T14:42:07.275Z",
+  "data": {
+    "lastUpdated": {
+      "epochUnixSeconds": 1752278395,
+      "humanDate": "2025-07-11T23:59:55.000Z"
+    },
+    "fgi": {
+      "now": {
+        "value": 75,
+        "valueText": "Extreme Greed"
+      },
+      "previousClose": {
+        "value": 75,
+        "valueText": "Extreme Greed"
+      },
+      "oneWeekAgo": {
+        "value": 78,
+        "valueText": "Extreme Greed"
+      },
+      "oneMonthAgo": {
+        "value": 61,
+        "valueText": "Greed"
+      },
+      "oneYearAgo": {
+        "value": 49,
+        "valueText": "Neutral"
+      }
+    }
+  }
+}

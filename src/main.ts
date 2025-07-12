@@ -1,6 +1,6 @@
 import { DataService } from './services/data-service';
 import { SentimentCluster } from './components/sentiment-cluster';
-import { MarketCard, VixCard, OptionsCard } from './components/indicator-card';
+import { MarketCard, VixCard, OptionsCard, FearGreedCard } from './components/indicator-card';
 import type { SentimentData, TimeFrame } from './types/sentiment';
 
 class ModernSentimentTracker {
@@ -66,19 +66,33 @@ class ModernSentimentTracker {
     if (!this.data) return;
 
     const indicators = this.data.indicators;
-    const timeframe = this.currentTimeframe.toUpperCase();
+    const timeframeData = this.data.timeframes[this.currentTimeframe];
+
+    // Fear & Greed Index Card
+    const fearGreedContainer = document.getElementById('fear-greed-card-container');
+    if (fearGreedContainer) {
+      this.components.cards.fearGreed = new FearGreedCard(
+        fearGreedContainer,
+        indicators.fearGreed.value,
+        indicators.fearGreed.message,
+        indicators.fearGreed.color,
+        this.currentTimeframe,
+        (timeframe: TimeFrame) => this.handleCardTimeframeChange(timeframe)
+      );
+    }
 
     // S&P 500 Card
     const spyContainer = document.getElementById('spy-card-container');
     if (spyContainer) {
       this.components.cards.spy = new MarketCard(
         spyContainer,
-        'S&P 500',
+        'S&P 500 (SPY)',
         indicators.spy.price,
         indicators.spy.change,
         indicators.spy.message,
         indicators.spy.color,
-        timeframe
+        this.currentTimeframe,
+        (timeframe: TimeFrame) => this.handleCardTimeframeChange(timeframe)
       );
     }
 
@@ -87,12 +101,13 @@ class ModernSentimentTracker {
     if (qqqContainer) {
       this.components.cards.qqq = new MarketCard(
         qqqContainer,
-        'Nasdaq 100',
+        'Nasdaq 100 (QQQ)',
         indicators.qqq.price,
         indicators.qqq.change,
         indicators.qqq.message,
         indicators.qqq.color,
-        timeframe
+        this.currentTimeframe,
+        (timeframe: TimeFrame) => this.handleCardTimeframeChange(timeframe)
       );
     }
 
@@ -101,12 +116,13 @@ class ModernSentimentTracker {
     if (iwmContainer) {
       this.components.cards.iwm = new MarketCard(
         iwmContainer,
-        'Russell 2000',
+        'Russell 2000 (IWM)',
         indicators.iwm.price,
         indicators.iwm.change,
         indicators.iwm.message,
         indicators.iwm.color,
-        timeframe
+        this.currentTimeframe,
+        (timeframe: TimeFrame) => this.handleCardTimeframeChange(timeframe)
       );
     }
 
@@ -118,7 +134,8 @@ class ModernSentimentTracker {
         indicators.vix.value,
         indicators.vix.message,
         indicators.vix.color,
-        timeframe
+        this.currentTimeframe,
+        (timeframe: TimeFrame) => this.handleCardTimeframeChange(timeframe)
       );
     }
 
@@ -129,7 +146,8 @@ class ModernSentimentTracker {
         spyOptionsContainer,
         'SPY',
         indicators.options.spy,
-        timeframe
+        this.currentTimeframe,
+        (timeframe: TimeFrame) => this.handleCardTimeframeChange(timeframe)
       );
     }
 
@@ -139,7 +157,8 @@ class ModernSentimentTracker {
         qqqOptionsContainer,
         'QQQ',
         indicators.options.qqq,
-        timeframe
+        this.currentTimeframe,
+        (timeframe: TimeFrame) => this.handleCardTimeframeChange(timeframe)
       );
     }
 
@@ -149,7 +168,8 @@ class ModernSentimentTracker {
         iwmOptionsContainer,
         'IWM',
         indicators.options.iwm,
-        timeframe
+        this.currentTimeframe,
+        (timeframe: TimeFrame) => this.handleCardTimeframeChange(timeframe)
       );
     }
   }
@@ -159,11 +179,17 @@ class ModernSentimentTracker {
     this.updateComponents();
   }
 
+  private handleCardTimeframeChange(timeframe: TimeFrame): void {
+    // Update all cards and main cluster to the same timeframe
+    this.currentTimeframe = timeframe;
+    this.updateComponents();
+  }
+
   private updateComponents(): void {
     if (!this.data) return;
 
     const timeframeData = this.data.timeframes[this.currentTimeframe];
-    const timeframeLabel = this.currentTimeframe.toUpperCase();
+    const indicators = this.data.indicators;
 
     // Update sentiment cluster
     if (this.components.cluster) {
@@ -175,15 +201,139 @@ class ModernSentimentTracker {
       });
     }
 
-    // Update all cards with new timeframe
-    Object.values(this.components.cards).forEach(card => {
+    // Update all cards with new timeframe and enhanced data
+    Object.entries(this.components.cards).forEach(([key, card]) => {
       if (card && typeof card.updateProps === 'function') {
-        card.updateProps({ timeframe: timeframeLabel });
+        const updateData: any = { timeframe: this.currentTimeframe };
+        
+        // Add specific updates for each card type based on timeframe
+        if (key === 'spy' || key === 'qqq' || key === 'iwm') {
+          // Get timeframe-specific data
+          const baseIndicator = indicators[key as keyof typeof indicators] as any;
+          const timeframeIndicator = DataService.getIndicatorForTimeframe(this.data, this.currentTimeframe, key);
+          
+          if (baseIndicator && timeframeIndicator) {
+            updateData.value = `$${baseIndicator.price.toFixed(2)}`;
+            updateData.change = `${timeframeIndicator.change >= 0 ? '+' : ''}${timeframeIndicator.change.toFixed(2)}%`;
+            
+            // Create user-friendly messages based on timeframe performance
+            let message = this.getMarketMessage(key, timeframeIndicator.change, this.currentTimeframe);
+            updateData.message = message;
+            
+            // Update color based on timeframe change
+            updateData.color = timeframeIndicator.change >= 0 ? '#10b981' : '#ef4444';
+            
+            // Update score for gauge
+            const normalizedScore = Math.min(Math.max(((timeframeIndicator.change + 10) / 20) * 100, 0), 100);
+            updateData.score = normalizedScore;
+          }
+        } else if (key === 'vix') {
+          const baseVix = indicators.vix;
+          const timeframeVix = DataService.getIndicatorForTimeframe(this.data, this.currentTimeframe, 'vix');
+          
+          updateData.value = timeframeVix.value.toFixed(1);
+          updateData.color = timeframeVix.value > 20 ? '#ef4444' : '#10b981';
+          
+          // Create user-friendly VIX messages
+          updateData.message = this.getVixMessage(timeframeVix.value, this.currentTimeframe);
+          
+          // Update VIX score for gauge
+          const normalizedScore = Math.min(Math.max((timeframeVix.value / 40) * 100, 0), 100);
+          updateData.score = normalizedScore;
+        } else if (key === 'fearGreed') {
+          // Update Fear & Greed with timeframe-specific score and user-friendly message
+          updateData.score = timeframeData.score;
+          updateData.value = timeframeData.score.toString();
+          updateData.message = this.getFearGreedMessage(timeframeData.score, this.currentTimeframe);
+          updateData.color = this.getSentimentColor(timeframeData.score);
+        }
+        
+        card.updateProps(updateData);
       }
     });
 
     // Update background gradient
     this.updateBackgroundGradient(timeframeData.score);
+  }
+
+  private getSentimentColor(score: number): string {
+    if (score >= 80) return '#047857'; // Extreme Greed
+    if (score >= 65) return '#059669'; // Greed
+    if (score >= 55) return '#16a34a'; // Mild Greed
+    if (score >= 45) return '#65a30d'; // Neutral
+    if (score >= 35) return '#d97706'; // Mild Fear
+    if (score >= 20) return '#ea580c'; // Fear
+    return '#dc2626'; // Extreme Fear
+  }
+
+  private getMarketMessage(symbol: string, change: number, timeframe: TimeFrame): string {
+    const symbolName = {
+      spy: 'S&P 500',
+      qqq: 'Nasdaq 100', 
+      iwm: 'Russell 2000'
+    }[symbol] || symbol.toUpperCase();
+    
+    const timeframeName = {
+      '1d': 'today',
+      '5d': 'this week',
+      '1m': 'this month'
+    }[timeframe];
+    
+    const absChange = Math.abs(change);
+    
+    if (change > 2) {
+      return `${symbolName} is up strongly ${timeframeName} (+${change.toFixed(1)}%) - bullish momentum`;
+    } else if (change > 0.5) {
+      return `${symbolName} is gaining ${timeframeName} (+${change.toFixed(1)}%) - positive trend`;
+    } else if (change > -0.5) {
+      return `${symbolName} is trading sideways ${timeframeName} (${change.toFixed(1)}%) - neutral`;
+    } else if (change > -2) {
+      return `${symbolName} is declining ${timeframeName} (${change.toFixed(1)}%) - bearish pressure`;
+    } else {
+      return `${symbolName} is down significantly ${timeframeName} (${change.toFixed(1)}%) - strong selling`;
+    }
+  }
+  
+  private getVixMessage(value: number, timeframe: TimeFrame): string {
+    const timeframeName = {
+      '1d': 'today',
+      '5d': 'this week',
+      '1m': 'this month'
+    }[timeframe];
+    
+    if (value > 30) {
+      return `High fear ${timeframeName} (${value.toFixed(1)}) - investors are very nervous`;
+    } else if (value > 20) {
+      return `Elevated concern ${timeframeName} (${value.toFixed(1)}) - some market anxiety`;
+    } else if (value > 15) {
+      return `Normal levels ${timeframeName} (${value.toFixed(1)}) - markets are comfortable`;
+    } else {
+      return `Very calm ${timeframeName} (${value.toFixed(1)}) - investors feel confident`;
+    }
+  }
+  
+  private getFearGreedMessage(score: number, timeframe: TimeFrame): string {
+    const timeframeName = {
+      '1d': 'Today',
+      '5d': 'This week',
+      '1m': 'This month'
+    }[timeframe];
+    
+    if (score >= 80) {
+      return `${timeframeName} investors are extremely greedy - high risk of market top`;
+    } else if (score >= 65) {
+      return `${timeframeName} shows greed - markets may be getting overheated`;
+    } else if (score >= 55) {
+      return `${timeframeName} sentiment is mildly greedy - cautiously optimistic`;
+    } else if (score >= 45) {
+      return `${timeframeName} markets are neutral - balanced investor sentiment`;
+    } else if (score >= 35) {
+      return `${timeframeName} shows mild fear - some investor concern`;
+    } else if (score >= 20) {
+      return `${timeframeName} investors are fearful - good buying opportunities may emerge`;
+    } else {
+      return `${timeframeName} shows extreme fear - potentially great buying opportunity`;
+    }
   }
 
   private setupBackgroundGradient(): void {
