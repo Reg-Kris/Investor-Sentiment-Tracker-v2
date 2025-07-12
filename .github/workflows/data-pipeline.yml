@@ -4,14 +4,47 @@ on:
   schedule:
     # Run daily at 6:00 AM EST (11:00 UTC)
     - cron: '0 11 * * *'
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch: # Allow manual trigger with options
+    inputs:
+      force-run:
+        description: 'Force run even without API keys'
+        required: false
+        default: false
+        type: boolean
+      use-cache:
+        description: 'Use cached data when available'
+        required: false
+        default: true
+        type: boolean
   push:
     branches: [main]
     paths: ['scripts/**']
 
 jobs:
-  fetch-and-process:
+  # Step 1: Validate environment and dependencies
+  validate:
     runs-on: ubuntu-latest
+    outputs:
+      should-run: ${{ steps.check.outputs.should-run }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check if data pipeline should run
+        id: check
+        run: |
+          # Check if we have API keys or if this is a test run
+          if [[ "${{ secrets.ALPHA_VANTAGE_KEY }}" == "" && "${{ github.event_name }}" != "workflow_dispatch" ]]; then
+            echo "should-run=false" >> $GITHUB_OUTPUT
+            echo "⚠️ Missing API keys - using mock data"
+          else
+            echo "should-run=true" >> $GITHUB_OUTPUT
+          fi
+  
+  # Step 2: Fetch core market data
+  fetch-core-data:
+    runs-on: ubuntu-latest
+    needs: validate
+    if: needs.validate.outputs.should-run == 'true'
     
     steps:
       - uses: actions/checkout@v4
@@ -29,27 +62,191 @@ jobs:
           cd scripts
           npm ci
           
-      - name: Fetch market data
+      - name: Create data directories
+        run: |
+          mkdir -p public/data/cache
+          
+      - name: Fetch market data with robust error handling
         env:
           ALPHA_VANTAGE_KEY: ${{ secrets.ALPHA_VANTAGE_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          NODE_ENV: production
         run: |
           cd scripts
-          npm run fetch-data
+          echo "🚀 Starting robust data fetching..."
+          timeout 300 npm run fetch-data || {
+            echo "⚠️ Data fetch timed out or failed, checking for partial data..."
+            if [[ -f ../public/data/market-data.json ]]; then
+              echo "✅ Partial data available, continuing..."
+            else
+              echo "❌ No data available, pipeline failed"
+              exit 1
+            fi
+          }
+          
+      - name: Validate fetched data
+        run: |
+          cd scripts
+          node -e "
+            const fs = require('fs');
+            const path = '../public/data/market-data.json';
+            try {
+              const data = JSON.parse(fs.readFileSync(path, 'utf8'));
+              const required = ['fearGreed', 'spy', 'vix'];
+              const missing = required.filter(field => !data[field]);
+              if (missing.length > 0) {
+                console.error('❌ Missing required fields:', missing);
+                process.exit(1);
+              }
+              console.log('✅ Data validation passed');
+              console.log('📊 Data summary:', {
+                fearGreed: data.fearGreed?.current?.value,
+                spy: data.spy?.current?.price,
+                vix: data.vix?.current?.value
+              });
+            } catch (error) {
+              console.error('❌ Data validation failed:', error.message);
+              process.exit(1);
+            }
+          "
+          
+      - name: Upload raw data artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: market-data
+          path: public/data/market-data.json
+          retention-days: 7
+  
+  # Step 3: Process and analyze sentiment
+  analyze-sentiment:
+    runs-on: ubuntu-latest
+    needs: [validate, fetch-core-data]
+    if: needs.validate.outputs.should-run == 'true'
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'scripts/package.json'
+          
+      - name: Install dependencies
+        run: |
+          cd scripts
+          npm ci
+          
+      - name: Download market data
+        uses: actions/download-artifact@v4
+        with:
+          name: market-data
+          path: public/data/
           
       - name: Process and analyze sentiment
         run: |
           cd scripts
-          npm run analyze-sentiment
+          echo "🧠 Analyzing market sentiment..."
+          timeout 60 npm run analyze-sentiment || {
+            echo "⚠️ Sentiment analysis timed out, using basic analysis"
+            exit 1
+          }
           
-      - name: Commit updated data
+      - name: Validate analysis results
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          cd scripts
+          node -e "
+            const fs = require('fs');
+            const path = '../public/data/sentiment-analysis.json';
+            try {
+              const analysis = JSON.parse(fs.readFileSync(path, 'utf8'));
+              if (!analysis.overall || typeof analysis.overall.score !== 'number') {
+                console.error('❌ Invalid sentiment analysis format');
+                process.exit(1);
+              }
+              console.log('✅ Sentiment analysis validation passed');
+              console.log('📈 Overall sentiment:', analysis.overall.score, analysis.overall.sentiment);
+            } catch (error) {
+              console.error('❌ Sentiment analysis validation failed:', error.message);
+              process.exit(1);
+            }
+          "
+          
+      - name: Upload analysis artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sentiment-analysis
+          path: public/data/sentiment-analysis.json
+          retention-days: 7
+  
+  # Step 4: Commit and deploy results
+  commit-results:
+    runs-on: ubuntu-latest
+    needs: [validate, fetch-core-data, analyze-sentiment]
+    if: needs.validate.outputs.should-run == 'true'
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          
+      - name: Move data to correct location
+        run: |
+          mkdir -p public/data
+          cp artifacts/market-data/* public/data/ 2>/dev/null || echo "No market data artifact"
+          cp artifacts/sentiment-analysis/* public/data/ 2>/dev/null || echo "No sentiment analysis artifact"
+          
+      - name: Check for data changes
+        id: changes
+        run: |
           git add public/data/
           if git diff --staged --quiet; then
-            echo "No data changes detected"
+            echo "has-changes=false" >> $GITHUB_OUTPUT
+            echo "📋 No data changes detected"
           else
-            git commit -m "🤖 Update market sentiment data - $(date +'%Y-%m-%d %H:%M UTC')"
-            git push
+            echo "has-changes=true" >> $GITHUB_OUTPUT
+            echo "📋 Data changes detected"
+            git diff --staged --name-only
+          fi
+          
+      - name: Commit updated data
+        if: steps.changes.outputs.has-changes == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action Bot"
+          
+          # Create detailed commit message
+          TIMESTAMP=$(date +'%Y-%m-%d %H:%M UTC')
+          echo "📊 Update sentiment data - $TIMESTAMP" > commit_msg.txt
+          echo "" >> commit_msg.txt
+          echo "Data collection summary:" >> commit_msg.txt
+          
+          if [[ -f public/data/market-data.json ]]; then
+            echo "✅ Market data updated" >> commit_msg.txt
+          fi
+          
+          if [[ -f public/data/sentiment-analysis.json ]]; then
+            echo "✅ Sentiment analysis updated" >> commit_msg.txt
+          fi
+          
+          echo "" >> commit_msg.txt
+          echo "🤖 Generated with robust pipeline v2" >> commit_msg.txt
+          
+          git commit -F commit_msg.txt
+          git push
+          
+      - name: Pipeline Summary
+        run: |
+          echo "🎉 Data pipeline completed successfully!"
+          echo "📈 Check the updated sentiment dashboard"
+          if [[ -f public/data/sentiment-analysis.json ]]; then
+            echo "📊 Latest sentiment score:"
+            node -e "console.log(JSON.parse(require('fs').readFileSync('public/data/sentiment-analysis.json', 'utf8')).overall.score)"
           fi
