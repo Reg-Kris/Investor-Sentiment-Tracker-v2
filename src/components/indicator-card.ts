@@ -162,38 +162,12 @@ export class IndicatorCard {
   }
 
   private setupTimeframeSwitcher(): HTMLElement | null {
-    if (!this.props.onTimeframeChange) return null;
-    
-    const switcher = document.createElement('div');
-    switcher.className = 'timeframe-switcher mini';
-    switcher.innerHTML = `
-      <button class="timeframe-btn ${this.props.timeframe === '1d' ? 'active' : ''}" data-timeframe="1d">1D</button>
-      <button class="timeframe-btn ${this.props.timeframe === '5d' ? 'active' : ''}" data-timeframe="5d">5D</button>
-      <button class="timeframe-btn ${this.props.timeframe === '1m' ? 'active' : ''}" data-timeframe="1m">1M</button>
-    `;
-
-    switcher.addEventListener('click', (e) => {
-      const target = e.target as HTMLButtonElement;
-      if (target.classList.contains('timeframe-btn')) {
-        const timeframe = target.getAttribute('data-timeframe') as TimeFrame;
-        this.updateTimeframe(timeframe);
-      }
-    });
-
-    return switcher;
+    // Individual card timeframe switchers are disabled
+    // All timeframe switching is now handled by the global switcher in hero section
+    return null;
   }
 
-  private updateTimeframe(timeframe: TimeFrame): void {
-    if (!this.props.onTimeframeChange) return;
-    
-    // Update active button
-    this.container.querySelectorAll('.timeframe-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.getAttribute('data-timeframe') === timeframe);
-    });
-
-    this.props.timeframe = timeframe;
-    this.props.onTimeframeChange(timeframe);
-  }
+  // Method removed - timeframe switching now handled globally
 
   private render(): void {
     const hasGauge = typeof this.props.score === 'number';

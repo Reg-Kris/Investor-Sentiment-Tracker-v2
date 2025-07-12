@@ -25,6 +25,7 @@ class ModernSentimentTracker {
       // Initialize components
       this.setupSentimentCluster();
       this.setupIndicatorCards();
+      this.setupGlobalTimeframeSwitcher();
       this.setupBackgroundGradient();
       this.setupRefreshInterval();
       
@@ -55,7 +56,26 @@ class ModernSentimentTracker {
       sentiment: timeframeData.sentiment,
       message: timeframeData.message,
       timeframe: this.currentTimeframe,
-      onTimeframeChange: (timeframe: TimeFrame) => {
+      // No onTimeframeChange callback - controlled globally now
+    });
+  }
+
+  private setupGlobalTimeframeSwitcher(): void {
+    const switcher = document.querySelector('.global-timeframe-switcher');
+    if (!switcher) return;
+
+    switcher.addEventListener('click', (e) => {
+      const target = e.target as HTMLButtonElement;
+      if (target.classList.contains('timeframe-btn')) {
+        const timeframe = target.getAttribute('data-timeframe') as TimeFrame;
+        
+        // Update active button
+        switcher.querySelectorAll('.timeframe-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        target.classList.add('active');
+        
+        // Update global timeframe
         this.handleTimeframeChange(timeframe);
       }
     });
@@ -75,8 +95,8 @@ class ModernSentimentTracker {
         indicators.fearGreed.value,
         indicators.fearGreed.message,
         indicators.fearGreed.color,
-        this.currentTimeframe,
-        (timeframe: TimeFrame) => this.handleCardTimeframeChange(timeframe)
+        this.currentTimeframe
+        // No callback - controlled by global switcher
       );
     }
 
@@ -90,8 +110,8 @@ class ModernSentimentTracker {
         indicators.spy.change,
         indicators.spy.message,
         indicators.spy.color,
-        this.currentTimeframe,
-        (timeframe: TimeFrame) => this.handleCardTimeframeChange(timeframe)
+        this.currentTimeframe
+        // No callback - controlled by global switcher
       );
     }
 
@@ -105,8 +125,8 @@ class ModernSentimentTracker {
         indicators.qqq.change,
         indicators.qqq.message,
         indicators.qqq.color,
-        this.currentTimeframe,
-        (timeframe: TimeFrame) => this.handleCardTimeframeChange(timeframe)
+        this.currentTimeframe
+        // No callback - controlled by global switcher
       );
     }
 
@@ -120,8 +140,8 @@ class ModernSentimentTracker {
         indicators.iwm.change,
         indicators.iwm.message,
         indicators.iwm.color,
-        this.currentTimeframe,
-        (timeframe: TimeFrame) => this.handleCardTimeframeChange(timeframe)
+        this.currentTimeframe
+        // No callback - controlled by global switcher
       );
     }
 
@@ -133,53 +153,25 @@ class ModernSentimentTracker {
         indicators.vix.value,
         indicators.vix.message,
         indicators.vix.color,
-        this.currentTimeframe,
-        (timeframe: TimeFrame) => this.handleCardTimeframeChange(timeframe)
+        this.currentTimeframe
+        // No callback - controlled by global switcher
       );
     }
 
-    // Options Cards
-    const spyOptionsContainer = document.getElementById('spy-options-card-container');
-    if (spyOptionsContainer) {
-      this.components.cards.spyOptions = new OptionsCard(
-        spyOptionsContainer,
-        'SPY',
-        indicators.options.spy,
-        this.currentTimeframe,
-        (timeframe: TimeFrame) => this.handleCardTimeframeChange(timeframe)
-      );
-    }
-
-    const qqqOptionsContainer = document.getElementById('qqq-options-card-container');
-    if (qqqOptionsContainer) {
-      this.components.cards.qqqOptions = new OptionsCard(
-        qqqOptionsContainer,
-        'QQQ',
-        indicators.options.qqq,
-        this.currentTimeframe,
-        (timeframe: TimeFrame) => this.handleCardTimeframeChange(timeframe)
-      );
-    }
-
-    const iwmOptionsContainer = document.getElementById('iwm-options-card-container');
-    if (iwmOptionsContainer) {
-      this.components.cards.iwmOptions = new OptionsCard(
-        iwmOptionsContainer,
-        'IWM',
-        indicators.options.iwm,
-        this.currentTimeframe,
-        (timeframe: TimeFrame) => this.handleCardTimeframeChange(timeframe)
+    // Market Options Sentiment Card (Consolidated)
+    const marketOptionsContainer = document.getElementById('market-options-card-container');
+    if (marketOptionsContainer) {
+      this.components.cards.marketOptions = new OptionsCard(
+        marketOptionsContainer,
+        'Market',
+        indicators.options.market || 'Market options sentiment is neutral',
+        this.currentTimeframe
+        // No callback - controlled by global switcher
       );
     }
   }
 
   private handleTimeframeChange(timeframe: TimeFrame): void {
-    this.currentTimeframe = timeframe;
-    this.updateComponents();
-  }
-
-  private handleCardTimeframeChange(timeframe: TimeFrame): void {
-    // Update all cards and main cluster to the same timeframe
     this.currentTimeframe = timeframe;
     this.updateComponents();
   }

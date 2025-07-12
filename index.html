@@ -24,6 +24,16 @@
           <div id="sentiment-cluster-container" class="sentiment-cluster-container">
             <!-- Sentiment cluster component will be injected here -->
           </div>
+          
+          <!-- Global Timeframe Switcher -->
+          <div class="global-timeframe-switcher">
+            <div class="timeframe-label">Time Period:</div>
+            <div class="timeframe-buttons">
+              <button class="timeframe-btn active" data-timeframe="1d">1 Day</button>
+              <button class="timeframe-btn" data-timeframe="5d">5 Days</button>
+              <button class="timeframe-btn" data-timeframe="1m">1 Month</button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -41,10 +51,8 @@
           <!-- Volatility -->
           <div id="vix-card-container" class="card-container"></div>
           
-          <!-- Options Sentiment -->
-          <div id="spy-options-card-container" class="card-container"></div>
-          <div id="qqq-options-card-container" class="card-container"></div>
-          <div id="iwm-options-card-container" class="card-container"></div>
+          <!-- Market Options Sentiment -->
+          <div id="market-options-card-container" class="card-container"></div>
         </div>
       </section>
     </main>

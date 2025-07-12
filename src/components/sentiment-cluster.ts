@@ -56,7 +56,9 @@ export class SentimentCluster {
     });
 
     this.props.timeframe = timeframe;
-    this.props.onTimeframeChange(timeframe);
+    if (this.props.onTimeframeChange) {
+      this.props.onTimeframeChange(timeframe);
+    }
   }
 
   public updateProps(newProps: Partial<SentimentClusterProps>): void {

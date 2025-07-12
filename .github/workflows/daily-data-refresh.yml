@@ -1,0 +1,55 @@
+name: Daily Market Data Refresh
+
+on:
+  schedule:
+    # Run at 6:00 AM EST (11:00 AM UTC) every weekday
+    - cron: '0 11 * * 1-5'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  refresh-data:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: |
+        cd scripts
+        npm install
+        
+    - name: Fetch fresh market data
+      env:
+        ALPHA_VANTAGE_KEY: ${{ secrets.ALPHA_VANTAGE_KEY }}
+        FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
+      run: |
+        cd scripts
+        node src/data-fetcher-new.js
+        
+    - name: Generate sentiment analysis
+      run: |
+        cd scripts
+        node src/sentiment-analyzer.js
+        
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add public/data/
+        git diff --staged --quiet || git commit -m "📊 Update market data - $(date -u +'%Y-%m-%d %H:%M UTC')"
+        git push
+        
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./dist
+        cname: your-domain.com # Optional: replace with your domain

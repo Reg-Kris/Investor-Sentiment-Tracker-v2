@@ -35,9 +35,10 @@ export interface SentimentData {
       color: string;
     };
     options: {
-      spy: string;
-      qqq: string;
-      iwm: string;
+      spy?: string;
+      qqq?: string;
+      iwm?: string;
+      market?: string;
     };
   };
   lastAnalyzed: string;
@@ -57,5 +58,5 @@ export interface SentimentClusterProps {
   sentiment: string;
   message: string;
   timeframe: TimeFrame;
-  onTimeframeChange: (timeframe: TimeFrame) => void;
+  onTimeframeChange?: (timeframe: TimeFrame) => void;
 }
