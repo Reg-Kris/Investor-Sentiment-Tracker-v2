@@ -1,6 +1,6 @@
 {
   "overall": {
-    "score": 68,
+    "score": 66,
     "sentiment": "GREED",
     "message": "Investors are greedy",
     "confidence": 100,
@@ -18,7 +18,7 @@
         "weight": 0.2
       },
       "options": {
-        "score": 76,
+        "score": 68,
         "weight": 0.2
       }
     }
@@ -31,7 +31,7 @@
       "trend": "neutral"
     },
     "5d": {
-      "score": 66,
+      "score": 67,
       "sentiment": "GREED",
       "message": "Investors are greedy",
       "trend": "stable"
@@ -74,10 +74,10 @@
       "color": "#10b981"
     },
     "options": {
-      "spy": "SPY traders bullish",
+      "spy": "SPY traders neutral",
       "qqq": "QQQ traders bullish",
-      "iwm": "IWM traders neutral"
+      "iwm": "IWM traders bearish"
     }
   },
-  "lastAnalyzed": "2025-07-12T15:20:23.105Z"
+  "lastAnalyzed": "2025-07-12T16:21:17.057Z"
 }
