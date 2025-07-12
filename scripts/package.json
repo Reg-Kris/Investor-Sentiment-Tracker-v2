@@ -5,7 +5,7 @@
   "scripts": {
     "fetch-data": "node src/data-fetcher.js",
     "fetch-enhanced": "node src/enhanced-data-fetcher.js",
-    "analyze-sentiment": "node src/sentiment-analyzer.js",
+    "analyze-sentiment": "node src/sentiment/index.js",
     "dev": "node --watch src/data-fetcher.js",
     "dev-enhanced": "node --watch src/enhanced-data-fetcher.js"
   },

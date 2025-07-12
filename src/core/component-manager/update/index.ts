@@ -1,0 +1,1 @@
+export { ComponentUpdater } from './component-updater';

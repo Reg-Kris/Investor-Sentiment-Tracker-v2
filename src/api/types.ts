@@ -14,3 +14,30 @@ export interface PutCallData {
   successfulFetches: number;
   totalSymbols: number;
 }
+
+export interface MarketData {
+  price: number;
+  change: number;
+  changePercent: number;
+}
+
+export interface FearGreedData {
+  value: number;
+  rating: string;
+  timestamp: number;
+}
+
+export interface VixData {
+  value: number;
+  date: string;
+}
+
+export interface VolumeData {
+  volume: number;
+  date: string;
+}
+
+export interface PolicyUncertaintyData {
+  value: number;
+  date: string;
+}

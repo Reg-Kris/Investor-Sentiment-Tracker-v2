@@ -1,0 +1,1 @@
+export { SentimentUtils } from './utils';

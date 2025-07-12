@@ -1,0 +1,96 @@
+/* Hero Section - Sentiment Cluster */
+.hero-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  padding: 2rem 0;
+}
+
+.sentiment-cluster-wrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.sentiment-cluster-wrapper::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+  animation: rotate 8s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sentiment-cluster-wrapper:hover::before {
+  opacity: 1;
+}
+
+.sentiment-cluster-wrapper:hover {
+  border-color: var(--accent-primary);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 25px 50px rgba(59, 130, 246, 0.25);
+}
+
+/* Sentiment Cluster Component */
+.sentiment-cluster-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.sentiment-score {
+  font-size: 4rem;
+  font-weight: 300;
+  font-family: 'JetBrains Mono', monospace;
+  margin: 1rem 0;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sentiment-message {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  margin-top: 1rem;
+  font-weight: 400;
+}
+
+/* Sentiment-specific styling */
+.sentiment-cluster.extreme-greed .sentiment-score {
+  background: linear-gradient(135deg, var(--extreme-greed), var(--greed));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.sentiment-cluster.greed .sentiment-score {
+  background: linear-gradient(135deg, var(--greed), var(--mild-greed));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.sentiment-cluster.fear .sentiment-score {
+  background: linear-gradient(135deg, var(--fear), var(--mild-fear));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.sentiment-cluster.extreme-fear .sentiment-score {
+  background: linear-gradient(135deg, var(--extreme-fear), var(--fear));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
