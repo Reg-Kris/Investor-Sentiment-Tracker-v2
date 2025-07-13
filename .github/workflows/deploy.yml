@@ -7,10 +7,6 @@ on:
   
   # Run daily at 9:30 AM EST (market open) on weekdays
   schedule:
-    - cron: '30 14 * * 1-5'  # UTC time for 9:30 AM EST
-  
-  # Run every 4 hours during market hours (9:30 AM - 4:00 PM EST)
-  schedule:
     - cron: '30 14,18,22 * * 1-5'  # 9:30 AM, 1:30 PM, 5:30 PM EST
   
   # Allows you to run this workflow manually from the Actions tab
@@ -61,20 +57,23 @@ jobs:
         env:
           ALPHA_VANTAGE_KEY: ${{ secrets.ALPHA_VANTAGE_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
-          RAPID_API_KEY: ${{ secrets.RAPID_API_KEY }}
+          RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
         run: |
           cd scripts
-          npm run fetch-enhanced
+          npm run fetch-data || echo "Data fetch failed, continuing with existing data"
+          npm run analyze-sentiment || echo "Sentiment analysis failed, continuing with existing data"
 
       - name: ✅ Check if data was updated
         id: check-update
         run: |
-          if git diff --quiet public/data/market-data.json; then
+          git add public/data/ || true
+          if git diff --staged --quiet; then
             echo "updated=false" >> $GITHUB_OUTPUT
             echo "No data changes detected"
           else
             echo "updated=true" >> $GITHUB_OUTPUT
             echo "Data updated successfully"
+            git diff --staged --name-only
           fi
 
       - name: 💾 Commit updated data
@@ -87,16 +86,14 @@ jobs:
 
       - name: 🚀 Push changes
         if: steps.check-update.outputs.updated == 'true'
-        uses: ad-m/github-push-action@v0.8.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
+        run: |
+          git push origin main
 
   # Build and deployment job
   build-and-deploy:
     runs-on: ubuntu-latest
     needs: fetch-data
-    if: always() && (needs.fetch-data.outputs.data-updated == 'true' || github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    if: always() && !cancelled() && !failure()
     
     environment:
       name: github-pages
