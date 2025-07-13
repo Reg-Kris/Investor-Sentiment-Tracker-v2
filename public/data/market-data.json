@@ -1,6 +1,6 @@
 {
-  "lastUpdated": "2025-07-13T10:11:49.914Z",
-  "generatedAt": "2025-07-13T10:11:49.914Z",
+  "lastUpdated": "2025-07-13T10:23:37.555Z",
+  "generatedAt": "2025-07-13T10:23:37.555Z",
   "fearGreed": {
     "current": {
       "date": "2025-07-13",
@@ -352,7 +352,7 @@
         "change": -3.009999999999991
       }
     ],
-    "lastUpdated": "2025-07-13T10:11:52.655Z"
+    "lastUpdated": "2025-07-13T10:23:39.729Z"
   },
   "vix": {
     "current": {
@@ -646,7 +646,7 @@
         "change": -6.400000000000091
       }
     ],
-    "lastUpdated": "2025-07-13T10:11:56.813Z"
+    "lastUpdated": "2025-07-13T10:23:43.834Z"
   },
   "iwm": {
     "symbol": "IWM",
@@ -839,16 +839,16 @@
         "change": -0.8299999999999841
       }
     ],
-    "lastUpdated": "2025-07-13T10:11:58.912Z"
+    "lastUpdated": "2025-07-13T10:23:45.973Z"
   },
   "options": {
-    "market": "Market options show bearish sentiment (P/C: 1.14)",
-    "ratio": 1.14,
-    "putVolume": 203672,
-    "callVolume": 179415,
+    "market": "Market options show bearish sentiment (P/C: 1.06)",
+    "ratio": 1.06,
+    "putVolume": 184759,
+    "callVolume": 173542,
     "sentiment": "bearish",
     "successfulFetches": 3,
     "totalSymbols": 3,
-    "lastUpdated": "2025-07-13T10:01:10.491Z"
+    "lastUpdated": "2025-07-13T10:23:48.359Z"
   }
 }
