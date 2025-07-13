@@ -32,12 +32,12 @@ jobs:
       - name: Check if data pipeline should run
         id: check
         run: |
-          # Check if we have API keys or if this is a test run
-          if [[ "${{ secrets.ALPHA_VANTAGE_KEY }}" == "" && "${{ github.event_name }}" != "workflow_dispatch" ]]; then
-            echo "should-run=false" >> $GITHUB_OUTPUT
-            echo "⚠️ Missing API keys - using mock data"
+          # Always run pipeline - it can work with Yahoo Finance without API keys
+          echo "should-run=true" >> $GITHUB_OUTPUT
+          if [[ "${{ secrets.ALPHA_VANTAGE_KEY }}" == "" ]]; then
+            echo "⚠️ Alpha Vantage API key not configured - using Yahoo Finance data"
           else
-            echo "should-run=true" >> $GITHUB_OUTPUT
+            echo "✅ Alpha Vantage API key available"
           fi
   
   # Step 2: Fetch core market data
