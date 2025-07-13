@@ -17,12 +17,6 @@ export default defineConfig({
         manualChunks: (id) => {
           // Separate vendor libraries for better caching
           if (id.includes('node_modules')) {
-            if (id.includes('animejs') || id.includes('gsap')) {
-              return 'vendor-animation';
-            }
-            if (id.includes('lottie-web')) {
-              return 'vendor-ui';
-            }
             return 'vendor';
           }
         },
@@ -85,15 +79,12 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
-      '@components': resolve(__dirname, 'src/components'),
-      '@services': resolve(__dirname, 'src/services'),
-      '@types': resolve(__dirname, 'src/types'),
     },
   },
 
   // Performance optimizations
   optimizeDeps: {
-    include: ['animejs', 'gsap', 'lottie-web'],
+    include: [],
     exclude: [],
   },
 
