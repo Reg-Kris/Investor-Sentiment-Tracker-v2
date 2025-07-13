@@ -14,7 +14,7 @@ export class TimeframeManager {
 
   updateComponents(): void {
     if (!this.data || !this.componentManager) return;
-    
+
     this.componentManager.setTimeframe(this.currentTimeframe);
     this.componentManager.updateAll(this.data);
   }
@@ -51,11 +51,13 @@ export class TimeframeManager {
     if (!switcher) return;
 
     // Update active button
-    switcher.querySelectorAll('.timeframe-btn').forEach(btn => {
+    switcher.querySelectorAll('.timeframe-btn').forEach((btn) => {
       btn.classList.remove('active');
     });
 
-    const activeButton = switcher.querySelector(`[data-timeframe="${timeframe}"]`);
+    const activeButton = switcher.querySelector(
+      `[data-timeframe="${timeframe}"]`,
+    );
     if (activeButton) {
       activeButton.classList.add('active');
     }

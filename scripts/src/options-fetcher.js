@@ -9,7 +9,7 @@ export class OptionsFetcher {
   async fetchMarketOptionsData() {
     try {
       console.log('📋 Fetching consolidated market options data...');
-      
+
       const symbols = SYMBOLS.etfs;
       const endpoints = API_ENDPOINTS.yahoo;
 
@@ -19,18 +19,28 @@ export class OptionsFetcher {
 
       for (const symbol of symbols) {
         let symbolSuccess = false;
-        
+
         for (const baseUrl of endpoints) {
           try {
-            const data = await this.http.fetchWithRetry(`${baseUrl}${symbol}`, 1, `market-options-${symbol}`);
-            
+            const data = await this.http.fetchWithRetry(
+              `${baseUrl}${symbol}`,
+              1,
+              `market-options-${symbol}`,
+            );
+
             if (data.optionChain?.result?.[0]) {
               const optionChain = data.optionChain.result[0];
               const calls = optionChain.options[0].calls || [];
               const puts = optionChain.options[0].puts || [];
 
-              const symbolCallVolume = calls.reduce((sum, call) => sum + (call.volume || 0), 0);
-              const symbolPutVolume = puts.reduce((sum, put) => sum + (put.volume || 0), 0);
+              const symbolCallVolume = calls.reduce(
+                (sum, call) => sum + (call.volume || 0),
+                0,
+              );
+              const symbolPutVolume = puts.reduce(
+                (sum, put) => sum + (put.volume || 0),
+                0,
+              );
 
               totalMarketCalls += symbolCallVolume;
               totalMarketPuts += symbolPutVolume;
@@ -39,7 +49,10 @@ export class OptionsFetcher {
               break; // Success, move to next symbol
             }
           } catch (error) {
-            console.warn(`Failed to fetch ${symbol} options from ${baseUrl}:`, error.message);
+            console.warn(
+              `Failed to fetch ${symbol} options from ${baseUrl}:`,
+              error.message,
+            );
             continue; // Try next endpoint
           }
         }
@@ -55,8 +68,9 @@ export class OptionsFetcher {
         }
       }
 
-      const ratio = totalMarketCalls > 0 ? totalMarketPuts / totalMarketCalls : 0.9;
-      
+      const ratio =
+        totalMarketCalls > 0 ? totalMarketPuts / totalMarketCalls : 0.9;
+
       // Create sentiment message based on ratio
       let sentiment = 'neutral';
       if (ratio > 1.2) {
@@ -79,10 +93,13 @@ export class OptionsFetcher {
         sentiment,
         successfulFetches,
         totalSymbols: symbols.length,
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
     } catch (error) {
-      console.warn('📋 Market options fetch failed completely, using fallback:', error.message);
+      console.warn(
+        '📋 Market options fetch failed completely, using fallback:',
+        error.message,
+      );
       return this.mock.getMockMarketOptionsData();
     }
   }

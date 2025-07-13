@@ -8,7 +8,7 @@ export class FearGreedCard extends BaseIndicatorCard {
     message: string,
     color: string,
     timeframe: TimeFrame,
-    onTimeframeChange?: (timeframe: TimeFrame) => void
+    onTimeframeChange?: (timeframe: TimeFrame) => void,
   ) {
     let sentiment = 'Neutral';
     if (score >= 80) sentiment = 'Extreme Greed';
@@ -27,7 +27,7 @@ export class FearGreedCard extends BaseIndicatorCard {
       timeframe,
       trend: score > 50 ? 'up' : score < 50 ? 'down' : 'neutral',
       score,
-      onTimeframeChange
+      onTimeframeChange,
     });
   }
 }

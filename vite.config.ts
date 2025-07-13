@@ -3,7 +3,7 @@ import { resolve } from 'path';
 
 export default defineConfig({
   base: '/Investor-Sentiment-Tracker-v2/',
-  
+
   // Build optimization for production
   build: {
     outDir: 'dist',
@@ -41,8 +41,8 @@ export default defineConfig({
           return `assets/[name]-[hash][extname]`;
         },
         chunkFileNames: 'js/[name]-[hash].js',
-        entryFileNames: 'js/[name]-[hash].js'
-      }
+        entryFileNames: 'js/[name]-[hash].js',
+      },
     },
     terserOptions: {
       compress: {
@@ -51,55 +51,55 @@ export default defineConfig({
         pure_funcs: ['console.log', 'console.warn', 'console.info'],
       },
       mangle: {
-        safari10: true
-      }
+        safari10: true,
+      },
     },
     chunkSizeWarningLimit: 1000,
-    assetsInlineLimit: 4096 // Inline assets smaller than 4kb
+    assetsInlineLimit: 4096, // Inline assets smaller than 4kb
   },
-  
+
   // Development server
   server: {
     port: 5173,
     host: true,
     open: true,
-    cors: true
+    cors: true,
   },
-  
+
   // Asset optimization
   assetsInclude: ['**/*.woff2', '**/*.svg'],
-  
+
   // Define global constants for optimization
   define: {
     __PRODUCTION__: JSON.stringify(process.env.NODE_ENV === 'production'),
-    __DEV__: JSON.stringify(process.env.NODE_ENV !== 'production')
+    __DEV__: JSON.stringify(process.env.NODE_ENV !== 'production'),
   },
-  
+
   // CSS optimization
   css: {
     devSourcemap: false,
-    postcss: {}
+    postcss: {},
   },
-  
+
   // Resolve configuration for cleaner imports
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
       '@components': resolve(__dirname, 'src/components'),
       '@services': resolve(__dirname, 'src/services'),
-      '@types': resolve(__dirname, 'src/types')
-    }
+      '@types': resolve(__dirname, 'src/types'),
+    },
   },
-  
+
   // Performance optimizations
   optimizeDeps: {
     include: ['animejs', 'gsap', 'lottie-web'],
-    exclude: []
+    exclude: [],
   },
-  
+
   // Preview server configuration
   preview: {
     port: 4173,
-    host: true
-  }
+    host: true,
+  },
 });

@@ -56,10 +56,14 @@ export class BaseCard {
       container: this.container,
       card: this.container.querySelector('.indicator-card') as HTMLElement,
       value: this.container.querySelector('.primary-value') as HTMLElement,
-      message: this.container.querySelector('.indicator-message') as HTMLElement,
+      message: this.container.querySelector(
+        '.indicator-message',
+      ) as HTMLElement,
       gauge: this.container.querySelector('.mini-gauge') as HTMLElement,
       trendLine: this.container.querySelector('.trend-line') as HTMLElement,
-      background: this.container.querySelector('.morphing-background') as HTMLElement,
+      background: this.container.querySelector(
+        '.morphing-background',
+      ) as HTMLElement,
     };
   }
 
@@ -67,16 +71,16 @@ export class BaseCard {
     if ('IntersectionObserver' in window) {
       this.observer = new IntersectionObserver(
         (entries) => {
-          entries.forEach(entry => {
+          entries.forEach((entry) => {
             if (entry.isIntersecting && !this.isVisible) {
               this.isVisible = true;
               callback();
             }
           });
         },
-        { threshold: 0.1 }
+        { threshold: 0.1 },
       );
-      
+
       this.observer.observe(this.container);
     } else {
       this.isVisible = true;
@@ -87,7 +91,7 @@ export class BaseCard {
   protected setupInteractions(
     onHover: () => void,
     onHoverOut: () => void,
-    onClick: () => void
+    onClick: () => void,
   ): void {
     const elements = this.getCardElements();
     if (!elements.card) return;

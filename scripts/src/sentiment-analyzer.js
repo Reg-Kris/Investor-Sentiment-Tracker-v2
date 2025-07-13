@@ -8,10 +8,10 @@ const DATA_DIR = join(__dirname, '../../public/data');
 class SentimentAnalyzer {
   constructor() {
     this.weights = {
-      fearGreed: 0.35,      // Primary sentiment indicator
-      market: 0.25,         // Price movements (SPY/QQQ/IWM average)
-      volatility: 0.20,     // VIX levels
-      options: 0.20         // Put/Call ratios
+      fearGreed: 0.35, // Primary sentiment indicator
+      market: 0.25, // Price movements (SPY/QQQ/IWM average)
+      volatility: 0.2, // VIX levels
+      options: 0.2, // Put/Call ratios
     };
   }
 
@@ -27,9 +27,9 @@ class SentimentAnalyzer {
     // Weighted composite score
     const compositeScore = Math.round(
       fearGreedScore * this.weights.fearGreed +
-      marketScore * this.weights.market +
-      volatilityScore * this.weights.volatility +
-      optionsScore * this.weights.options
+        marketScore * this.weights.market +
+        volatilityScore * this.weights.volatility +
+        optionsScore * this.weights.options,
     );
 
     // Generate time-based data (1d, 5d, 1m)
@@ -44,13 +44,16 @@ class SentimentAnalyzer {
         components: {
           fearGreed: { score: fearGreedScore, weight: this.weights.fearGreed },
           market: { score: marketScore, weight: this.weights.market },
-          volatility: { score: volatilityScore, weight: this.weights.volatility },
-          options: { score: optionsScore, weight: this.weights.options }
-        }
+          volatility: {
+            score: volatilityScore,
+            weight: this.weights.volatility,
+          },
+          options: { score: optionsScore, weight: this.weights.options },
+        },
       },
       timeframes,
       indicators: this.generateIndicatorData(data),
-      lastAnalyzed: new Date().toISOString()
+      lastAnalyzed: new Date().toISOString(),
     };
   }
 
@@ -65,18 +68,18 @@ class SentimentAnalyzer {
     const spyChange = data.spy.current.changePercent || 0;
     const qqqChange = data.qqq.current.changePercent || 0;
     const iwmChange = data.iwm.current.changePercent || 0;
-    
+
     const avgChange = (spyChange + qqqChange + iwmChange) / 3;
-    
+
     // Convert percentage change to 0-100 sentiment scale
     // -5% = 0 (extreme fear), 0% = 50 (neutral), +5% = 100 (extreme greed)
-    const score = Math.max(0, Math.min(100, 50 + (avgChange * 10)));
+    const score = Math.max(0, Math.min(100, 50 + avgChange * 10));
     return Math.round(score);
   }
 
   analyzeVolatility(vixData) {
     const vix = vixData.current.value;
-    
+
     // VIX interpretation: Lower VIX = Higher sentiment (inverted)
     // VIX 10-15 = Complacent (80-100), VIX 15-25 = Normal (40-80), VIX 25+ = Fear (0-40)
     let score;
@@ -87,7 +90,7 @@ class SentimentAnalyzer {
     } else {
       score = Math.max(0, 40 - ((vix - 25) / 15) * 40); // 0-40
     }
-    
+
     return Math.round(score);
   }
 
@@ -96,9 +99,9 @@ class SentimentAnalyzer {
     const spyRatio = optionsData.spy?.putCallRatio || 1;
     const qqqRatio = optionsData.qqq?.putCallRatio || 1;
     const iwmRatio = optionsData.iwm?.putCallRatio || 1;
-    
+
     const avgRatio = (spyRatio + qqqRatio + iwmRatio) / 3;
-    
+
     // Convert ratio to sentiment score
     // Ratio 0.5 = 100 (very bullish), Ratio 1.0 = 50 (neutral), Ratio 2.0 = 0 (very bearish)
     const score = Math.max(0, Math.min(100, 100 - (avgRatio - 0.5) * 66.67));
@@ -114,32 +117,39 @@ class SentimentAnalyzer {
     return {
       '1d': this.analyzeTimeframe(data, 1),
       '5d': this.analyzeTimeframe(data, 5),
-      '1m': this.analyzeTimeframe(data, 30)
+      '1m': this.analyzeTimeframe(data, 30),
     };
   }
 
   analyzeTimeframe(data, days) {
     // Calculate average sentiment over the timeframe
-    const fearGreedAvg = this.getAverageValue(data.fearGreed.historical, days, 'value');
+    const fearGreedAvg = this.getAverageValue(
+      data.fearGreed.historical,
+      days,
+      'value',
+    );
     const spyChange = this.getPercentChange(data.spy.historical, days, 'price');
     const vixAvg = this.getAverageValue(data.vix.historical, days, 'value');
 
     // Use same scoring logic but with historical averages
     const fearGreedScore = Math.round(fearGreedAvg);
-    const marketScore = Math.max(0, Math.min(100, 50 + (spyChange * 10)));
-    const volatilityScore = vixAvg <= 15 ? 80 + ((15 - vixAvg) / 5) * 20 : 
-                           vixAvg <= 25 ? 40 + ((25 - vixAvg) / 10) * 40 : 
-                           Math.max(0, 40 - ((vixAvg - 25) / 15) * 40);
+    const marketScore = Math.max(0, Math.min(100, 50 + spyChange * 10));
+    const volatilityScore =
+      vixAvg <= 15
+        ? 80 + ((15 - vixAvg) / 5) * 20
+        : vixAvg <= 25
+          ? 40 + ((25 - vixAvg) / 10) * 40
+          : Math.max(0, 40 - ((vixAvg - 25) / 15) * 40);
 
     const compositeScore = Math.round(
-      fearGreedScore * 0.4 + marketScore * 0.4 + volatilityScore * 0.2
+      fearGreedScore * 0.4 + marketScore * 0.4 + volatilityScore * 0.2,
     );
 
     return {
       score: compositeScore,
       sentiment: this.getSentimentLabel(compositeScore),
       message: this.getSentimentMessage(compositeScore),
-      trend: this.calculateTrend(data, days)
+      trend: this.calculateTrend(data, days),
     };
   }
 
@@ -149,36 +159,45 @@ class SentimentAnalyzer {
         value: Math.round(data.fearGreed.current.value),
         label: data.fearGreed.current.rating,
         message: this.getFearGreedMessage(data.fearGreed.current.value),
-        color: this.getFearGreedColor(data.fearGreed.current.value)
+        color: this.getFearGreedColor(data.fearGreed.current.value),
       },
       spy: {
         price: data.spy.current.price,
         change: data.spy.current.changePercent,
-        message: this.getMarketMessage('S&P 500', data.spy.current.changePercent),
-        color: this.getChangeColor(data.spy.current.changePercent)
+        message: this.getMarketMessage(
+          'S&P 500',
+          data.spy.current.changePercent,
+        ),
+        color: this.getChangeColor(data.spy.current.changePercent),
       },
       qqq: {
         price: data.qqq.current.price,
         change: data.qqq.current.changePercent,
-        message: this.getMarketMessage('Nasdaq 100', data.qqq.current.changePercent),
-        color: this.getChangeColor(data.qqq.current.changePercent)
+        message: this.getMarketMessage(
+          'Nasdaq 100',
+          data.qqq.current.changePercent,
+        ),
+        color: this.getChangeColor(data.qqq.current.changePercent),
       },
       iwm: {
         price: data.iwm.current.price,
         change: data.iwm.current.changePercent,
-        message: this.getMarketMessage('Russell 2000', data.iwm.current.changePercent),
-        color: this.getChangeColor(data.iwm.current.changePercent)
+        message: this.getMarketMessage(
+          'Russell 2000',
+          data.iwm.current.changePercent,
+        ),
+        color: this.getChangeColor(data.iwm.current.changePercent),
       },
       vix: {
         value: Math.round(data.vix.current.value * 10) / 10,
         message: this.getVixMessage(data.vix.current.value),
-        color: this.getVixColor(data.vix.current.value)
+        color: this.getVixColor(data.vix.current.value),
       },
       options: {
         spy: this.getOptionsMessage('SPY', data.options.spy?.putCallRatio),
         qqq: this.getOptionsMessage('QQQ', data.options.qqq?.putCallRatio),
-        iwm: this.getOptionsMessage('IWM', data.options.iwm?.putCallRatio)
-      }
+        iwm: this.getOptionsMessage('IWM', data.options.iwm?.putCallRatio),
+      },
     };
   }
 
@@ -268,13 +287,15 @@ class SentimentAnalyzer {
 
   calculateTrend(data, days) {
     // Simple trend calculation based on fear/greed movement
-    const values = data.fearGreed.historical.slice(0, days).map(item => item.value);
+    const values = data.fearGreed.historical
+      .slice(0, days)
+      .map((item) => item.value);
     if (values.length < 2) return 'neutral';
-    
+
     const start = values[values.length - 1];
     const end = values[0];
     const change = end - start;
-    
+
     if (change > 5) return 'improving';
     if (change < -5) return 'deteriorating';
     return 'stable';
@@ -283,17 +304,17 @@ class SentimentAnalyzer {
   calculateConfidence(data) {
     // Calculate confidence based on data recency and completeness
     let confidence = 100;
-    
+
     // Reduce confidence for missing options data
     if (!data.options.spy) confidence -= 10;
     if (!data.options.qqq) confidence -= 10;
     if (!data.options.iwm) confidence -= 10;
-    
+
     // Reduce confidence for stale data (more than 1 day old)
     const dataAge = Date.now() - new Date(data.lastUpdated).getTime();
     const hoursOld = dataAge / (1000 * 60 * 60);
     if (hoursOld > 24) confidence -= 20;
-    
+
     return Math.max(50, confidence);
   }
 
@@ -301,7 +322,7 @@ class SentimentAnalyzer {
     try {
       console.log('📊 Loading market data...');
       const rawData = JSON.parse(
-        readFileSync(join(DATA_DIR, 'market-data.json'), 'utf8')
+        readFileSync(join(DATA_DIR, 'market-data.json'), 'utf8'),
       );
 
       const analysis = this.analyzeMarketSentiment(rawData);
@@ -309,12 +330,16 @@ class SentimentAnalyzer {
       // Save analysis
       writeFileSync(
         join(DATA_DIR, 'sentiment-analysis.json'),
-        JSON.stringify(analysis, null, 2)
+        JSON.stringify(analysis, null, 2),
       );
 
-      console.log('✅ Sentiment analysis saved to public/data/sentiment-analysis.json');
-      console.log(`📈 Overall sentiment: ${analysis.overall.score}/100 (${analysis.overall.sentiment})`);
-      
+      console.log(
+        '✅ Sentiment analysis saved to public/data/sentiment-analysis.json',
+      );
+      console.log(
+        `📈 Overall sentiment: ${analysis.overall.score}/100 (${analysis.overall.sentiment})`,
+      );
+
       return analysis;
     } catch (error) {
       console.error('❌ Sentiment analysis failed:', error.message);

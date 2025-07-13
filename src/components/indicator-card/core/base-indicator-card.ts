@@ -22,7 +22,7 @@ export class BaseIndicatorCard {
 
   protected render(): void {
     const hasGauge = typeof this.props.score === 'number';
-    
+
     this.container.innerHTML = this.generateHTML(hasGauge);
     this.setupGauge(hasGauge);
     this.addInteractionEffects();
@@ -43,11 +43,15 @@ export class BaseIndicatorCard {
             <div class="primary-value" style="color: ${this.props.color}">
               ${this.props.value}
             </div>
-            ${this.props.change ? `
+            ${
+              this.props.change
+                ? `
               <div class="change-value" style="color: ${this.props.color}">
                 ${this.props.change}
               </div>
-            ` : ''}
+            `
+                : ''
+            }
           </div>
           
           <div class="message-section">
@@ -67,7 +71,9 @@ export class BaseIndicatorCard {
   protected setupGauge(hasGauge: boolean): void {
     if (!hasGauge) return;
 
-    const canvas = this.container.querySelector('.mini-gauge') as HTMLCanvasElement;
+    const canvas = this.container.querySelector(
+      '.mini-gauge',
+    ) as HTMLCanvasElement;
     if (canvas) {
       this.gaugeRenderer = new GaugeRenderer(canvas);
       if (typeof this.props.score === 'number') {

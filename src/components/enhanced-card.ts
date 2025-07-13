@@ -25,12 +25,15 @@ export class EnhancedCard extends BaseCard {
     this.setupInteractions(
       () => this.animateHover(),
       () => this.animateHoverOut(),
-      () => this.animateClick()
+      () => this.animateClick(),
     );
   }
 
   private createMorphingBackground(): void {
-    this.morphingShapes = this.visualEffects.createMorphingBackground(this.container, this.data);
+    this.morphingShapes = this.visualEffects.createMorphingBackground(
+      this.container,
+      this.data,
+    );
   }
 
   private animateIn(): void {
@@ -50,7 +53,10 @@ export class EnhancedCard extends BaseCard {
 
     // Animate trend line
     if (elements.trendLine) {
-      this.animationEffects.animateTrendLine(elements.trendLine, this.data.trend);
+      this.animationEffects.animateTrendLine(
+        elements.trendLine,
+        this.data.trend,
+      );
     }
 
     // Add subtle text reveal
@@ -64,7 +70,11 @@ export class EnhancedCard extends BaseCard {
     if (!elements.card) return;
 
     // Enhanced hover effect
-    this.animationEffects.animateHover(elements.card, elements.gauge, elements.value);
+    this.animationEffects.animateHover(
+      elements.card,
+      elements.gauge,
+      elements.value,
+    );
 
     // Intensify morphing shapes
     this.visualEffects.intensifyMorphingShapes(this.morphingShapes);
@@ -75,7 +85,11 @@ export class EnhancedCard extends BaseCard {
     if (!elements.card) return;
 
     // Return to normal state
-    this.animationEffects.animateHoverOut(elements.card, elements.gauge, elements.value);
+    this.animationEffects.animateHoverOut(
+      elements.card,
+      elements.gauge,
+      elements.value,
+    );
 
     // Return morphing shapes to normal
     this.visualEffects.normalizeMorphingShapes(this.morphingShapes);
@@ -95,7 +109,7 @@ export class EnhancedCard extends BaseCard {
   public updateData(newData: Partial<CardData>): void {
     this.data = { ...this.data, ...newData };
     const elements = this.getCardElements();
-    
+
     // Animate value change
     if (elements.value && newData.value !== undefined) {
       this.animationEffects.animateValueUpdate(elements.value, newData.value);
@@ -103,7 +117,10 @@ export class EnhancedCard extends BaseCard {
 
     // Update message with fade transition
     if (elements.message && newData.message) {
-      this.animationEffects.animateMessageUpdate(elements.message, newData.message);
+      this.animationEffects.animateMessageUpdate(
+        elements.message,
+        newData.message,
+      );
     }
 
     // Update colors if changed
@@ -121,7 +138,7 @@ export class EnhancedCard extends BaseCard {
 
   public destroy(): void {
     super.destroy();
-    
+
     // Clean up animations and effects
     this.animationEffects.destroy([this.container, ...this.morphingShapes]);
     this.visualEffects.destroy();

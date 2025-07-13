@@ -6,7 +6,7 @@ export const CONFIG = {
   requestTimeout: 15000, // 15 seconds
   rateLimitDelay: 2000, // 2 seconds between requests
   maxFailures: 3,
-  
+
   // Feature flags for fallback behavior
   useYahooFinanceAsPrimary: true, // Yahoo Finance doesn't need API keys
   allowMockDataFallback: true,
@@ -30,8 +30,6 @@ export const API_ENDPOINTS = {
     'https://query1.finance.yahoo.com/v7/finance/options/',
     'https://query2.finance.yahoo.com/v7/finance/options/',
   ],
-  fearGreed: [
-    'https://fear-and-greed-index.p.rapidapi.com/v1/fgi',
-  ],
+  fearGreed: ['https://fear-and-greed-index.p.rapidapi.com/v1/fgi'],
   vix: 'https://query1.finance.yahoo.com/v8/finance/chart/^VIX?range=1mo&interval=1d',
 };

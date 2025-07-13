@@ -3,11 +3,11 @@ import { BaseIndicatorCard } from '../core';
 
 export class OptionsCard extends BaseIndicatorCard {
   constructor(
-    container: HTMLElement, 
-    symbol: string, 
-    message: string, 
+    container: HTMLElement,
+    symbol: string,
+    message: string,
     timeframe: TimeFrame,
-    onTimeframeChange?: (timeframe: TimeFrame) => void
+    onTimeframeChange?: (timeframe: TimeFrame) => void,
   ) {
     const sentiment = message.toLowerCase();
     let color = '#6b7280';
@@ -40,7 +40,7 @@ export class OptionsCard extends BaseIndicatorCard {
       timeframe,
       trend,
       score,
-      onTimeframeChange
+      onTimeframeChange,
     });
   }
 }

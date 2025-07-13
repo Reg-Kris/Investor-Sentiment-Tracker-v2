@@ -21,18 +21,18 @@ export class EnhancedFooter extends FooterBase {
   private init(): void {
     this.enhanceFooterStructure();
     FooterStyles.inject();
-    
+
     this.floatingElements = new FloatingElements(this.container);
     this.socialLinks = new SocialLinks(this.container);
     this.techBadge = new TechBadge(this.container);
     this.animations = new FooterAnimations(this.container);
     this.celebrationEffects = new CelebrationEffects(this.container);
-    
+
     this.floatingElements.create();
     this.socialLinks.setupInteractions();
     this.techBadge.setupInteractions();
     this.animations.setupScrollAnimations();
-    
+
     this.animations.setupIntersectionObserver(() => {
       this.animateIn();
     });

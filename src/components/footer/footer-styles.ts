@@ -186,7 +186,7 @@ export class FooterStyles {
         }
       }
     `;
-    
+
     document.head.appendChild(style);
   }
 }

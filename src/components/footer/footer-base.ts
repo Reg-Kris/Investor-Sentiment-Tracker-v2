@@ -11,7 +11,7 @@ export class FooterBase {
 
   protected enhanceFooterStructure(): void {
     const existingContent = this.container.innerHTML;
-    
+
     this.container.innerHTML = `
       <div class="footer-background">
         <div class="footer-gradient"></div>

@@ -6,26 +6,26 @@ export class MockDataGenerator {
     const historical = Array.from({ length: 30 }, (_, i) => ({
       date: format(subDays(new Date(), i), 'yyyy-MM-dd'),
       value: Math.round((30 + Math.random() * 40) * 100) / 100,
-      rating: 'Neutral'
+      rating: 'Neutral',
     }));
 
     return {
       current: historical[0],
       historical,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
   }
 
   getMockStockData(symbol) {
     const basePrice = SYMBOLS.basePrices[symbol] || 400;
-    
+
     const historical = Array.from({ length: 30 }, (_, i) => {
       const price = basePrice + (Math.random() - 0.5) * 20;
       return {
         date: format(subDays(new Date(), i), 'yyyy-MM-dd'),
         price: Math.round(price * 100) / 100,
         volume: Math.floor(50000000 + Math.random() * 50000000),
-        change: (Math.random() - 0.5) * 10
+        change: (Math.random() - 0.5) * 10,
       };
     });
 
@@ -34,28 +34,31 @@ export class MockDataGenerator {
 
     return {
       symbol,
-      current: { ...current, changePercent: Math.round(changePercent * 100) / 100 },
+      current: {
+        ...current,
+        changePercent: Math.round(changePercent * 100) / 100,
+      },
       historical,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
   }
 
   getMockVixData() {
     const historical = Array.from({ length: 30 }, (_, i) => ({
       date: format(subDays(new Date(), i), 'yyyy-MM-dd'),
-      value: Math.round((15 + Math.random() * 25) * 100) / 100
+      value: Math.round((15 + Math.random() * 25) * 100) / 100,
     }));
 
     return {
       current: historical[0],
       historical,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
   }
 
   getMockMarketOptionsData() {
     const ratio = 0.85 + (Math.random() - 0.5) * 0.4; // Random ratio between 0.65-1.05
-    
+
     let sentiment = 'neutral';
     if (ratio > 1.2) {
       sentiment = 'very bearish';
@@ -68,7 +71,7 @@ export class MockDataGenerator {
     } else {
       sentiment = 'very bullish';
     }
-    
+
     return {
       market: `Market options show ${sentiment} sentiment (P/C: ${ratio.toFixed(2)})`,
       ratio: Math.round(ratio * 100) / 100,
@@ -77,7 +80,7 @@ export class MockDataGenerator {
       sentiment,
       successfulFetches: 0,
       totalSymbols: 3,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
   }
 
@@ -96,7 +99,7 @@ export class MockDataGenerator {
       return {
         date: format(subDays(new Date(), i), 'yyyy-MM-dd'),
         value: Math.round(Math.max(0, Math.min(100, value)) * 100) / 100,
-        rating: type === 'fear-greed' ? this.getValueText(value) : undefined
+        rating: type === 'fear-greed' ? this.getValueText(value) : undefined,
       };
     });
   }

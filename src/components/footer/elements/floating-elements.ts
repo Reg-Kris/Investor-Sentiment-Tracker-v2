@@ -10,7 +10,9 @@ export class FloatingElements {
   }
 
   create(): void {
-    const floatingContainer = this.container.querySelector('.floating-elements-container') as HTMLElement;
+    const floatingContainer = this.container.querySelector(
+      '.floating-elements-container',
+    ) as HTMLElement;
     if (!floatingContainer) return;
 
     this.createCodeSnippets(floatingContainer);
@@ -26,7 +28,7 @@ export class FloatingElements {
       'function analyze() {}',
       'export default class',
       'import { gsap } from "gsap"',
-      '=> promise.resolve()'
+      '=> promise.resolve()',
     ];
 
     codeSnippets.forEach((code) => {
@@ -38,7 +40,7 @@ export class FloatingElements {
         top: ${Math.random() * 80 + 10}%;
         opacity: 0;
       `;
-      
+
       this.floatingIcons.push(element);
       container.appendChild(element);
     });
@@ -57,7 +59,7 @@ export class FloatingElements {
         top: ${Math.random() * 90 + 5}%;
         opacity: 0;
       `;
-      
+
       this.floatingIcons.push(shape);
       container.appendChild(shape);
     }
@@ -66,32 +68,44 @@ export class FloatingElements {
   startAnimations(): void {
     this.floatingIcons.forEach((element, index) => {
       const delay = index * 200;
-      
+
       gsap.to(element, {
         opacity: 0.3,
         delay: delay / 1000,
         duration: 1,
-        ease: "power2.out"
+        ease: 'power2.out',
       });
 
       anime({
         targets: element,
         translateX: [
-          { value: Math.random() * 40 - 20, duration: 4000 + Math.random() * 2000 },
-          { value: Math.random() * 40 - 20, duration: 4000 + Math.random() * 2000 }
+          {
+            value: Math.random() * 40 - 20,
+            duration: 4000 + Math.random() * 2000,
+          },
+          {
+            value: Math.random() * 40 - 20,
+            duration: 4000 + Math.random() * 2000,
+          },
         ],
         translateY: [
-          { value: Math.random() * 30 - 15, duration: 5000 + Math.random() * 2000 },
-          { value: Math.random() * 30 - 15, duration: 5000 + Math.random() * 2000 }
+          {
+            value: Math.random() * 30 - 15,
+            duration: 5000 + Math.random() * 2000,
+          },
+          {
+            value: Math.random() * 30 - 15,
+            duration: 5000 + Math.random() * 2000,
+          },
         ],
         opacity: [
           { value: Math.random() * 0.4 + 0.1, duration: 3000 },
-          { value: Math.random() * 0.2 + 0.05, duration: 3000 }
+          { value: Math.random() * 0.2 + 0.05, duration: 3000 },
         ],
         delay: delay,
         loop: true,
         direction: 'alternate',
-        easing: 'easeInOutSine'
+        easing: 'easeInOutSine',
       });
     });
   }

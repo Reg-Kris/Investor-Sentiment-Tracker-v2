@@ -11,19 +11,24 @@ export class MessageGenerators {
     return '#dc2626';
   }
 
-  static getMarketMessage(symbol: string, change: number, timeframe: TimeFrame): string {
-    const symbolName = {
-      spy: 'S&P 500',
-      qqq: 'Nasdaq 100', 
-      iwm: 'Russell 2000'
-    }[symbol] || symbol.toUpperCase();
-    
+  static getMarketMessage(
+    symbol: string,
+    change: number,
+    timeframe: TimeFrame,
+  ): string {
+    const symbolName =
+      {
+        spy: 'S&P 500',
+        qqq: 'Nasdaq 100',
+        iwm: 'Russell 2000',
+      }[symbol] || symbol.toUpperCase();
+
     const timeframeName = {
       '1d': 'today',
       '5d': 'this week',
-      '1m': 'this month'
+      '1m': 'this month',
     }[timeframe];
-    
+
     if (change > 2) {
       return `${symbolName} is up strongly ${timeframeName} (+${change.toFixed(1)}%) - bullish momentum`;
     } else if (change > 0.5) {
@@ -36,14 +41,14 @@ export class MessageGenerators {
       return `${symbolName} is down significantly ${timeframeName} (${change.toFixed(1)}%) - strong selling`;
     }
   }
-  
+
   static getVixMessage(value: number, timeframe: TimeFrame): string {
     const timeframeName = {
       '1d': 'today',
       '5d': 'this week',
-      '1m': 'this month'
+      '1m': 'this month',
     }[timeframe];
-    
+
     if (value > 30) {
       return `High fear ${timeframeName} (${value.toFixed(1)}) - investors are very nervous`;
     } else if (value > 20) {
@@ -54,14 +59,14 @@ export class MessageGenerators {
       return `Very calm ${timeframeName} (${value.toFixed(1)}) - investors feel confident`;
     }
   }
-  
+
   static getFearGreedMessage(score: number, timeframe: TimeFrame): string {
     const timeframeName = {
       '1d': 'Today',
       '5d': 'This week',
-      '1m': 'This month'
+      '1m': 'This month',
     }[timeframe];
-    
+
     if (score >= 80) {
       return `${timeframeName} investors are extremely greedy - high risk of market top`;
     } else if (score >= 65) {

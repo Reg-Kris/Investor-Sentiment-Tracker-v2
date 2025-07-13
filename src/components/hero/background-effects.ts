@@ -63,7 +63,7 @@ export class BackgroundEffects {
   private createFloatingShape(shape: string, index: number): HTMLElement {
     const element = document.createElement('div');
     element.className = `floating-${shape}`;
-    
+
     const shapeStyles = this.getShapeStyles(shape);
     element.style.cssText = `
       position: absolute;
@@ -78,7 +78,7 @@ export class BackgroundEffects {
       pointer-events: none;
       z-index: 2;
     `;
-    
+
     return element;
   }
 
@@ -103,7 +103,7 @@ export class BackgroundEffects {
   }
 
   public updateParticleColors(color: string): void {
-    this.particles.forEach(particle => {
+    this.particles.forEach((particle) => {
       particle.style.background = color;
     });
   }
@@ -121,7 +121,7 @@ export class BackgroundEffects {
     `;
 
     const colors = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b'];
-    
+
     for (let i = 0; i < 50; i++) {
       const confetti = document.createElement('div');
       confetti.style.cssText = `

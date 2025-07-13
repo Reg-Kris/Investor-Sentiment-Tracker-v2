@@ -9,13 +9,13 @@ export class SocialLinks {
 
   setupInteractions(): void {
     const socialLinks = this.container.querySelectorAll('.social-link');
-    
-    socialLinks.forEach(link => {
+
+    socialLinks.forEach((link) => {
       link.addEventListener('mouseenter', () => {
         gsap.to(link, {
           scale: 1.1,
           duration: 0.3,
-          ease: "power2.out"
+          ease: 'power2.out',
         });
 
         this.createRippleEffect(link as HTMLElement);
@@ -25,7 +25,7 @@ export class SocialLinks {
         gsap.to(link, {
           scale: 1,
           duration: 0.3,
-          ease: "power2.out"
+          ease: 'power2.out',
         });
       });
     });
@@ -53,22 +53,23 @@ export class SocialLinks {
       height: 60,
       opacity: 0,
       duration: 0.6,
-      ease: "power2.out",
-      onComplete: () => ripple.remove()
+      ease: 'power2.out',
+      onComplete: () => ripple.remove(),
     });
   }
 
   animateIn(): void {
-    gsap.fromTo('.social-link',
+    gsap.fromTo(
+      '.social-link',
       { scale: 0, rotation: -180 },
-      { 
-        scale: 1, 
-        rotation: 0, 
-        duration: 0.6, 
-        stagger: 0.1, 
-        ease: "back.out(1.7)",
-        delay: 0.5
-      }
+      {
+        scale: 1,
+        rotation: 0,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: 'back.out(1.7)',
+        delay: 0.5,
+      },
     );
   }
 }

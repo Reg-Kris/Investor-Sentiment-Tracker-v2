@@ -20,7 +20,7 @@ export class IndicatorGenerator {
       qqq: this.generateMarketIndicator('Nasdaq 100', data.qqq),
       iwm: this.generateMarketIndicator('Russell 2000', data.iwm),
       vix: this.generateVixIndicator(data.vix),
-      options: this.generateOptionsIndicators(data.options)
+      options: this.generateOptionsIndicators(data.options),
     };
   }
 
@@ -33,7 +33,7 @@ export class IndicatorGenerator {
       value,
       label: fearGreedData.current.rating,
       message: this.messageGenerator.getFearGreedMessage(value),
-      color: this.colorGenerator.getFearGreedColor(value)
+      color: this.colorGenerator.getFearGreedColor(value),
     };
   }
 
@@ -46,7 +46,7 @@ export class IndicatorGenerator {
       price: marketData.current.price,
       change: changePercent,
       message: this.messageGenerator.getMarketMessage(indexName, changePercent),
-      color: this.colorGenerator.getChangeColor(changePercent)
+      color: this.colorGenerator.getChangeColor(changePercent),
     };
   }
 
@@ -58,7 +58,7 @@ export class IndicatorGenerator {
     return {
       value,
       message: this.messageGenerator.getVixMessage(value),
-      color: this.colorGenerator.getVixColor(value)
+      color: this.colorGenerator.getVixColor(value),
     };
   }
 
@@ -70,14 +70,23 @@ export class IndicatorGenerator {
       return {
         spy: this.messageGenerator.getOptionsMessage('SPY', null),
         qqq: this.messageGenerator.getOptionsMessage('QQQ', null),
-        iwm: this.messageGenerator.getOptionsMessage('IWM', null)
+        iwm: this.messageGenerator.getOptionsMessage('IWM', null),
       };
     }
-    
+
     return {
-      spy: this.messageGenerator.getOptionsMessage('SPY', optionsData.spy?.putCallRatio),
-      qqq: this.messageGenerator.getOptionsMessage('QQQ', optionsData.qqq?.putCallRatio),
-      iwm: this.messageGenerator.getOptionsMessage('IWM', optionsData.iwm?.putCallRatio)
+      spy: this.messageGenerator.getOptionsMessage(
+        'SPY',
+        optionsData.spy?.putCallRatio,
+      ),
+      qqq: this.messageGenerator.getOptionsMessage(
+        'QQQ',
+        optionsData.qqq?.putCallRatio,
+      ),
+      iwm: this.messageGenerator.getOptionsMessage(
+        'IWM',
+        optionsData.iwm?.putCallRatio,
+      ),
     };
   }
 }

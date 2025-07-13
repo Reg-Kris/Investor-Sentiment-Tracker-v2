@@ -17,29 +17,32 @@ export class YahooFinanceFetcher {
   async fetchStockData(symbol) {
     try {
       console.log(`📊 Fetching ${symbol} data from Yahoo Finance...`);
-      
+
       // Get current quote
       const quote = await yahooFinance.quote(symbol);
-      
+
       // Get historical data (last 30 days)
       const endDate = new Date();
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - 30);
-      
+
       const historical = await yahooFinance.historical(symbol, {
         period1: startDate,
         period2: endDate,
-        interval: '1d'
+        interval: '1d',
       });
 
       // Get key statistics
       const quoteSummary = await yahooFinance.quoteSummary(symbol, {
-        modules: ['summaryDetail', 'defaultKeyStatistics', 'financialData']
+        modules: ['summaryDetail', 'defaultKeyStatistics', 'financialData'],
       });
 
       return this.formatStockData(symbol, quote, historical, quoteSummary);
     } catch (error) {
-      console.error(`❌ Error fetching ${symbol} from Yahoo Finance:`, error.message);
+      console.error(
+        `❌ Error fetching ${symbol} from Yahoo Finance:`,
+        error.message,
+      );
       return this.mock.getMockStockData(symbol);
     }
   }
@@ -52,17 +55,17 @@ export class YahooFinanceFetcher {
     try {
       console.log('📊 Fetching VIX data...');
       const vixData = await this.fetchStockData('^VIX');
-      
+
       return {
         current: {
           value: vixData.current.price,
           change: vixData.current.change,
           changePercent: vixData.current.changePercent,
-          timestamp: vixData.current.timestamp
+          timestamp: vixData.current.timestamp,
         },
         historical: vixData.historical,
         interpretation: this.interpretVix(vixData.current.price),
-        metadata: vixData.metadata
+        metadata: vixData.metadata,
       };
     } catch (error) {
       console.error('❌ Error fetching VIX data:', error.message);
@@ -77,23 +80,23 @@ export class YahooFinanceFetcher {
   async fetchCryptocurrencyData() {
     try {
       console.log('₿ Fetching cryptocurrency data...');
-      
+
       const btcData = await this.fetchStockData('BTC-USD');
       const ethData = await this.fetchStockData('ETH-USD');
-      
+
       return {
         bitcoin: btcData,
         ethereum: ethData,
         metadata: {
           source: 'yahoo-finance2',
-          fetchedAt: new Date().toISOString()
-        }
+          fetchedAt: new Date().toISOString(),
+        },
       };
     } catch (error) {
       console.error('❌ Error fetching cryptocurrency data:', error.message);
       return {
         bitcoin: this.mock.getMockStockData('BTC-USD'),
-        ethereum: this.mock.getMockStockData('ETH-USD')
+        ethereum: this.mock.getMockStockData('ETH-USD'),
       };
     }
   }
@@ -105,23 +108,23 @@ export class YahooFinanceFetcher {
   async fetchCommodityData() {
     try {
       console.log('🏅 Fetching commodity data...');
-      
+
       const goldData = await this.fetchStockData('GC=F');
       const oilData = await this.fetchStockData('CL=F');
-      
+
       return {
         gold: goldData,
         oil: oilData,
         metadata: {
           source: 'yahoo-finance2',
-          fetchedAt: new Date().toISOString()
-        }
+          fetchedAt: new Date().toISOString(),
+        },
       };
     } catch (error) {
       console.error('❌ Error fetching commodity data:', error.message);
       return {
         gold: this.mock.getMockStockData('GC=F'),
-        oil: this.mock.getMockStockData('CL=F')
+        oil: this.mock.getMockStockData('CL=F'),
       };
     }
   }
@@ -136,10 +139,13 @@ export class YahooFinanceFetcher {
       current: {
         price: quote.regularMarketPrice,
         change: quote.regularMarketChange,
-        changePercent: ((quote.regularMarketChange / quote.regularMarketPreviousClose) * 100).toFixed(2),
+        changePercent: (
+          (quote.regularMarketChange / quote.regularMarketPreviousClose) *
+          100
+        ).toFixed(2),
         volume: quote.regularMarketVolume,
         marketCap: quote.marketCap,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
       historical: historical.slice(-7), // Last 7 days
       statistics: {
@@ -148,12 +154,12 @@ export class YahooFinanceFetcher {
         dividendYield: quoteSummary?.summaryDetail?.dividendYield,
         fiftyTwoWeekHigh: quoteSummary?.summaryDetail?.fiftyTwoWeekHigh,
         fiftyTwoWeekLow: quoteSummary?.summaryDetail?.fiftyTwoWeekLow,
-        beta: quoteSummary?.summaryDetail?.beta
+        beta: quoteSummary?.summaryDetail?.beta,
       },
       metadata: {
         source: 'yahoo-finance2',
-        fetchedAt: new Date().toISOString()
-      }
+        fetchedAt: new Date().toISOString(),
+      },
     };
   }
 

@@ -7,7 +7,7 @@ export class SentimentCluster {
   private props: SentimentClusterProps;
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
-  
+
   // Module instances
   private renderer: CanvasRenderer;
   private animator: AnimationController;
@@ -15,23 +15,23 @@ export class SentimentCluster {
 
   constructor(container: HTMLElement, props: SentimentClusterProps) {
     this.props = props;
-    
+
     // Initialize UI components
     this.ui = new UIComponents(container);
-    
+
     // Create and setup canvas
     this.canvas = this.ui.createCanvas();
     this.ctx = this.canvas.getContext('2d')!;
-    
+
     // Initialize renderer and animator
     this.renderer = new CanvasRenderer(this.ctx);
     this.animator = new AnimationController();
-    
+
     // Setup animation callback
     this.animator.setRenderCallback((angle: number) => {
       this.renderer.renderComplete(angle);
     });
-    
+
     this.initialize();
   }
 
@@ -42,17 +42,19 @@ export class SentimentCluster {
   }
 
   private setupTimeframeSwitcher(): void {
-    const config = this.ui.getDefaultTimeframeSwitcherConfig(this.props.timeframe);
+    const config = this.ui.getDefaultTimeframeSwitcherConfig(
+      this.props.timeframe,
+    );
     const switcher = this.ui.createTimeframeSwitcher(config, (timeframe) => {
       this.updateTimeframe(timeframe);
     });
-    
+
     this.ui.appendElement(switcher);
   }
 
   private updateTimeframe(timeframe: TimeFrame): void {
     this.props.timeframe = timeframe;
-    
+
     if (this.props.onTimeframeChange) {
       this.props.onTimeframeChange(timeframe);
     }
@@ -61,7 +63,7 @@ export class SentimentCluster {
   private updateFromProps(): void {
     // Update animator with new score
     this.animator.updateFromScore(this.props.score);
-    
+
     // Update UI labels and styling
     this.ui.updateLabels(this.props.score, this.props.message);
   }
@@ -80,12 +82,12 @@ export class SentimentCluster {
   public updateProps(newProps: Partial<SentimentClusterProps>): void {
     const oldTimeframe = this.props.timeframe;
     this.props = { ...this.props, ...newProps };
-    
+
     // Update timeframe button if changed
     if (oldTimeframe !== this.props.timeframe) {
       this.ui.updateActiveTimeframeButton(this.props.timeframe);
     }
-    
+
     this.updateFromProps();
   }
 

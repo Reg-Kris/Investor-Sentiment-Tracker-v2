@@ -3,12 +3,12 @@ name: 🚀 Deploy to GitHub Pages with Data Update
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["main"]
-  
+    branches: ['main']
+
   # Run daily at 9:30 AM EST (market open) on weekdays
   schedule:
-    - cron: '30 14,18,22 * * 1-5'  # 9:30 AM, 1:30 PM, 5:30 PM EST
-  
+    - cron: '30 14,18,22 * * 1-5' # 9:30 AM, 1:30 PM, 5:30 PM EST
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
@@ -20,13 +20,13 @@ on:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: write  # Changed to write for data commits
+  contents: write # Changed to write for data commits
   pages: write
   id-token: write
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 concurrency:
-  group: "pages"
+  group: 'pages'
   cancel-in-progress: false
 
 jobs:
@@ -94,17 +94,17 @@ jobs:
     runs-on: ubuntu-latest
     needs: fetch-data
     if: always() && !cancelled() && !failure()
-    
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    
+
     steps:
       - name: 📥 Checkout (updated)
         uses: actions/checkout@v4
         with:
-          ref: main  # Make sure we get the latest changes
-          
+          ref: main # Make sure we get the latest changes
+
       - name: 🔧 Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -119,7 +119,7 @@ jobs:
           NODE_ENV: production
         run: |
           npm run build
-          
+
           # Log bundle sizes for monitoring
           echo "📊 Bundle Analysis:"
           ls -lah dist/

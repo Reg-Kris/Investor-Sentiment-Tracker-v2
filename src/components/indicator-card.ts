@@ -5,5 +5,5 @@ export {
   MarketCard,
   OptionsCard,
   FearGreedCard,
-  type IndicatorCardProps
+  type IndicatorCardProps,
 } from './indicator-card/index';

@@ -19,16 +19,16 @@ export class AppInitializer {
   async initialize(): Promise<void> {
     try {
       console.log('🚀 Initializing Modern Sentiment Tracker...');
-      
+
       // Load data first
       await this.loadData();
-      
+
       // Initialize all components
       await this.setupComponents();
-      
+
       // Setup refresh interval
       this.setupRefreshInterval();
-      
+
       console.log('✅ App initialized successfully');
     } catch (error) {
       console.error('❌ Failed to initialize app:', error);
@@ -51,19 +51,19 @@ export class AppInitializer {
 
     // Initialize component manager with data
     this.componentManager.initialize(this.data);
-    
+
     // Setup timeframe management
     this.timeframeManager.initialize(this.data, this.componentManager);
-    
+
     // Setup background gradient
     this.backgroundManager.initialize(this.data);
   }
 
   private updateLastUpdateTime(): void {
     if (!this.data) return;
-    
+
     const updateText = DataService.getLastUpdateText(this.data.lastAnalyzed);
-    
+
     const lastUpdateElement = document.getElementById('last-update');
     if (lastUpdateElement) {
       lastUpdateElement.textContent = updateText;
@@ -71,20 +71,23 @@ export class AppInitializer {
   }
 
   private setupRefreshInterval(): void {
-    setInterval(async () => {
-      try {
-        await this.loadData();
-        
-        if (this.data) {
-          this.componentManager.updateAll(this.data);
-          this.timeframeManager.updateComponents();
+    setInterval(
+      async () => {
+        try {
+          await this.loadData();
+
+          if (this.data) {
+            this.componentManager.updateAll(this.data);
+            this.timeframeManager.updateComponents();
+          }
+
+          console.log('📊 Data refreshed successfully');
+        } catch (error) {
+          console.error('Failed to refresh data:', error);
         }
-        
-        console.log('📊 Data refreshed successfully');
-      } catch (error) {
-        console.error('Failed to refresh data:', error);
-      }
-    }, 5 * 60 * 1000);
+      },
+      5 * 60 * 1000,
+    );
   }
 
   private showErrorState(): void {
