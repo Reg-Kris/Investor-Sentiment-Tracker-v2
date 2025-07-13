@@ -223,10 +223,7 @@ git checkout -b feature/amazing-new-thing
 npm run dev && npm run build
 
 # 5️⃣ Commit with style
-git commit -m "✨ Add amazing new thing
-
-🤖 Generated with [Claude Code](https://claude.ai/code)
-Co-Authored-By: Claude <noreply@anthropic.com>"
+git commit -m "✨ Add amazing new thing"
 
 # 6️⃣ Submit PR and celebrate! 🎉
 ```
@@ -278,6 +275,6 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 
 ### 🎯 **Made with ❤️ by a human who got tired of ugly financial dashboards**
 
-*Built using [Claude Code](https://claude.ai/code) for maximum development velocity* ⚡
+*Built with love and lots of coffee* ☕
 
 </div>
