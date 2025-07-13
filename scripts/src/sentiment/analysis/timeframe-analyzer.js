@@ -2,7 +2,6 @@
  * Timeframe analysis for sentiment trends
  */
 export class TimeframeAnalyzer {
-  
   /**
    * Generate sentiment data for different timeframes
    */
@@ -15,7 +14,7 @@ export class TimeframeAnalyzer {
     return {
       '1d': this.analyzeTimeframe(data, 1),
       '5d': this.analyzeTimeframe(data, 5),
-      '1m': this.analyzeTimeframe(data, 30)
+      '1m': this.analyzeTimeframe(data, 30),
     };
   }
 
@@ -24,26 +23,33 @@ export class TimeframeAnalyzer {
    */
   analyzeTimeframe(data, days) {
     // Calculate average sentiment over the timeframe
-    const fearGreedAvg = this.getAverageValue(data.fearGreed.historical, days, 'value');
+    const fearGreedAvg = this.getAverageValue(
+      data.fearGreed.historical,
+      days,
+      'value',
+    );
     const spyChange = this.getPercentChange(data.spy.historical, days, 'price');
     const vixAvg = this.getAverageValue(data.vix.historical, days, 'value');
 
     // Use same scoring logic but with historical averages
     const fearGreedScore = Math.round(fearGreedAvg);
-    const marketScore = Math.max(0, Math.min(100, 50 + (spyChange * 10)));
-    const volatilityScore = vixAvg <= 15 ? 80 + ((15 - vixAvg) / 5) * 20 : 
-                           vixAvg <= 25 ? 40 + ((25 - vixAvg) / 10) * 40 : 
-                           Math.max(0, 40 - ((vixAvg - 25) / 15) * 40);
+    const marketScore = Math.max(0, Math.min(100, 50 + spyChange * 10));
+    const volatilityScore =
+      vixAvg <= 15
+        ? 80 + ((15 - vixAvg) / 5) * 20
+        : vixAvg <= 25
+          ? 40 + ((25 - vixAvg) / 10) * 40
+          : Math.max(0, 40 - ((vixAvg - 25) / 15) * 40);
 
     const compositeScore = Math.round(
-      fearGreedScore * 0.4 + marketScore * 0.4 + volatilityScore * 0.2
+      fearGreedScore * 0.4 + marketScore * 0.4 + volatilityScore * 0.2,
     );
 
     return {
       score: compositeScore,
       sentiment: this.getSentimentLabel(compositeScore),
       message: this.getSentimentMessage(compositeScore),
-      trend: this.calculateTrend(data, days)
+      trend: this.calculateTrend(data, days),
     };
   }
 
@@ -52,13 +58,15 @@ export class TimeframeAnalyzer {
    */
   calculateTrend(data, days) {
     // Simple trend calculation based on fear/greed movement
-    const values = data.fearGreed.historical.slice(0, days).map(item => item.value);
+    const values = data.fearGreed.historical
+      .slice(0, days)
+      .map((item) => item.value);
     if (values.length < 2) return 'neutral';
-    
+
     const start = values[values.length - 1];
     const end = values[0];
     const change = end - start;
-    
+
     if (change > 5) return 'improving';
     if (change < -5) return 'deteriorating';
     return 'stable';

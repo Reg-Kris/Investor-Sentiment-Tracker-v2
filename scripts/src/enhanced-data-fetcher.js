@@ -26,30 +26,34 @@ mkdirSync(CACHE_DIR, { recursive: true });
 class EnhancedFinancialDataFetcher {
   constructor() {
     console.log('🚀 Initializing enhanced financial data fetcher...');
-    
+
     // Initialize existing components
     this.cache = new CacheManager(CACHE_DIR);
     this.circuitBreaker = new CircuitBreaker();
     this.mock = new MockDataGenerator();
-    
+
     // Initialize enhanced modules
     this.logger = new EnhancedLogger();
     this.yahooFetcher = new YahooFinanceFetcher(this.mock);
-    this.alphaVantageFetcher = new AlphaVantageFetcher(CONFIG.alphaVantageKey, this.mock);
+    this.alphaVantageFetcher = new AlphaVantageFetcher(
+      CONFIG.alphaVantageKey,
+      this.mock,
+    );
     this.sentimentAnalyzer = new MarketSentimentAnalyzer();
     this.marketFetcher = new EnhancedMarketFetcher(
       this.yahooFetcher,
       this.alphaVantageFetcher,
       this.sentimentAnalyzer,
-      this.mock
+      this.mock,
     );
-    
+
     this.validateSetup();
   }
 
   validateSetup() {
-    const hasAlphaVantageKey = CONFIG.alphaVantageKey && CONFIG.alphaVantageKey !== 'demo';
-    
+    const hasAlphaVantageKey =
+      CONFIG.alphaVantageKey && CONFIG.alphaVantageKey !== 'demo';
+
     this.logger.logSetupValidation(hasAlphaVantageKey);
     this.alphaVantageFetcher.validateSetup();
   }
@@ -81,19 +85,21 @@ class EnhancedFinancialDataFetcher {
 
   async fetchAllMarketData() {
     const results = await this.marketFetcher.fetchAllMarketData();
-    
+
     // Save enhanced data with execution summary
     const executionSummary = this.logger.createExecutionSummary(results);
     results.execution = executionSummary;
-    
+
     writeFileSync(
       join(DATA_DIR, 'market-data.json'),
-      JSON.stringify(results, null, 2)
+      JSON.stringify(results, null, 2),
     );
 
-    this.logger.logSuccess('Enhanced market data saved to public/data/market-data.json');
+    this.logger.logSuccess(
+      'Enhanced market data saved to public/data/market-data.json',
+    );
     this.logger.logEnhancedSummary(results);
-    
+
     return results;
   }
 
@@ -124,7 +130,7 @@ class EnhancedFinancialDataFetcher {
   }
 
   async sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 

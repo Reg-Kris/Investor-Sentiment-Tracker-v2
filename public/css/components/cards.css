@@ -26,7 +26,11 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  background: linear-gradient(
+    90deg,
+    var(--accent-primary),
+    var(--accent-secondary)
+  );
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -122,11 +126,11 @@
 }
 
 /* Trend animations */
-.indicator-card[data-trend="up"] .trend-line {
+.indicator-card[data-trend='up'] .trend-line {
   animation: slideUp 1s ease-out;
 }
 
-.indicator-card[data-trend="down"] .trend-line {
+.indicator-card[data-trend='down'] .trend-line {
   animation: slideDown 1s ease-out;
 }
 
@@ -166,10 +170,24 @@
 }
 
 /* Staggered animation for cards */
-.indicator-card:nth-child(1) { animation-delay: 0.1s; }
-.indicator-card:nth-child(2) { animation-delay: 0.2s; }
-.indicator-card:nth-child(3) { animation-delay: 0.3s; }
-.indicator-card:nth-child(4) { animation-delay: 0.4s; }
-.indicator-card:nth-child(5) { animation-delay: 0.5s; }
-.indicator-card:nth-child(6) { animation-delay: 0.6s; }
-.indicator-card:nth-child(7) { animation-delay: 0.7s; }
+.indicator-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.indicator-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.indicator-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.indicator-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.indicator-card:nth-child(5) {
+  animation-delay: 0.5s;
+}
+.indicator-card:nth-child(6) {
+  animation-delay: 0.6s;
+}
+.indicator-card:nth-child(7) {
+  animation-delay: 0.7s;
+}

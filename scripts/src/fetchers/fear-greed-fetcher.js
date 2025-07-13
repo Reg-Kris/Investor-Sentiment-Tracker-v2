@@ -12,14 +12,14 @@ export class FearGreedFetcher {
   async fetch() {
     try {
       console.log('📊 Fetching Fear & Greed Index...');
-      
+
       const endpoints = [
         {
           url: 'https://fear-and-greed-index.p.rapidapi.com/v1/fgi',
-          parser: 'fgi_v1'
-        }
+          parser: 'fgi_v1',
+        },
       ];
-      
+
       let data = null;
       for (const endpoint of endpoints) {
         try {
@@ -30,14 +30,19 @@ export class FearGreedFetcher {
 
           const cached = this.cacheManager.get(`fear-greed-${endpoint.parser}`);
           if (cached) {
-            console.log(`📦 Using cached data for fear-greed-${endpoint.parser}`);
+            console.log(
+              `📦 Using cached data for fear-greed-${endpoint.parser}`,
+            );
             return cached;
           }
 
           console.log(`🔄 Trying ${endpoint.url}...`);
           const urlObj = new URL(endpoint.url);
-          const headers = this.httpClient.buildRapidApiHeaders(this.rapidApiKey, urlObj.hostname);
-          
+          const headers = this.httpClient.buildRapidApiHeaders(
+            this.rapidApiKey,
+            urlObj.hostname,
+          );
+
           data = await this.httpClient.fetchWithRetry(endpoint.url, 2, headers);
           if (data) {
             data._parser = endpoint.parser;
@@ -50,12 +55,12 @@ export class FearGreedFetcher {
           continue;
         }
       }
-      
+
       if (!data) {
         console.warn('🔄 Using mock Fear & Greed data');
         return MockDataProvider.getFearGreed();
       }
-      
+
       const result = this.parseResponse(data);
       this.cacheManager.set(`fear-greed-${data._parser}`, result);
       return result;
@@ -68,32 +73,58 @@ export class FearGreedFetcher {
   parseResponse(data) {
     let historical;
     let currentValue = 50;
-    
+
     if (data._parser === 'fgi_v1') {
       if (data.fgi?.now?.value) {
         currentValue = data.fgi.now.value;
-        
+
         const timePoints = [
-          { date: new Date().toISOString().split('T')[0], value: data.fgi.now.value, rating: data.fgi.now.valueText },
-          { date: new Date(Date.now() - 86400000).toISOString().split('T')[0], value: data.fgi.previousClose?.value || currentValue, rating: data.fgi.previousClose?.valueText || 'Unknown' },
-          { date: new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0], value: data.fgi.oneWeekAgo?.value || currentValue, rating: data.fgi.oneWeekAgo?.valueText || 'Unknown' },
-          { date: new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0], value: data.fgi.oneMonthAgo?.value || currentValue, rating: data.fgi.oneMonthAgo?.valueText || 'Unknown' }
+          {
+            date: new Date().toISOString().split('T')[0],
+            value: data.fgi.now.value,
+            rating: data.fgi.now.valueText,
+          },
+          {
+            date: new Date(Date.now() - 86400000).toISOString().split('T')[0],
+            value: data.fgi.previousClose?.value || currentValue,
+            rating: data.fgi.previousClose?.valueText || 'Unknown',
+          },
+          {
+            date: new Date(Date.now() - 7 * 86400000)
+              .toISOString()
+              .split('T')[0],
+            value: data.fgi.oneWeekAgo?.value || currentValue,
+            rating: data.fgi.oneWeekAgo?.valueText || 'Unknown',
+          },
+          {
+            date: new Date(Date.now() - 30 * 86400000)
+              .toISOString()
+              .split('T')[0],
+            value: data.fgi.oneMonthAgo?.value || currentValue,
+            rating: data.fgi.oneMonthAgo?.valueText || 'Unknown',
+          },
         ];
-        
+
         historical = DataGenerators.interpolateHistoricalData(timePoints, 30);
       } else {
         currentValue = data.fgi?.value || data.value || 50;
-        historical = DataGenerators.generateHistoricalFromCurrent(currentValue, 'fear-greed');
+        historical = DataGenerators.generateHistoricalFromCurrent(
+          currentValue,
+          'fear-greed',
+        );
       }
     } else {
       currentValue = data.value || data.score || data.fgi?.value || 50;
-      historical = DataGenerators.generateHistoricalFromCurrent(currentValue, 'fear-greed');
+      historical = DataGenerators.generateHistoricalFromCurrent(
+        currentValue,
+        'fear-greed',
+      );
     }
 
     return {
       current: historical[0],
       historical,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
   }
 }

@@ -8,7 +8,9 @@ export class CelebrationEffects {
   }
 
   celebrate(): void {
-    const floatingContainer = this.container.querySelector('.floating-elements-container') as HTMLElement;
+    const floatingContainer = this.container.querySelector(
+      '.floating-elements-container',
+    ) as HTMLElement;
     if (!floatingContainer) return;
 
     for (let i = 0; i < 30; i++) {
@@ -24,7 +26,7 @@ export class CelebrationEffects {
         pointer-events: none;
         z-index: 10;
       `;
-      
+
       floatingContainer.appendChild(particle);
 
       anime({
@@ -36,7 +38,7 @@ export class CelebrationEffects {
         scale: [0, 1, 0],
         duration: 2000,
         easing: 'easeOutCubic',
-        complete: () => particle.remove()
+        complete: () => particle.remove(),
       });
     }
   }

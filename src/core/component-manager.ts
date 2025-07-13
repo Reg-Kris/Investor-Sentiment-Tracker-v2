@@ -18,10 +18,19 @@ export class ComponentManager {
   private currentTimeframe: TimeFrame = '1d';
 
   initialize(data: SentimentData): void {
-    this.components.cluster = IndicatorSetup.setupSentimentCluster(data, this.currentTimeframe);
-    this.components.cards = IndicatorSetup.setupIndicatorCards(data, this.currentTimeframe);
-    
-    const enhancedComponents = EnhancedSetup.setupEnhancedComponents(data, this.currentTimeframe);
+    this.components.cluster = IndicatorSetup.setupSentimentCluster(
+      data,
+      this.currentTimeframe,
+    );
+    this.components.cards = IndicatorSetup.setupIndicatorCards(
+      data,
+      this.currentTimeframe,
+    );
+
+    const enhancedComponents = EnhancedSetup.setupEnhancedComponents(
+      data,
+      this.currentTimeframe,
+    );
     this.components.enhancedHero = enhancedComponents.enhancedHero;
     this.components.enhancedFooter = enhancedComponents.enhancedFooter;
     this.components.enhancedCards = enhancedComponents.enhancedCards;
@@ -31,13 +40,16 @@ export class ComponentManager {
     ComponentUpdater.updateComponents(
       { cluster: this.components.cluster, cards: this.components.cards },
       data,
-      this.currentTimeframe
+      this.currentTimeframe,
     );
-    
+
     ComponentUpdater.updateEnhancedComponents(
-      { enhancedHero: this.components.enhancedHero, enhancedCards: this.components.enhancedCards },
+      {
+        enhancedHero: this.components.enhancedHero,
+        enhancedCards: this.components.enhancedCards,
+      },
       data,
-      this.currentTimeframe
+      this.currentTimeframe,
     );
   }
 
@@ -48,5 +60,4 @@ export class ComponentManager {
   getComponents() {
     return this.components;
   }
-
 }

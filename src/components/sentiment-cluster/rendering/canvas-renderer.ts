@@ -19,7 +19,7 @@ export class CanvasRenderer {
 
   constructor(
     ctx: CanvasRenderingContext2D,
-    config: Partial<CanvasRendererConfig> = {}
+    config: Partial<CanvasRendererConfig> = {},
   ) {
     this.ctx = ctx;
     this.config = {
@@ -29,7 +29,7 @@ export class CanvasRenderer {
       needleLength: 70,
       segmentWidth: 8,
       centerOffsetY: 20,
-      ...config
+      ...config,
     };
   }
 
@@ -40,7 +40,7 @@ export class CanvasRenderer {
   public getCenterPosition(): { x: number; y: number } {
     return {
       x: this.config.width / 2,
-      y: this.config.height - this.config.centerOffsetY
+      y: this.config.height - this.config.centerOffsetY,
     };
   }
 
@@ -50,7 +50,7 @@ export class CanvasRenderer {
 
   public drawGaugeBackground(): void {
     const { x: centerX, y: centerY } = this.getCenterPosition();
-    
+
     this.ctx.beginPath();
     this.ctx.arc(centerX, centerY, this.config.radius, Math.PI, 0);
     this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
@@ -63,21 +63,21 @@ export class CanvasRenderer {
     const segments: GaugeSegment[] = [
       { start: 180, end: 150, color: '#dc2626' }, // Extreme Fear
       { start: 150, end: 120, color: '#ea580c' }, // Fear
-      { start: 120, end: 90, color: '#d97706' },  // Mild Fear
-      { start: 90, end: 70, color: '#65a30d' },   // Neutral
-      { start: 70, end: 45, color: '#16a34a' },   // Mild Greed
-      { start: 45, end: 15, color: '#059669' },   // Greed
-      { start: 15, end: 0, color: '#047857' }     // Extreme Greed
+      { start: 120, end: 90, color: '#d97706' }, // Mild Fear
+      { start: 90, end: 70, color: '#65a30d' }, // Neutral
+      { start: 70, end: 45, color: '#16a34a' }, // Mild Greed
+      { start: 45, end: 15, color: '#059669' }, // Greed
+      { start: 15, end: 0, color: '#047857' }, // Extreme Greed
     ];
 
-    segments.forEach(segment => {
+    segments.forEach((segment) => {
       this.ctx.beginPath();
       this.ctx.arc(
-        centerX, 
-        centerY, 
-        this.config.radius, 
-        (segment.start * Math.PI) / 180, 
-        (segment.end * Math.PI) / 180
+        centerX,
+        centerY,
+        this.config.radius,
+        (segment.start * Math.PI) / 180,
+        (segment.end * Math.PI) / 180,
       );
       this.ctx.strokeStyle = segment.color;
       this.ctx.lineWidth = this.config.segmentWidth;
@@ -113,7 +113,7 @@ export class CanvasRenderer {
 
   public drawCenterCircle(): void {
     const { x: centerX, y: centerY } = this.getCenterPosition();
-    
+
     this.ctx.beginPath();
     this.ctx.arc(centerX, centerY, 8, 0, 2 * Math.PI);
     this.ctx.fillStyle = '#ffffff';
@@ -122,17 +122,17 @@ export class CanvasRenderer {
 
   public drawLabels(): void {
     const { x: centerX, y: centerY } = this.getCenterPosition();
-    
+
     this.ctx.font = '12px JetBrains Sans, sans-serif';
     this.ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
     this.ctx.textAlign = 'center';
 
     // Left label (Fear)
     this.ctx.fillText('FEAR', centerX - this.config.radius + 20, centerY + 15);
-    
+
     // Right label (Greed)
     this.ctx.fillText('GREED', centerX + this.config.radius - 20, centerY + 15);
-    
+
     // Center label (Neutral)
     this.ctx.fillText('NEUTRAL', centerX, centerY + 30);
   }

@@ -8,7 +8,7 @@ export class DataGenerators {
       return {
         date: format(subDays(new Date(), i), 'yyyy-MM-dd'),
         value: Math.round(Math.max(0, Math.min(100, value)) * 100) / 100,
-        rating: type === 'fear-greed' ? this.getValueText(value) : undefined
+        rating: type === 'fear-greed' ? this.getValueText(value) : undefined,
       };
     });
   }
@@ -16,14 +16,14 @@ export class DataGenerators {
   static interpolateHistoricalData(timePoints, totalDays) {
     const historical = [];
     timePoints.sort((a, b) => new Date(b.date) - new Date(a.date));
-    
+
     for (let i = 0; i < totalDays; i++) {
       const targetDate = format(subDays(new Date(), i), 'yyyy-MM-dd');
-      
+
       let value = timePoints[0].value;
       let rating = timePoints[0].rating;
-      
-      const exactMatch = timePoints.find(tp => tp.date === targetDate);
+
+      const exactMatch = timePoints.find((tp) => tp.date === targetDate);
       if (exactMatch) {
         value = exactMatch.value;
         rating = exactMatch.rating;
@@ -33,14 +33,14 @@ export class DataGenerators {
         value = Math.max(0, Math.min(100, baseValue + variance));
         rating = this.getValueText(value);
       }
-      
+
       historical.push({
         date: targetDate,
         value: Math.round(value * 100) / 100,
-        rating
+        rating,
       });
     }
-    
+
     return historical;
   }
 

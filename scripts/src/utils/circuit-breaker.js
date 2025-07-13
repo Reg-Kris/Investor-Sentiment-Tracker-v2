@@ -21,7 +21,7 @@ export class CircuitBreaker {
   getStatus() {
     return {
       activeCircuits: this.failures.size,
-      failures: Array.from(this.failures.entries())
+      failures: Array.from(this.failures.entries()),
     };
   }
 }

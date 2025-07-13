@@ -2,7 +2,6 @@
  * Message and color generation for sentiment indicators
  */
 export class MessageGenerator {
-
   /**
    * Generate Fear & Greed specific messages
    */

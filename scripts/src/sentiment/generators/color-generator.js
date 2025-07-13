@@ -2,7 +2,6 @@
  * Color generation for sentiment indicators
  */
 export class ColorGenerator {
-
   /**
    * Get Fear & Greed color
    */

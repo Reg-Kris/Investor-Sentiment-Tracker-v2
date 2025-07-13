@@ -25,30 +25,35 @@ sentiment-cluster/
 ## Modules
 
 ### AnimationController (`animation/animation-controller.ts`)
+
 - Handles smooth angle interpolation and animation logic
 - Manages animation state and lifecycle
 - Provides callback mechanism for rendering updates
 - **117 lines**
 
 ### CanvasRenderer (`rendering/canvas-renderer.ts`)
+
 - Manages all canvas drawing operations
 - Renders gauge background, segments, needle, and labels
 - Configurable canvas dimensions and styling
 - **147 lines**
 
 ### UIComponents (`ui/ui-components.ts`)
+
 - Handles DOM element creation and management
 - Manages timeframe switcher and sentiment labels
 - Provides utilities for canvas creation and styling
 - **135 lines**
 
 ### SentimentUtils (`core/utils.ts`)
+
 - Utility functions for score/angle conversions
 - Sentiment classification and color mapping
 - Helper functions for validation and interpolation
 - **124 lines**
 
 ### SentimentCluster (`sentiment-cluster.ts`)
+
 - Main coordinating class that uses all modules
 - Maintains the same public API as the original
 - Simplified orchestration logic

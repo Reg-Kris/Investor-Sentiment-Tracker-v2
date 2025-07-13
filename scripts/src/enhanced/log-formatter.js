@@ -10,11 +10,11 @@ export class LogFormatter {
    */
   static formatChange(current) {
     if (!current?.changePercent) return 'N/A';
-    
+
     const change = parseFloat(current.changePercent);
     const sign = change >= 0 ? '+' : '';
     const emoji = change >= 0 ? '📈' : '📉';
-    
+
     return `${sign}${change}% ${emoji}`;
   }
 
@@ -30,9 +30,9 @@ export class LogFormatter {
       'cnn-fear-greed': '😨',
       'mock-data': '🎭',
       'sector-etfs': '🏗️',
-      'international-indices': '🌍'
+      'international-indices': '🌍',
     };
-    
+
     return emojiMap[source] || '📡';
   }
 
@@ -45,11 +45,15 @@ export class LogFormatter {
     const performances = [
       results.spy?.current?.changePercent,
       results.qqq?.current?.changePercent,
-      results.iwm?.current?.changePercent
-    ].filter(p => p !== undefined).map(p => parseFloat(p));
-    
-    return performances.length > 0 
-      ? (performances.reduce((a, b) => a + b, 0) / performances.length).toFixed(2)
+      results.iwm?.current?.changePercent,
+    ]
+      .filter((p) => p !== undefined)
+      .map((p) => parseFloat(p));
+
+    return performances.length > 0
+      ? (performances.reduce((a, b) => a + b, 0) / performances.length).toFixed(
+          2,
+        )
       : null;
   }
 
@@ -60,14 +64,14 @@ export class LogFormatter {
    */
   static getUniqueSources(results) {
     const sources = new Set();
-    
+
     const collectSources = (obj) => {
       if (obj?.metadata?.source) sources.add(obj.metadata.source);
       if (typeof obj === 'object' && obj !== null) {
         Object.values(obj).forEach(collectSources);
       }
     };
-    
+
     collectSources(results);
     return Array.from(sources);
   }
@@ -89,11 +93,13 @@ export class LogFormatter {
    */
   static formatSectorPerformers(performers, isTopPerformers = true) {
     if (!performers || performers.length === 0) return 'None';
-    
-    return performers.map((sector, index) => {
-      const sign = isTopPerformers ? '+' : '';
-      return `    ${index + 1}. ${sector.sector}: ${sign}${sector.performance.toFixed(2)}%`;
-    }).join('\n');
+
+    return performers
+      .map((sector, index) => {
+        const sign = isTopPerformers ? '+' : '';
+        return `    ${index + 1}. ${sector.sector}: ${sign}${sector.performance.toFixed(2)}%`;
+      })
+      .join('\n');
   }
 
   /**

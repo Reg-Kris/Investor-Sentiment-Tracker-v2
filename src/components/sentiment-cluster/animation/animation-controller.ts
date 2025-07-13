@@ -16,7 +16,7 @@ export class AnimationController {
     this.config = {
       interpolationSpeed: 0.1,
       stopThreshold: 0.1,
-      ...config
+      ...config,
     };
   }
 
@@ -100,7 +100,7 @@ export class AnimationController {
   public jumpToTarget(): void {
     this.currentAngle = this.targetAngle;
     this.stopAnimation();
-    
+
     if (this.renderCallback) {
       this.renderCallback(this.currentAngle);
     }
@@ -110,7 +110,7 @@ export class AnimationController {
     this.currentAngle = 0;
     this.targetAngle = 0;
     this.stopAnimation();
-    
+
     if (this.renderCallback) {
       this.renderCallback(this.currentAngle);
     }

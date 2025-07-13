@@ -23,7 +23,7 @@ export class UIComponents {
       width: 300,
       height: 200,
       maxWidth: '300px',
-      ...config
+      ...config,
     };
 
     const canvas = document.createElement('canvas');
@@ -38,15 +38,17 @@ export class UIComponents {
 
   public createTimeframeSwitcher(
     config: TimeframeSwitcherConfig,
-    onTimeframeChange: (timeframe: TimeFrame) => void
+    onTimeframeChange: (timeframe: TimeFrame) => void,
   ): HTMLElement {
     const switcher = document.createElement('div');
     switcher.className = 'timeframe-switcher';
 
-    const buttons = config.timeframes.map(tf => {
-      const isActive = tf.value === config.activeTimeframe;
-      return `<button class="timeframe-btn ${isActive ? 'active' : ''}" data-timeframe="${tf.value}">${tf.label}</button>`;
-    }).join('');
+    const buttons = config.timeframes
+      .map((tf) => {
+        const isActive = tf.value === config.activeTimeframe;
+        return `<button class="timeframe-btn ${isActive ? 'active' : ''}" data-timeframe="${tf.value}">${tf.label}</button>`;
+      })
+      .join('');
 
     switcher.innerHTML = buttons;
 
@@ -63,14 +65,19 @@ export class UIComponents {
   }
 
   public updateActiveTimeframeButton(timeframe: TimeFrame): void {
-    this.container.querySelectorAll('.timeframe-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.getAttribute('data-timeframe') === timeframe);
+    this.container.querySelectorAll('.timeframe-btn').forEach((btn) => {
+      btn.classList.toggle(
+        'active',
+        btn.getAttribute('data-timeframe') === timeframe,
+      );
     });
   }
 
   public createOrUpdateSentimentScore(score: number): HTMLElement {
-    let sentimentElement = this.container.querySelector('.sentiment-score') as HTMLElement;
-    
+    let sentimentElement = this.container.querySelector(
+      '.sentiment-score',
+    ) as HTMLElement;
+
     if (!sentimentElement) {
       sentimentElement = document.createElement('div');
       sentimentElement.className = 'sentiment-score';
@@ -82,8 +89,10 @@ export class UIComponents {
   }
 
   public createOrUpdateSentimentMessage(message: string): HTMLElement {
-    let messageElement = this.container.querySelector('.sentiment-message') as HTMLElement;
-    
+    let messageElement = this.container.querySelector(
+      '.sentiment-message',
+    ) as HTMLElement;
+
     if (!messageElement) {
       messageElement = document.createElement('div');
       messageElement.className = 'sentiment-message';
@@ -123,14 +132,16 @@ export class UIComponents {
     this.updateSentimentClass(score);
   }
 
-  public getDefaultTimeframeSwitcherConfig(activeTimeframe: TimeFrame): TimeframeSwitcherConfig {
+  public getDefaultTimeframeSwitcherConfig(
+    activeTimeframe: TimeFrame,
+  ): TimeframeSwitcherConfig {
     return {
       timeframes: [
         { value: '1d', label: '1D' },
         { value: '5d', label: '5D' },
-        { value: '1m', label: '1M' }
+        { value: '1m', label: '1M' },
       ],
-      activeTimeframe
+      activeTimeframe,
     };
   }
 }

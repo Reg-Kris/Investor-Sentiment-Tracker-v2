@@ -12,12 +12,12 @@ export class StockFetcher {
   async fetch(symbol) {
     try {
       console.log(`📈 Fetching ${symbol} data...`);
-      
+
       const endpoints = [
         `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&outputsize=compact&apikey=${this.alphaVantageKey}`,
         `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=1mo&interval=1d`,
       ];
-      
+
       for (const [index, endpoint] of endpoints.entries()) {
         try {
           if (this.circuitBreaker.isOpen(endpoint)) {
@@ -32,7 +32,7 @@ export class StockFetcher {
           }
 
           const data = await this.httpClient.fetchWithRetry(endpoint, 2);
-          
+
           let result;
           if (data['Time Series (Daily)']) {
             result = DataParsers.parseAlphaVantageData(data, symbol);
@@ -46,12 +46,15 @@ export class StockFetcher {
           this.cacheManager.set(`${symbol}-${index}`, result);
           return result;
         } catch (error) {
-          console.warn(`${symbol} endpoint ${index + 1} failed:`, error.message);
+          console.warn(
+            `${symbol} endpoint ${index + 1} failed:`,
+            error.message,
+          );
           this.circuitBreaker.recordFailure(endpoint);
           continue;
         }
       }
-      
+
       throw new Error(`All ${symbol} endpoints failed`);
     } catch (error) {
       console.error(`❌ ${symbol} fetch completely failed:`, error.message);

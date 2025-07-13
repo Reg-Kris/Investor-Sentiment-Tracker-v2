@@ -20,11 +20,11 @@ export class EnhancedHero {
       throw new Error(`Hero container with id "${containerId}" not found`);
     }
     this.container = container;
-    
+
     // Initialize modules
     this.backgroundEffects = new BackgroundEffects(this.container);
     this.animations = new HeroAnimations(this.container);
-    
+
     this.init();
   }
 
@@ -38,7 +38,7 @@ export class EnhancedHero {
     // Create background particles and floating elements
     const particles = this.backgroundEffects.createParticleBackground();
     this.backgroundEffects.createFloatingElements();
-    
+
     // Initialize particle system with created particles
     this.particleSystem = new ParticleSystem(particles);
   }
@@ -48,16 +48,16 @@ export class EnhancedHero {
     if ('IntersectionObserver' in window) {
       this.observer = new IntersectionObserver(
         (entries) => {
-          entries.forEach(entry => {
+          entries.forEach((entry) => {
             if (entry.isIntersecting && !this.isVisible) {
               this.isVisible = true;
               this.animateIn();
             }
           });
         },
-        { threshold: 0.1 }
+        { threshold: 0.1 },
       );
-      
+
       this.observer.observe(this.container);
     } else {
       // Fallback for older browsers
@@ -67,7 +67,9 @@ export class EnhancedHero {
   }
 
   private setupHoverEffects(): void {
-    const heroWrapper = this.container.querySelector('.sentiment-cluster-wrapper') as HTMLElement;
+    const heroWrapper = this.container.querySelector(
+      '.sentiment-cluster-wrapper',
+    ) as HTMLElement;
     if (!heroWrapper) return;
 
     heroWrapper.addEventListener('mouseenter', () => {
@@ -90,7 +92,7 @@ export class EnhancedHero {
 
   private animateIn(): void {
     const timeline = this.animations.animateIn();
-    
+
     // Start particle animations after main animation
     timeline.call(() => {
       this.particleSystem.startContinuousAnimation();
@@ -108,23 +110,25 @@ export class EnhancedHero {
   }
 
   public updateSentiment(sentimentValue: number): void {
-    const sentimentColor = this.animations.getColorFromSentiment(sentimentValue);
-    
+    const sentimentColor =
+      this.animations.getColorFromSentiment(sentimentValue);
+
     // Update particle colors using animations module
     const particles = this.particleSystem.getParticles();
     this.animations.updateParticleColors(particles, sentimentColor);
-    
+
     // Update background gradient
     this.animations.updateBackgroundGradient(sentimentValue);
   }
 
   public celebrate(): void {
-    const celebrationContainer = this.backgroundEffects.createCelebrationParticles();
+    const celebrationContainer =
+      this.backgroundEffects.createCelebrationParticles();
     this.container.appendChild(celebrationContainer);
-    
+
     // Animate celebration particles
     this.particleSystem.animateCelebration(celebrationContainer);
-    
+
     // Remove celebration container after animation
     setTimeout(() => {
       if (celebrationContainer.parentNode) {
@@ -137,7 +141,7 @@ export class EnhancedHero {
     if (this.observer) {
       this.observer.disconnect();
     }
-    
+
     // Clean up all modules
     this.particleSystem.destroy();
     this.backgroundEffects.destroy();

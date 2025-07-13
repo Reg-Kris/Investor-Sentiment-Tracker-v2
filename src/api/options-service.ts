@@ -14,10 +14,12 @@ export class OptionsService {
 
       for (const symbol of symbols) {
         let symbolSuccess = false;
-        
+
         for (const baseUrl of endpoints) {
           try {
-            const response = await fetch(`${API_CONFIG.CORS_PROXY}${baseUrl}${symbol}`);
+            const response = await fetch(
+              `${API_CONFIG.CORS_PROXY}${baseUrl}${symbol}`,
+            );
             if (!response.ok) continue;
 
             const data = await response.json();
@@ -41,7 +43,10 @@ export class OptionsService {
             symbolSuccess = true;
             break; // Success, move to next symbol
           } catch (error) {
-            console.warn(`Failed to fetch ${symbol} from ${baseUrl}:`, (error as Error).message);
+            console.warn(
+              `Failed to fetch ${symbol} from ${baseUrl}:`,
+              (error as Error).message,
+            );
             continue; // Try next endpoint
           }
         }
@@ -57,8 +62,9 @@ export class OptionsService {
         }
       }
 
-      const ratio = totalMarketCalls > 0 ? totalMarketPuts / totalMarketCalls : 0.9;
-      
+      const ratio =
+        totalMarketCalls > 0 ? totalMarketPuts / totalMarketCalls : 0.9;
+
       // Create sentiment message based on ratio
       let sentiment = 'Neutral';
       let color = '#6b7280';
@@ -95,7 +101,10 @@ export class OptionsService {
         data: putCallData,
       };
     } catch (error) {
-      console.warn('Market Put/Call ratio calculation failed completely:', error);
+      console.warn(
+        'Market Put/Call ratio calculation failed completely:',
+        error,
+      );
       return {
         success: true,
         data: {
@@ -104,7 +113,8 @@ export class OptionsService {
           callVolume: 210000,
           sentiment: 'Neutral',
           color: '#6b7280',
-          message: 'Market options sentiment unavailable - using neutral estimate',
+          message:
+            'Market options sentiment unavailable - using neutral estimate',
           successfulFetches: 0,
           totalSymbols: 3,
         },

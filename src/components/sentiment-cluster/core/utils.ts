@@ -9,7 +9,7 @@ export class SentimentUtils {
   static scoreToAngle(score: number): number {
     // Clamp score to valid range
     const clampedScore = Math.max(0, Math.min(100, score));
-    
+
     // Convert: 0 = -90°, 50 = 0°, 100 = +90°
     return ((clampedScore - 50) / 50) * 90;
   }
@@ -22,9 +22,9 @@ export class SentimentUtils {
   static angleToScore(angle: number): number {
     // Clamp angle to valid range
     const clampedAngle = Math.max(-90, Math.min(90, angle));
-    
+
     // Convert: -90° = 0, 0° = 50, +90° = 100
-    return ((clampedAngle / 90) * 50) + 50;
+    return (clampedAngle / 90) * 50 + 50;
   }
 
   /**
@@ -120,7 +120,11 @@ export class SentimentUtils {
    * @param tolerance Tolerance for comparison (default: 0.001)
    * @returns True if values are approximately equal
    */
-  static approximately(a: number, b: number, tolerance: number = 0.001): boolean {
+  static approximately(
+    a: number,
+    b: number,
+    tolerance: number = 0.001,
+  ): boolean {
     return Math.abs(a - b) < tolerance;
   }
 }

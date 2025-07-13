@@ -16,8 +16,10 @@ export class EnhancedLogger {
   logSetupValidation(hasAlphaVantageKey) {
     console.log('🔑 Financial API Setup:');
     console.log(`  Yahoo Finance: ✅ (no key required)`);
-    console.log(`  Alpha Vantage: ${hasAlphaVantageKey ? '✅' : '⚠️  demo key'}`);
-    
+    console.log(
+      `  Alpha Vantage: ${hasAlphaVantageKey ? '✅' : '⚠️  demo key'}`,
+    );
+
     if (!hasAlphaVantageKey) {
       console.warn('⚠️  Using demo Alpha Vantage key - expect limited data');
     }
@@ -72,37 +74,55 @@ export class EnhancedLogger {
    */
   logEnhancedSummary(results) {
     const elapsed = LogFormatter.formatExecutionTime(this.startTime);
-    
+
     console.log('📈 Enhanced Data Summary:');
     console.log(`  ⏱️  Fetch time: ${elapsed}`);
     console.log(`  📊 Data version: ${results.version}`);
     console.log('');
-    
+
     // Market Sentiment
     this.logSentimentSummary(results.sentiment);
     console.log('');
-    
+
     // Core Indicators
     console.log('📈 Core Market Indicators:');
-    console.log(`  Fear & Greed: ${results.fearGreed?.current?.value || 'N/A'} (${results.fearGreed?.current?.rating || 'N/A'})`);
-    console.log(`  VIX: ${results.vix?.current?.value || 'N/A'} (${results.vix?.interpretation || 'N/A'})`);
+    console.log(
+      `  Fear & Greed: ${results.fearGreed?.current?.value || 'N/A'} (${results.fearGreed?.current?.rating || 'N/A'})`,
+    );
+    console.log(
+      `  VIX: ${results.vix?.current?.value || 'N/A'} (${results.vix?.interpretation || 'N/A'})`,
+    );
     console.log('');
-    
+
     // Major ETFs
     console.log('📊 Major ETFs:');
-    console.log(`  SPY: $${results.spy?.current?.price || 'N/A'} (${LogFormatter.formatChange(results.spy?.current)})`);
-    console.log(`  QQQ: $${results.qqq?.current?.price || 'N/A'} (${LogFormatter.formatChange(results.qqq?.current)})`);
-    console.log(`  IWM: $${results.iwm?.current?.price || 'N/A'} (${LogFormatter.formatChange(results.iwm?.current)})`);
+    console.log(
+      `  SPY: $${results.spy?.current?.price || 'N/A'} (${LogFormatter.formatChange(results.spy?.current)})`,
+    );
+    console.log(
+      `  QQQ: $${results.qqq?.current?.price || 'N/A'} (${LogFormatter.formatChange(results.qqq?.current)})`,
+    );
+    console.log(
+      `  IWM: $${results.iwm?.current?.price || 'N/A'} (${LogFormatter.formatChange(results.iwm?.current)})`,
+    );
     console.log('');
-    
+
     // Crypto & Commodities
     console.log('₿ Digital Assets & Commodities:');
-    console.log(`  Bitcoin: $${results.cryptocurrency?.bitcoin?.current?.price || 'N/A'} (${LogFormatter.formatChange(results.cryptocurrency?.bitcoin?.current)})`);
-    console.log(`  Ethereum: $${results.cryptocurrency?.ethereum?.current?.price || 'N/A'} (${LogFormatter.formatChange(results.cryptocurrency?.ethereum?.current)})`);
-    console.log(`  Gold: $${results.commodities?.gold?.current?.price || 'N/A'} (${LogFormatter.formatChange(results.commodities?.gold?.current)})`);
-    console.log(`  Oil: $${results.commodities?.oil?.current?.price || 'N/A'} (${LogFormatter.formatChange(results.commodities?.oil?.current)})`);
+    console.log(
+      `  Bitcoin: $${results.cryptocurrency?.bitcoin?.current?.price || 'N/A'} (${LogFormatter.formatChange(results.cryptocurrency?.bitcoin?.current)})`,
+    );
+    console.log(
+      `  Ethereum: $${results.cryptocurrency?.ethereum?.current?.price || 'N/A'} (${LogFormatter.formatChange(results.cryptocurrency?.ethereum?.current)})`,
+    );
+    console.log(
+      `  Gold: $${results.commodities?.gold?.current?.price || 'N/A'} (${LogFormatter.formatChange(results.commodities?.gold?.current)})`,
+    );
+    console.log(
+      `  Oil: $${results.commodities?.oil?.current?.price || 'N/A'} (${LogFormatter.formatChange(results.commodities?.oil?.current)})`,
+    );
     console.log('');
-    
+
     // Data Sources
     this.logDataSources(results);
   }
@@ -113,20 +133,26 @@ export class EnhancedLogger {
    */
   logSentimentSummary(sentiment) {
     if (!sentiment) return;
-    
+
     console.log('🎯 Market Sentiment Analysis:');
     console.log(`  Score: ${sentiment.score}/100 (${sentiment.rating})`);
-    
+
     if (sentiment.components) {
       console.log('  Components:');
       if (sentiment.components.fearGreed) {
-        console.log(`    Fear & Greed: ${sentiment.components.fearGreed.value} (${(sentiment.components.fearGreed.weight * 100)}% weight)`);
+        console.log(
+          `    Fear & Greed: ${sentiment.components.fearGreed.value} (${sentiment.components.fearGreed.weight * 100}% weight)`,
+        );
       }
       if (sentiment.components.vix) {
-        console.log(`    VIX Impact: ${sentiment.components.vix.value.toFixed(2)} (${(sentiment.components.vix.weight * 100)}% weight)`);
+        console.log(
+          `    VIX Impact: ${sentiment.components.vix.value.toFixed(2)} (${sentiment.components.vix.weight * 100}% weight)`,
+        );
       }
       if (sentiment.components.marketPerformance) {
-        console.log(`    Market Perf: ${sentiment.components.marketPerformance.avgPerformance?.toFixed(2)}% avg (${(sentiment.components.marketPerformance.weight * 100)}% weight)`);
+        console.log(
+          `    Market Perf: ${sentiment.components.marketPerformance.avgPerformance?.toFixed(2)}% avg (${sentiment.components.marketPerformance.weight * 100}% weight)`,
+        );
       }
     }
   }
@@ -137,13 +163,12 @@ export class EnhancedLogger {
    */
   logDataSources(results) {
     const sources = LogFormatter.getUniqueSources(results);
-    
+
     console.log('📡 Data Sources:');
-    sources.forEach(source => {
+    sources.forEach((source) => {
       console.log(`  ${LogFormatter.getSourceEmoji(source)} ${source}`);
     });
   }
-
 
   /**
    * Log performance metrics
@@ -164,21 +189,27 @@ export class EnhancedLogger {
    */
   logSectorAnalysis(sectorData) {
     if (!sectorData?.analysis) return;
-    
+
     const { analysis } = sectorData;
-    
+
     console.log('🏗️ Sector Performance:');
-    console.log(`  Market breadth: ${LogFormatter.formatMarketBreadth(analysis.breadth)}`);
+    console.log(
+      `  Market breadth: ${LogFormatter.formatMarketBreadth(analysis.breadth)}`,
+    );
     console.log(`  Average: ${analysis.averagePerformance}%`);
-    
+
     if (analysis.topPerformers?.length > 0) {
       console.log('  🥇 Top performers:');
-      console.log(LogFormatter.formatSectorPerformers(analysis.topPerformers, true));
+      console.log(
+        LogFormatter.formatSectorPerformers(analysis.topPerformers, true),
+      );
     }
-    
+
     if (analysis.bottomPerformers?.length > 0) {
       console.log('  🥉 Bottom performers:');
-      console.log(LogFormatter.formatSectorPerformers(analysis.bottomPerformers, false));
+      console.log(
+        LogFormatter.formatSectorPerformers(analysis.bottomPerformers, false),
+      );
     }
   }
 
@@ -189,7 +220,7 @@ export class EnhancedLogger {
    */
   createExecutionSummary(results) {
     const elapsed = LogFormatter.formatExecutionTime(this.startTime);
-    
+
     return {
       executionTime: elapsed,
       timestamp: new Date().toISOString(),
@@ -198,10 +229,10 @@ export class EnhancedLogger {
         fearGreedIndex: results.fearGreed?.current?.value,
         marketSentiment: results.sentiment?.score,
         vixLevel: results.vix?.current?.value,
-        majorIndicesAvg: LogFormatter.calculateMajorIndicesAverage(results)
+        majorIndicesAvg: LogFormatter.calculateMajorIndicesAverage(results),
       },
       dataSources: LogFormatter.getUniqueSources(results),
-      status: 'completed'
+      status: 'completed',
     };
   }
 }

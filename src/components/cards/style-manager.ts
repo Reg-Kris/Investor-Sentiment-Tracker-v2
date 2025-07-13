@@ -1,17 +1,20 @@
 export class StyleManager {
   static getTrendClass(trend?: string): string {
     if (!trend) return 'neutral';
-    
+
     switch (trend) {
-      case 'up': return 'positive';
-      case 'down': return 'negative';
-      default: return 'neutral';
+      case 'up':
+        return 'positive';
+      case 'down':
+        return 'negative';
+      default:
+        return 'neutral';
     }
   }
 
   static getTrendColor(trend?: string): string {
     const trendClass = this.getTrendClass(trend);
-    
+
     if (trendClass.includes('positive')) return 'rgba(34, 197, 94, 0.8)';
     else if (trendClass.includes('negative')) return 'rgba(239, 68, 68, 0.8)';
     return 'rgba(59, 130, 246, 0.8)';
@@ -20,7 +23,7 @@ export class StyleManager {
   static createMorphingShapeStyle(index: number, color?: string): string {
     const defaultColor = 'rgba(59, 130, 246, 0.3)';
     const shapeColor = color || defaultColor;
-    
+
     return `
       position: absolute;
       width: ${60 + index * 20}px;

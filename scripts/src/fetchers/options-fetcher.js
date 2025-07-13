@@ -10,7 +10,7 @@ export class OptionsFetcher {
   async fetchSingle(symbol) {
     try {
       console.log(`📋 Fetching ${symbol} options data...`);
-      
+
       const cached = this.cacheManager.get(`options-${symbol}`);
       if (cached) {
         console.log(`📦 Using cached options data for ${symbol}`);
@@ -20,7 +20,7 @@ export class OptionsFetcher {
       const endpoints = [
         `https://query1.finance.yahoo.com/v7/finance/options/${symbol}`,
       ];
-      
+
       for (const endpoint of endpoints) {
         try {
           if (this.circuitBreaker.isOpen(endpoint)) {
@@ -29,7 +29,7 @@ export class OptionsFetcher {
           }
 
           const data = await this.httpClient.fetchWithRetry(endpoint, 1);
-          
+
           if (data.optionChain?.result?.[0]) {
             const result = this.parseOptionsData(data, symbol);
             this.circuitBreaker.reset(endpoint);
@@ -42,10 +42,13 @@ export class OptionsFetcher {
           continue;
         }
       }
-      
+
       throw new Error(`All options endpoints failed for ${symbol}`);
     } catch (error) {
-      console.warn(`📋 ${symbol} options fetch failed, using model:`, error.message);
+      console.warn(
+        `📋 ${symbol} options fetch failed, using model:`,
+        error.message,
+      );
       return MockDataProvider.getOptionsData(symbol);
     }
   }
@@ -53,7 +56,7 @@ export class OptionsFetcher {
   async fetchMarketOptions() {
     try {
       console.log('📋 Fetching consolidated market options data...');
-      
+
       const cached = this.cacheManager.get('market-options');
       if (cached) {
         console.log('📦 Using cached market options data');
@@ -72,21 +75,27 @@ export class OptionsFetcher {
 
       for (const symbol of symbols) {
         let symbolSuccess = false;
-        
+
         for (const baseUrl of endpoints) {
           try {
             const url = `${baseUrl}${symbol}`;
             if (this.circuitBreaker.isOpen(url)) continue;
 
             const data = await this.httpClient.fetchWithRetry(url, 1);
-            
+
             if (data.optionChain?.result?.[0]) {
               const optionChain = data.optionChain.result[0];
               const calls = optionChain.options[0].calls || [];
               const puts = optionChain.options[0].puts || [];
 
-              const symbolCallVolume = calls.reduce((sum, call) => sum + (call.volume || 0), 0);
-              const symbolPutVolume = puts.reduce((sum, put) => sum + (put.volume || 0), 0);
+              const symbolCallVolume = calls.reduce(
+                (sum, call) => sum + (call.volume || 0),
+                0,
+              );
+              const symbolPutVolume = puts.reduce(
+                (sum, put) => sum + (put.volume || 0),
+                0,
+              );
 
               totalMarketCalls += symbolCallVolume;
               totalMarketPuts += symbolPutVolume;
@@ -96,7 +105,10 @@ export class OptionsFetcher {
               break;
             }
           } catch (error) {
-            console.warn(`Failed to fetch ${symbol} options from ${baseUrl}:`, error.message);
+            console.warn(
+              `Failed to fetch ${symbol} options from ${baseUrl}:`,
+              error.message,
+            );
             this.circuitBreaker.recordFailure(`${baseUrl}${symbol}`);
             continue;
           }
@@ -112,11 +124,19 @@ export class OptionsFetcher {
         }
       }
 
-      const result = this.buildMarketOptionsResult(totalMarketPuts, totalMarketCalls, successfulFetches, symbols.length);
+      const result = this.buildMarketOptionsResult(
+        totalMarketPuts,
+        totalMarketCalls,
+        successfulFetches,
+        symbols.length,
+      );
       this.cacheManager.set('market-options', result);
       return result;
     } catch (error) {
-      console.warn('📋 Market options fetch failed completely, using fallback:', error.message);
+      console.warn(
+        '📋 Market options fetch failed completely, using fallback:',
+        error.message,
+      );
       return MockDataProvider.getMarketOptionsData();
     }
   }
@@ -126,22 +146,35 @@ export class OptionsFetcher {
     const calls = optionChain.options[0].calls || [];
     const puts = optionChain.options[0].puts || [];
 
-    const totalCallVolume = calls.reduce((sum, call) => sum + (call.volume || 0), 0);
-    const totalPutVolume = puts.reduce((sum, put) => sum + (put.volume || 0), 0);
-    const putCallRatio = totalCallVolume > 0 ? totalPutVolume / totalCallVolume : 1;
+    const totalCallVolume = calls.reduce(
+      (sum, call) => sum + (call.volume || 0),
+      0,
+    );
+    const totalPutVolume = puts.reduce(
+      (sum, put) => sum + (put.volume || 0),
+      0,
+    );
+    const putCallRatio =
+      totalCallVolume > 0 ? totalPutVolume / totalCallVolume : 1;
 
     return {
       symbol,
       putCallRatio: Math.round(putCallRatio * 100) / 100,
       totalCallVolume,
       totalPutVolume,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
   }
 
-  buildMarketOptionsResult(totalMarketPuts, totalMarketCalls, successfulFetches, totalSymbols) {
-    const ratio = totalMarketCalls > 0 ? totalMarketPuts / totalMarketCalls : 0.9;
-    
+  buildMarketOptionsResult(
+    totalMarketPuts,
+    totalMarketCalls,
+    successfulFetches,
+    totalSymbols,
+  ) {
+    const ratio =
+      totalMarketCalls > 0 ? totalMarketPuts / totalMarketCalls : 0.9;
+
     let sentiment = 'neutral';
     if (ratio > 1.2) {
       sentiment = 'very bearish';
@@ -163,7 +196,7 @@ export class OptionsFetcher {
       sentiment,
       successfulFetches,
       totalSymbols,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
   }
 }

@@ -57,7 +57,7 @@ export class GaugeRenderer {
       centerX,
       centerY,
       radius,
-      segments: this.getDefaultSegments()
+      segments: this.getDefaultSegments(),
     };
 
     this.drawGauge(config);
@@ -89,14 +89,14 @@ export class GaugeRenderer {
   }
 
   private drawSegments(config: GaugeConfig): void {
-    config.segments.forEach(segment => {
+    config.segments.forEach((segment) => {
       this.ctx.beginPath();
       this.ctx.arc(
-        config.centerX, 
-        config.centerY, 
-        config.radius, 
-        (segment.start * Math.PI) / 180, 
-        (segment.end * Math.PI) / 180
+        config.centerX,
+        config.centerY,
+        config.radius,
+        (segment.start * Math.PI) / 180,
+        (segment.end * Math.PI) / 180,
       );
       this.ctx.strokeStyle = segment.color;
       this.ctx.lineWidth = 4;
@@ -141,11 +141,11 @@ export class GaugeRenderer {
     return [
       { start: 180, end: 150, color: '#dc2626' }, // Extreme Fear
       { start: 150, end: 120, color: '#ea580c' }, // Fear
-      { start: 120, end: 90, color: '#d97706' },  // Mild Fear
-      { start: 90, end: 70, color: '#65a30d' },   // Neutral
-      { start: 70, end: 45, color: '#16a34a' },   // Mild Greed
-      { start: 45, end: 15, color: '#059669' },   // Greed
-      { start: 15, end: 0, color: '#047857' }     // Extreme Greed
+      { start: 120, end: 90, color: '#d97706' }, // Mild Fear
+      { start: 90, end: 70, color: '#65a30d' }, // Neutral
+      { start: 70, end: 45, color: '#16a34a' }, // Mild Greed
+      { start: 45, end: 15, color: '#059669' }, // Greed
+      { start: 15, end: 0, color: '#047857' }, // Extreme Greed
     ];
   }
 

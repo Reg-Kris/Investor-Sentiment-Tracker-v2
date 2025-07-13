@@ -9,7 +9,7 @@ export class ComponentUpdater {
   static updateComponents(
     components: { cluster?: SentimentCluster; cards: { [key: string]: any } },
     data: SentimentData,
-    timeframe: TimeFrame
+    timeframe: TimeFrame,
   ): void {
     const timeframeData = data.timeframes[timeframe];
 
@@ -19,7 +19,7 @@ export class ComponentUpdater {
         score: timeframeData.score,
         sentiment: timeframeData.sentiment,
         message: timeframeData.message,
-        timeframe
+        timeframe,
       });
     }
 
@@ -33,12 +33,12 @@ export class ComponentUpdater {
   }
 
   static updateEnhancedComponents(
-    components: { 
-      enhancedHero?: EnhancedHero; 
-      enhancedCards: { [key: string]: EnhancedCard } 
+    components: {
+      enhancedHero?: EnhancedHero;
+      enhancedCards: { [key: string]: EnhancedCard };
     },
     data: SentimentData,
-    timeframe: TimeFrame
+    timeframe: TimeFrame,
   ): void {
     const timeframeData = data.timeframes[timeframe];
 
@@ -60,39 +60,74 @@ export class ComponentUpdater {
     });
   }
 
-  private static getCardUpdateData(key: string, data: SentimentData, timeframe: TimeFrame): any {
+  private static getCardUpdateData(
+    key: string,
+    data: SentimentData,
+    timeframe: TimeFrame,
+  ): any {
     const updateData: any = { timeframe };
     const indicators = data.indicators;
     const timeframeData = data.timeframes[timeframe];
 
     if (key === 'spy' || key === 'qqq' || key === 'iwm') {
       const baseIndicator = indicators[key as keyof typeof indicators] as any;
-      const timeframeIndicator = DataService.getIndicatorForTimeframe(data, timeframe, key);
-      
+      const timeframeIndicator = DataService.getIndicatorForTimeframe(
+        data,
+        timeframe,
+        key,
+      );
+
       if (baseIndicator && timeframeIndicator) {
         updateData.value = `$${baseIndicator.price.toFixed(2)}`;
         updateData.change = `${timeframeIndicator.change >= 0 ? '+' : ''}${timeframeIndicator.change.toFixed(2)}%`;
-        updateData.message = MessageGenerators.getMarketMessage(key, timeframeIndicator.change, timeframe);
-        updateData.color = timeframeIndicator.change >= 0 ? '#10b981' : '#ef4444';
-        updateData.score = Math.min(Math.max(((timeframeIndicator.change + 10) / 20) * 100, 0), 100);
+        updateData.message = MessageGenerators.getMarketMessage(
+          key,
+          timeframeIndicator.change,
+          timeframe,
+        );
+        updateData.color =
+          timeframeIndicator.change >= 0 ? '#10b981' : '#ef4444';
+        updateData.score = Math.min(
+          Math.max(((timeframeIndicator.change + 10) / 20) * 100, 0),
+          100,
+        );
       }
     } else if (key === 'vix') {
-      const timeframeVix = DataService.getIndicatorForTimeframe(data, timeframe, 'vix');
+      const timeframeVix = DataService.getIndicatorForTimeframe(
+        data,
+        timeframe,
+        'vix',
+      );
       updateData.value = timeframeVix.value.toFixed(1);
       updateData.color = timeframeVix.value > 20 ? '#ef4444' : '#10b981';
-      updateData.message = MessageGenerators.getVixMessage(timeframeVix.value, timeframe);
-      updateData.score = Math.min(Math.max((timeframeVix.value / 40) * 100, 0), 100);
+      updateData.message = MessageGenerators.getVixMessage(
+        timeframeVix.value,
+        timeframe,
+      );
+      updateData.score = Math.min(
+        Math.max((timeframeVix.value / 40) * 100, 0),
+        100,
+      );
     } else if (key === 'fearGreed') {
       updateData.score = timeframeData.score;
       updateData.value = timeframeData.score.toString();
-      updateData.message = MessageGenerators.getFearGreedMessage(timeframeData.score, timeframe);
-      updateData.color = MessageGenerators.getSentimentColor(timeframeData.score);
+      updateData.message = MessageGenerators.getFearGreedMessage(
+        timeframeData.score,
+        timeframe,
+      );
+      updateData.color = MessageGenerators.getSentimentColor(
+        timeframeData.score,
+      );
     }
 
     return updateData;
   }
 
-  private static getEnhancedCardUpdateData(key: string, data: SentimentData, timeframe: TimeFrame): Partial<CardData> {
+  private static getEnhancedCardUpdateData(
+    key: string,
+    data: SentimentData,
+    timeframe: TimeFrame,
+  ): Partial<CardData> {
     const timeframeData = data.timeframes[timeframe];
     const indicators = data.indicators;
     let updateData: Partial<CardData> = { timeframe };
@@ -100,38 +135,52 @@ export class ComponentUpdater {
     if (key === 'fearGreed') {
       updateData = {
         value: timeframeData.score,
-        message: MessageGenerators.getFearGreedMessage(timeframeData.score, timeframe),
+        message: MessageGenerators.getFearGreedMessage(
+          timeframeData.score,
+          timeframe,
+        ),
         trend: timeframeData.score > 50 ? 'up' : 'down',
         color: MessageGenerators.getSentimentColor(timeframeData.score),
-        timeframe
+        timeframe,
       };
     } else if (key === 'spy' || key === 'qqq' || key === 'iwm') {
       const baseIndicator = indicators[key as keyof typeof indicators] as any;
-      const timeframeIndicator = DataService.getIndicatorForTimeframe(data, timeframe, key);
-      
+      const timeframeIndicator = DataService.getIndicatorForTimeframe(
+        data,
+        timeframe,
+        key,
+      );
+
       if (baseIndicator && timeframeIndicator) {
         updateData = {
           value: `$${baseIndicator.price.toFixed(2)}`,
           change: `${timeframeIndicator.change >= 0 ? '+' : ''}${timeframeIndicator.change.toFixed(2)}%`,
-          message: MessageGenerators.getMarketMessage(key, timeframeIndicator.change, timeframe),
+          message: MessageGenerators.getMarketMessage(
+            key,
+            timeframeIndicator.change,
+            timeframe,
+          ),
           trend: timeframeIndicator.change >= 0 ? 'up' : 'down',
           color: timeframeIndicator.change >= 0 ? '#10b981' : '#ef4444',
-          timeframe
+          timeframe,
         };
       }
     } else if (key === 'vix') {
-      const timeframeVix = DataService.getIndicatorForTimeframe(data, timeframe, 'vix');
-      
+      const timeframeVix = DataService.getIndicatorForTimeframe(
+        data,
+        timeframe,
+        'vix',
+      );
+
       updateData = {
         value: timeframeVix.value.toFixed(1),
         message: MessageGenerators.getVixMessage(timeframeVix.value, timeframe),
         trend: timeframeVix.value > 20 ? 'up' : 'down',
         color: timeframeVix.value > 20 ? '#ef4444' : '#10b981',
-        timeframe
+        timeframe,
       };
     }
 
     return updateData;
   }
-
 }
