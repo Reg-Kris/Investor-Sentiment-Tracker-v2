@@ -34,18 +34,23 @@ class ModularDataFetcher {
 
   validateApiKeys() {
     const keyStatus = {
-      alphaVantage: CONFIG.alphaVantageKey !== 'demo',
-      fred: CONFIG.fredApiKey !== 'demo', 
-      rapidApi: CONFIG.rapidApiKey !== 'demo'
+      alphaVantage: CONFIG.alphaVantageKey && CONFIG.alphaVantageKey !== 'demo',
+      fred: CONFIG.fredApiKey && CONFIG.fredApiKey !== 'demo', 
+      rapidApi: CONFIG.rapidApiKey && CONFIG.rapidApiKey !== 'demo'
     };
     
     console.log('🔑 API Key Status:');
-    console.log(`  Alpha Vantage: ${keyStatus.alphaVantage ? '✅' : '⚠️  demo'}`);
-    console.log(`  FRED: ${keyStatus.fred ? '✅' : '⚠️  demo'}`);
-    console.log(`  RapidAPI: ${keyStatus.rapidApi ? '✅' : '⚠️  demo'}`);
+    console.log(`  Alpha Vantage: ${keyStatus.alphaVantage ? '✅' : '❌ not configured'}`);
+    console.log(`  FRED: ${keyStatus.fred ? '✅' : '❌ not configured'}`);
+    console.log(`  RapidAPI: ${keyStatus.rapidApi ? '✅' : '❌ not configured'}`);
+    console.log(`  Yahoo Finance: ✅ (no API key required)`);
     
     if (!keyStatus.alphaVantage && !keyStatus.fred && !keyStatus.rapidApi) {
-      console.warn('⚠️  All APIs using demo keys - expect rate limits and mock data');
+      console.warn('⚠️  No API keys configured - using Yahoo Finance and fallback data sources');
+      console.log('💡 For better data coverage, configure API keys:');
+      console.log('   - Alpha Vantage: https://www.alphavantage.co/support/#api-key');
+      console.log('   - FRED: https://fred.stlouisfed.org/docs/api/api_key.html');
+      console.log('   - RapidAPI: https://rapidapi.com/');
     }
     
     return keyStatus;

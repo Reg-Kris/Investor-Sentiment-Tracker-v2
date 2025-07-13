@@ -1,11 +1,15 @@
 // Configuration and constants for data fetching
 export const CONFIG = {
-  alphaVantageKey: process.env.ALPHA_VANTAGE_KEY || 'demo',
-  fredApiKey: process.env.FRED_API_KEY || 'demo',
-  rapidApiKey: process.env.RAPIDAPI_KEY || 'demo',
+  alphaVantageKey: process.env.ALPHA_VANTAGE_KEY || null,
+  fredApiKey: process.env.FRED_API_KEY || null,
+  rapidApiKey: process.env.RAPIDAPI_KEY || null,
   requestTimeout: 15000, // 15 seconds
   rateLimitDelay: 2000, // 2 seconds between requests
   maxFailures: 3,
+  
+  // Feature flags for fallback behavior
+  useYahooFinanceAsPrimary: true, // Yahoo Finance doesn't need API keys
+  allowMockDataFallback: true,
 };
 
 export const CACHE_DURATIONS = {
