@@ -6,7 +6,7 @@
     "confidence": 70,
     "components": {
       "fearGreed": {
-        "score": 76,
+        "score": 77,
         "weight": 0.35
       },
       "market": {
@@ -14,7 +14,7 @@
         "weight": 0.25
       },
       "volatility": {
-        "score": 74,
+        "score": 71,
         "weight": 0.2
       },
       "options": {
@@ -31,7 +31,7 @@
       "trend": "neutral"
     },
     "5d": {
-      "score": 68,
+      "score": 69,
       "sentiment": "GREED",
       "message": "Investors are greedy",
       "trend": "stable"
@@ -45,7 +45,7 @@
   },
   "indicators": {
     "fearGreed": {
-      "value": 76,
+      "value": 77,
       "label": "Extreme Greed",
       "message": "Extreme greed in markets",
       "color": "#10b981"
@@ -69,7 +69,7 @@
       "color": "#10b981"
     },
     "vix": {
-      "value": 16.4,
+      "value": 17.2,
       "message": "Markets are calm",
       "color": "#10b981"
     },
@@ -79,5 +79,5 @@
       "iwm": "IWM options data unavailable"
     }
   },
-  "lastAnalyzed": "2025-07-15T11:16:34.671Z"
+  "lastAnalyzed": "2025-07-15T14:46:00.866Z"
 }
