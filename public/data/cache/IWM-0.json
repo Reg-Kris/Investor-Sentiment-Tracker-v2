@@ -1,15 +1,21 @@
 {
-  "timestamp": "2025-07-15T18:53:34.533Z",
+  "timestamp": "2025-07-15T22:45:17.811Z",
   "data": {
     "symbol": "IWM",
     "current": {
-      "date": "2025-07-14",
-      "price": 223.19,
-      "volume": 24632248,
-      "change": 1.8199999999999932,
-      "changePercent": 0.67
+      "date": "2025-07-15",
+      "price": 218.82,
+      "volume": 43295968,
+      "change": -5.25,
+      "changePercent": -1.96
     },
     "historical": [
+      {
+        "date": "2025-07-15",
+        "price": 218.82,
+        "volume": 43295968,
+        "change": -5.25
+      },
       {
         "date": "2025-07-14",
         "price": 223.19,
@@ -183,14 +189,8 @@
         "price": 205.71,
         "volume": 30334304,
         "change": 0.3900000000000148
-      },
-      {
-        "date": "2025-05-30",
-        "price": 205.07,
-        "volume": 37768909,
-        "change": -0.06999999999999318
       }
     ],
-    "lastUpdated": "2025-07-15T18:53:34.533Z"
+    "lastUpdated": "2025-07-15T22:45:17.811Z"
   }
 }

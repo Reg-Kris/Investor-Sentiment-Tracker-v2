@@ -1,16 +1,16 @@
 {
   "overall": {
-    "score": 68,
-    "sentiment": "GREED",
-    "message": "Investors are greedy",
+    "score": 64,
+    "sentiment": "MILD GREED",
+    "message": "Markets are slightly bullish",
     "confidence": 70,
     "components": {
       "fearGreed": {
-        "score": 76,
+        "score": 74,
         "weight": 0.35
       },
       "market": {
-        "score": 54,
+        "score": 42,
         "weight": 0.25
       },
       "volatility": {
@@ -25,19 +25,19 @@
   },
   "timeframes": {
     "1d": {
-      "score": 65,
-      "sentiment": "GREED",
-      "message": "Investors are greedy",
+      "score": 64,
+      "sentiment": "MILD GREED",
+      "message": "Markets are slightly bullish",
       "trend": "neutral"
     },
     "5d": {
-      "score": 68,
-      "sentiment": "GREED",
-      "message": "Investors are greedy",
+      "score": 63,
+      "sentiment": "MILD GREED",
+      "message": "Markets are slightly bullish",
       "trend": "stable"
     },
     "1m": {
-      "score": 85,
+      "score": 83,
       "sentiment": "EXTREME GREED",
       "message": "Markets are extremely optimistic",
       "trend": "stable"
@@ -45,28 +45,28 @@
   },
   "indicators": {
     "fearGreed": {
-      "value": 76,
-      "label": "Extreme Greed",
-      "message": "Extreme greed in markets",
-      "color": "#10b981"
+      "value": 74,
+      "label": "Greed",
+      "message": "Markets showing greed",
+      "color": "#f59e0b"
     },
     "spy": {
-      "price": 624.81,
-      "change": 0.19,
+      "price": 622.14,
+      "change": -0.43,
       "message": "S&P 500 trading flat",
-      "color": "#10b981"
+      "color": "#ef4444"
     },
     "qqq": {
-      "price": 556.21,
-      "change": 0.36,
+      "price": 556.72,
+      "change": 0.09,
       "message": "Nasdaq 100 trading flat",
       "color": "#10b981"
     },
     "iwm": {
-      "price": 223.19,
-      "change": 0.67,
-      "message": "Russell 2000 trending higher",
-      "color": "#10b981"
+      "price": 218.82,
+      "change": -1.96,
+      "message": "Russell 2000 under pressure",
+      "color": "#ef4444"
     },
     "vix": {
       "value": 17.2,
@@ -79,5 +79,5 @@
       "iwm": "IWM options data unavailable"
     }
   },
-  "lastAnalyzed": "2025-07-15T18:53:37.162Z"
+  "lastAnalyzed": "2025-07-15T22:45:20.411Z"
 }
