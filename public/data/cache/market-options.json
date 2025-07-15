@@ -1,13 +1,13 @@
 {
-  "timestamp": "2025-07-14T22:45:20.700Z",
+  "timestamp": "2025-07-15T11:16:34.514Z",
   "data": {
-    "market": "Market options show very bearish sentiment (P/C: 1.23)",
-    "ratio": 1.23,
-    "putVolume": 213507,
-    "callVolume": 173650,
-    "sentiment": "very bearish",
+    "market": "Market options show bearish sentiment (P/C: 1.06)",
+    "ratio": 1.06,
+    "putVolume": 190043,
+    "callVolume": 178670,
+    "sentiment": "bearish",
     "successfulFetches": 3,
     "totalSymbols": 3,
-    "lastUpdated": "2025-07-14T22:45:20.700Z"
+    "lastUpdated": "2025-07-15T11:16:34.514Z"
   }
 }
