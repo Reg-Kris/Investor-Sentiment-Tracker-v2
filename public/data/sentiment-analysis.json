@@ -1,6 +1,6 @@
 {
   "overall": {
-    "score": 64,
+    "score": 63,
     "sentiment": "MILD GREED",
     "message": "Markets are slightly bullish",
     "confidence": 70,
@@ -14,7 +14,7 @@
         "weight": 0.25
       },
       "volatility": {
-        "score": 71,
+        "score": 70,
         "weight": 0.2
       },
       "options": {
@@ -69,7 +69,7 @@
       "color": "#ef4444"
     },
     "vix": {
-      "value": 17.2,
+      "value": 17.4,
       "message": "Markets are calm",
       "color": "#10b981"
     },
@@ -79,5 +79,5 @@
       "iwm": "IWM options data unavailable"
     }
   },
-  "lastAnalyzed": "2025-07-16T11:16:17.823Z"
+  "lastAnalyzed": "2025-07-16T14:46:14.015Z"
 }
