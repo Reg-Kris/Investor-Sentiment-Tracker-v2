@@ -1,16 +1,16 @@
 {
   "overall": {
-    "score": 68,
+    "score": 69,
     "sentiment": "GREED",
     "message": "Investors are greedy",
     "confidence": 70,
     "components": {
       "fearGreed": {
-        "score": 76,
+        "score": 75,
         "weight": 0.35
       },
       "market": {
-        "score": 55,
+        "score": 59,
         "weight": 0.25
       },
       "volatility": {
@@ -25,19 +25,19 @@
   },
   "timeframes": {
     "1d": {
-      "score": 65,
-      "sentiment": "GREED",
-      "message": "Investors are greedy",
-      "trend": "neutral"
-    },
-    "5d": {
       "score": 64,
       "sentiment": "MILD GREED",
       "message": "Markets are slightly bullish",
+      "trend": "neutral"
+    },
+    "5d": {
+      "score": 67,
+      "sentiment": "GREED",
+      "message": "Investors are greedy",
       "trend": "stable"
     },
     "1m": {
-      "score": 83,
+      "score": 84,
       "sentiment": "EXTREME GREED",
       "message": "Markets are extremely optimistic",
       "trend": "stable"
@@ -45,26 +45,26 @@
   },
   "indicators": {
     "fearGreed": {
-      "value": 76,
+      "value": 75,
       "label": "Extreme Greed",
       "message": "Extreme greed in markets",
       "color": "#10b981"
     },
     "spy": {
-      "price": 624.22,
-      "change": 0.33,
-      "message": "S&P 500 trading flat",
+      "price": 628.04,
+      "change": 0.61,
+      "message": "S&P 500 trending higher",
       "color": "#10b981"
     },
     "qqq": {
-      "price": 557.29,
-      "change": 0.1,
-      "message": "Nasdaq 100 trading flat",
+      "price": 561.8,
+      "change": 0.81,
+      "message": "Nasdaq 100 trending higher",
       "color": "#10b981"
     },
     "iwm": {
-      "price": 221.02,
-      "change": 1.01,
+      "price": 223.92,
+      "change": 1.31,
       "message": "Russell 2000 trending higher",
       "color": "#10b981"
     },
@@ -79,5 +79,5 @@
       "iwm": "IWM options data unavailable"
     }
   },
-  "lastAnalyzed": "2025-07-17T18:53:41.769Z"
+  "lastAnalyzed": "2025-07-17T22:45:14.209Z"
 }
