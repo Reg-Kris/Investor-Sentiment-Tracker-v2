@@ -1,6 +1,6 @@
 {
   "overall": {
-    "score": 67,
+    "score": 66,
     "sentiment": "GREED",
     "message": "Investors are greedy",
     "confidence": 70,
@@ -10,7 +10,7 @@
         "weight": 0.35
       },
       "market": {
-        "score": 50,
+        "score": 47,
         "weight": 0.25
       },
       "volatility": {
@@ -31,7 +31,7 @@
       "trend": "neutral"
     },
     "5d": {
-      "score": 66,
+      "score": 65,
       "sentiment": "GREED",
       "message": "Investors are greedy",
       "trend": "stable"
@@ -57,10 +57,10 @@
       "color": "#ef4444"
     },
     "qqq": {
-      "price": 565.39,
-      "change": 0.74,
-      "message": "Nasdaq 100 trending higher",
-      "color": "#10b981"
+      "price": 561.26,
+      "change": -0.1,
+      "message": "Nasdaq 100 trading flat",
+      "color": "#ef4444"
     },
     "iwm": {
       "price": 222.33,
@@ -79,5 +79,5 @@
       "iwm": "IWM options data unavailable"
     }
   },
-  "lastAnalyzed": "2025-07-21T14:49:19.483Z"
+  "lastAnalyzed": "2025-07-21T18:53:50.924Z"
 }
