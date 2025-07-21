@@ -31,7 +31,7 @@
       "trend": "neutral"
     },
     "5d": {
-      "score": 65,
+      "score": 66,
       "sentiment": "GREED",
       "message": "Investors are greedy",
       "trend": "stable"
@@ -79,5 +79,5 @@
       "iwm": "IWM options data unavailable"
     }
   },
-  "lastAnalyzed": "2025-07-20T11:15:02.665Z"
+  "lastAnalyzed": "2025-07-21T11:16:21.008Z"
 }
