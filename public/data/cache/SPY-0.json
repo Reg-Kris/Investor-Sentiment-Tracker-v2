@@ -1,11 +1,11 @@
 {
-  "timestamp": "2025-07-21T22:45:06.496Z",
+  "timestamp": "2025-07-22T11:16:04.561Z",
   "data": {
     "symbol": "SPY",
     "current": {
       "date": "2025-07-21",
       "price": 628.77,
-      "volume": 62246399,
+      "volume": 63374984,
       "change": 0,
       "changePercent": 0.19
     },
@@ -13,7 +13,7 @@
       {
         "date": "2025-07-21",
         "price": 628.77,
-        "volume": 62246399,
+        "volume": 63374984,
         "change": 0
       },
       {
@@ -191,6 +191,6 @@
         "change": 0.4800000000000182
       }
     ],
-    "lastUpdated": "2025-07-21T22:45:06.496Z"
+    "lastUpdated": "2025-07-22T11:16:04.561Z"
   }
 }
