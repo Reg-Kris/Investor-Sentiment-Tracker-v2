@@ -1,16 +1,16 @@
 {
   "overall": {
-    "score": 71,
+    "score": 67,
     "sentiment": "GREED",
     "message": "Investors are greedy",
     "confidence": 70,
     "components": {
       "fearGreed": {
-        "score": 77,
+        "score": 75,
         "weight": 0.35
       },
       "market": {
-        "score": 59,
+        "score": 46,
         "weight": 0.25
       },
       "volatility": {
@@ -25,7 +25,7 @@
   },
   "timeframes": {
     "1d": {
-      "score": 67,
+      "score": 66,
       "sentiment": "GREED",
       "message": "Investors are greedy",
       "trend": "neutral"
@@ -37,7 +37,7 @@
       "trend": "stable"
     },
     "1m": {
-      "score": 85,
+      "score": 83,
       "sentiment": "EXTREME GREED",
       "message": "Markets are extremely optimistic",
       "trend": "stable"
@@ -45,28 +45,28 @@
   },
   "indicators": {
     "fearGreed": {
-      "value": 77,
+      "value": 75,
       "label": "Extreme Greed",
       "message": "Extreme greed in markets",
       "color": "#10b981"
     },
     "spy": {
-      "price": 634.21,
-      "change": 0.85,
-      "message": "S&P 500 trending higher",
+      "price": 634.42,
+      "change": 0.03,
+      "message": "S&P 500 trading flat",
       "color": "#10b981"
     },
     "qqq": {
-      "price": 563.81,
-      "change": 0.46,
+      "price": 565.01,
+      "change": 0.21,
       "message": "Nasdaq 100 trading flat",
       "color": "#10b981"
     },
     "iwm": {
-      "price": 226.68,
-      "change": 1.53,
-      "message": "Russell 2000 trending higher",
-      "color": "#10b981"
+      "price": 223.55,
+      "change": -1.38,
+      "message": "Russell 2000 under pressure",
+      "color": "#ef4444"
     },
     "vix": {
       "value": 15.4,
@@ -79,5 +79,5 @@
       "iwm": "IWM options data unavailable"
     }
   },
-  "lastAnalyzed": "2025-07-24T18:53:42.828Z"
+  "lastAnalyzed": "2025-07-24T22:45:21.088Z"
 }
