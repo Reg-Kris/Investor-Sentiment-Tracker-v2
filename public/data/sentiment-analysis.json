@@ -37,7 +37,7 @@
       "trend": "stable"
     },
     "1m": {
-      "score": 84,
+      "score": 85,
       "sentiment": "EXTREME GREED",
       "message": "Markets are extremely optimistic",
       "trend": "stable"
@@ -79,5 +79,5 @@
       "iwm": "IWM options data unavailable"
     }
   },
-  "lastAnalyzed": "2025-07-24T14:48:35.796Z"
+  "lastAnalyzed": "2025-07-24T18:53:42.828Z"
 }
