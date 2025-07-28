@@ -1,12 +1,12 @@
 {
   "overall": {
-    "score": 69,
+    "score": 68,
     "sentiment": "GREED",
     "message": "Investors are greedy",
     "confidence": 70,
     "components": {
       "fearGreed": {
-        "score": 75,
+        "score": 73,
         "weight": 0.35
       },
       "market": {
@@ -25,19 +25,19 @@
   },
   "timeframes": {
     "1d": {
-      "score": 66,
+      "score": 65,
       "sentiment": "GREED",
       "message": "Investors are greedy",
       "trend": "neutral"
     },
     "5d": {
-      "score": 70,
+      "score": 69,
       "sentiment": "GREED",
       "message": "Investors are greedy",
       "trend": "stable"
     },
     "1m": {
-      "score": 84,
+      "score": 83,
       "sentiment": "EXTREME GREED",
       "message": "Markets are extremely optimistic",
       "trend": "stable"
@@ -45,10 +45,10 @@
   },
   "indicators": {
     "fearGreed": {
-      "value": 75,
-      "label": "Extreme Greed",
-      "message": "Extreme greed in markets",
-      "color": "#10b981"
+      "value": 73,
+      "label": "Greed",
+      "message": "Markets showing greed",
+      "color": "#f59e0b"
     },
     "spy": {
       "price": 637.1,
@@ -79,5 +79,5 @@
       "iwm": "IWM options data unavailable"
     }
   },
-  "lastAnalyzed": "2025-07-28T14:48:59.778Z"
+  "lastAnalyzed": "2025-07-28T18:54:48.983Z"
 }
