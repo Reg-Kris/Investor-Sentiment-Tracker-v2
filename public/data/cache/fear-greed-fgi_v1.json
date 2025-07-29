@@ -1,15 +1,15 @@
 {
-  "timestamp": "2025-07-29T14:51:26.615Z",
+  "timestamp": "2025-07-29T18:55:44.042Z",
   "data": {
     "current": {
       "date": "2025-07-29",
-      "value": 72,
+      "value": 70,
       "rating": "Greed"
     },
     "historical": [
       {
         "date": "2025-07-29",
-        "value": 72,
+        "value": 70,
         "rating": "Greed"
       },
       {
@@ -19,27 +19,27 @@
       },
       {
         "date": "2025-07-27",
-        "value": 71.74,
+        "value": 69.02,
         "rating": "Greed"
       },
       {
         "date": "2025-07-26",
-        "value": 71.98,
+        "value": 66.12,
         "rating": "Greed"
       },
       {
         "date": "2025-07-25",
-        "value": 74.99,
+        "value": 66.33,
         "rating": "Greed"
       },
       {
         "date": "2025-07-24",
-        "value": 74.06,
+        "value": 67.02,
         "rating": "Greed"
       },
       {
         "date": "2025-07-23",
-        "value": 74.11,
+        "value": 66.43,
         "rating": "Greed"
       },
       {
@@ -49,42 +49,42 @@
       },
       {
         "date": "2025-07-21",
-        "value": 75.2,
-        "rating": "Extreme Greed"
+        "value": 66.51,
+        "rating": "Greed"
       },
       {
         "date": "2025-07-20",
-        "value": 76.51,
-        "rating": "Extreme Greed"
+        "value": 70.06,
+        "rating": "Greed"
       },
       {
         "date": "2025-07-19",
-        "value": 74.34,
+        "value": 66.77,
         "rating": "Greed"
       },
       {
         "date": "2025-07-18",
-        "value": 74.69,
+        "value": 69.04,
         "rating": "Greed"
       },
       {
         "date": "2025-07-17",
-        "value": 73.43,
+        "value": 71.51,
         "rating": "Greed"
       },
       {
         "date": "2025-07-16",
-        "value": 67.18,
+        "value": 67.12,
         "rating": "Greed"
       },
       {
         "date": "2025-07-15",
-        "value": 76.01,
-        "rating": "Extreme Greed"
+        "value": 65.31,
+        "rating": "Greed"
       },
       {
         "date": "2025-07-14",
-        "value": 69.2,
+        "value": 69.3,
         "rating": "Greed"
       },
       {
@@ -94,70 +94,70 @@
       },
       {
         "date": "2025-07-12",
-        "value": 73.3,
+        "value": 71.51,
         "rating": "Greed"
       },
       {
         "date": "2025-07-11",
-        "value": 76.91,
-        "rating": "Extreme Greed"
+        "value": 65.21,
+        "rating": "Greed"
       },
       {
         "date": "2025-07-10",
-        "value": 76.96,
-        "rating": "Extreme Greed"
+        "value": 72.36,
+        "rating": "Greed"
       },
       {
         "date": "2025-07-09",
-        "value": 73.48,
+        "value": 74.61,
         "rating": "Greed"
       },
       {
         "date": "2025-07-08",
-        "value": 72.46,
+        "value": 73.26,
         "rating": "Greed"
       },
       {
         "date": "2025-07-07",
-        "value": 74.49,
+        "value": 71.65,
         "rating": "Greed"
       },
       {
         "date": "2025-07-06",
-        "value": 71.8,
+        "value": 73.51,
         "rating": "Greed"
       },
       {
         "date": "2025-07-05",
-        "value": 74.03,
+        "value": 65.63,
         "rating": "Greed"
       },
       {
         "date": "2025-07-04",
-        "value": 70.93,
+        "value": 67.38,
         "rating": "Greed"
       },
       {
         "date": "2025-07-03",
-        "value": 72.56,
+        "value": 66.05,
         "rating": "Greed"
       },
       {
         "date": "2025-07-02",
-        "value": 69.38,
+        "value": 70.35,
         "rating": "Greed"
       },
       {
         "date": "2025-07-01",
-        "value": 75.13,
-        "rating": "Extreme Greed"
+        "value": 67.46,
+        "rating": "Greed"
       },
       {
         "date": "2025-06-30",
-        "value": 68.5,
+        "value": 73.98,
         "rating": "Greed"
       }
     ],
-    "lastUpdated": "2025-07-29T14:51:26.615Z"
+    "lastUpdated": "2025-07-29T18:55:44.042Z"
   }
 }
