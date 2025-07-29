@@ -1,15 +1,21 @@
 {
-  "timestamp": "2025-07-29T18:55:50.688Z",
+  "timestamp": "2025-07-29T22:46:08.835Z",
   "data": {
     "symbol": "QQQ",
     "current": {
-      "date": "2025-07-28",
-      "price": 568.14,
-      "volume": 31498739,
-      "change": 0.39999999999997726,
-      "changePercent": 0.31
+      "date": "2025-07-29",
+      "price": 567.26,
+      "volume": 45058178,
+      "change": -3.5,
+      "changePercent": -0.15
     },
     "historical": [
+      {
+        "date": "2025-07-29",
+        "price": 567.26,
+        "volume": 45058178,
+        "change": -3.5
+      },
       {
         "date": "2025-07-28",
         "price": 568.14,
@@ -183,14 +189,8 @@
         "price": 534.29,
         "volume": 37622051,
         "change": 3.7899999999999636
-      },
-      {
-        "date": "2025-06-13",
-        "price": 526.96,
-        "volume": 55814443,
-        "change": -0.7199999999999136
       }
     ],
-    "lastUpdated": "2025-07-29T18:55:50.688Z"
+    "lastUpdated": "2025-07-29T22:46:08.835Z"
   }
 }
