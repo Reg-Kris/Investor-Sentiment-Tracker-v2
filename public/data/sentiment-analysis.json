@@ -6,7 +6,7 @@
     "confidence": 70,
     "components": {
       "fearGreed": {
-        "score": 68,
+        "score": 69,
         "weight": 0.35
       },
       "market": {
@@ -14,7 +14,7 @@
         "weight": 0.25
       },
       "volatility": {
-        "score": 80,
+        "score": 76,
         "weight": 0.2
       },
       "options": {
@@ -31,7 +31,7 @@
       "trend": "neutral"
     },
     "5d": {
-      "score": 63,
+      "score": 64,
       "sentiment": "MILD GREED",
       "message": "Markets are slightly bullish",
       "trend": "stable"
@@ -45,7 +45,7 @@
   },
   "indicators": {
     "fearGreed": {
-      "value": 68,
+      "value": 69,
       "label": "Greed",
       "message": "Markets showing greed",
       "color": "#f59e0b"
@@ -69,7 +69,7 @@
       "color": "#ef4444"
     },
     "vix": {
-      "value": 15,
+      "value": 16,
       "message": "Markets are calm",
       "color": "#10b981"
     },
@@ -79,5 +79,5 @@
       "iwm": "IWM options data unavailable"
     }
   },
-  "lastAnalyzed": "2025-07-30T11:17:40.982Z"
+  "lastAnalyzed": "2025-07-30T14:48:02.327Z"
 }
