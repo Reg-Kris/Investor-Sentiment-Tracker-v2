@@ -6,7 +6,7 @@
     "confidence": 70,
     "components": {
       "fearGreed": {
-        "score": 69,
+        "score": 68,
         "weight": 0.35
       },
       "market": {
@@ -25,7 +25,7 @@
   },
   "timeframes": {
     "1d": {
-      "score": 64,
+      "score": 63,
       "sentiment": "MILD GREED",
       "message": "Markets are slightly bullish",
       "trend": "neutral"
@@ -37,7 +37,7 @@
       "trend": "stable"
     },
     "1m": {
-      "score": 82,
+      "score": 81,
       "sentiment": "EXTREME GREED",
       "message": "Markets are extremely optimistic",
       "trend": "stable"
@@ -45,7 +45,7 @@
   },
   "indicators": {
     "fearGreed": {
-      "value": 69,
+      "value": 68,
       "label": "Greed",
       "message": "Markets showing greed",
       "color": "#f59e0b"
@@ -79,5 +79,5 @@
       "iwm": "IWM options data unavailable"
     }
   },
-  "lastAnalyzed": "2025-07-29T22:46:14.005Z"
+  "lastAnalyzed": "2025-07-30T11:16:53.371Z"
 }
