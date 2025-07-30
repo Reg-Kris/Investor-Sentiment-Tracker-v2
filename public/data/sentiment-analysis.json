@@ -1,16 +1,16 @@
 {
   "overall": {
-    "score": 65,
-    "sentiment": "GREED",
-    "message": "Investors are greedy",
+    "score": 64,
+    "sentiment": "MILD GREED",
+    "message": "Markets are slightly bullish",
     "confidence": 70,
     "components": {
       "fearGreed": {
-        "score": 69,
+        "score": 67,
         "weight": 0.35
       },
       "market": {
-        "score": 47,
+        "score": 48,
         "weight": 0.25
       },
       "volatility": {
@@ -25,19 +25,19 @@
   },
   "timeframes": {
     "1d": {
-      "score": 63,
+      "score": 62,
       "sentiment": "MILD GREED",
       "message": "Markets are slightly bullish",
       "trend": "neutral"
     },
     "5d": {
-      "score": 64,
+      "score": 62,
       "sentiment": "MILD GREED",
       "message": "Markets are slightly bullish",
       "trend": "stable"
     },
     "1m": {
-      "score": 82,
+      "score": 81,
       "sentiment": "EXTREME GREED",
       "message": "Markets are extremely optimistic",
       "trend": "stable"
@@ -45,26 +45,26 @@
   },
   "indicators": {
     "fearGreed": {
-      "value": 69,
+      "value": 67,
       "label": "Greed",
       "message": "Markets showing greed",
       "color": "#f59e0b"
     },
     "spy": {
-      "price": 635.26,
-      "change": -0.26,
+      "price": 634.46,
+      "change": -0.13,
       "message": "S&P 500 trading flat",
       "color": "#ef4444"
     },
     "qqq": {
-      "price": 567.26,
-      "change": -0.15,
+      "price": 568.02,
+      "change": 0.13,
       "message": "Nasdaq 100 trading flat",
-      "color": "#ef4444"
+      "color": "#10b981"
     },
     "iwm": {
-      "price": 222.69,
-      "change": -0.64,
+      "price": 221.56,
+      "change": -0.51,
       "message": "Russell 2000 under pressure",
       "color": "#ef4444"
     },
@@ -79,5 +79,5 @@
       "iwm": "IWM options data unavailable"
     }
   },
-  "lastAnalyzed": "2025-07-30T18:54:31.764Z"
+  "lastAnalyzed": "2025-07-30T22:45:37.569Z"
 }
