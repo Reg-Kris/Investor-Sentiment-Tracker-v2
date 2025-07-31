@@ -14,7 +14,7 @@
         "weight": 0.25
       },
       "volatility": {
-        "score": 76,
+        "score": 78,
         "weight": 0.2
       },
       "options": {
@@ -31,13 +31,13 @@
       "trend": "neutral"
     },
     "5d": {
-      "score": 63,
+      "score": 62,
       "sentiment": "MILD GREED",
       "message": "Markets are slightly bullish",
       "trend": "stable"
     },
     "1m": {
-      "score": 80,
+      "score": 81,
       "sentiment": "EXTREME GREED",
       "message": "Markets are extremely optimistic",
       "trend": "stable"
@@ -69,7 +69,7 @@
       "color": "#ef4444"
     },
     "vix": {
-      "value": 16,
+      "value": 15.5,
       "message": "Markets are calm",
       "color": "#10b981"
     },
@@ -79,5 +79,5 @@
       "iwm": "IWM options data unavailable"
     }
   },
-  "lastAnalyzed": "2025-07-31T11:16:44.426Z"
+  "lastAnalyzed": "2025-07-31T14:48:38.583Z"
 }
