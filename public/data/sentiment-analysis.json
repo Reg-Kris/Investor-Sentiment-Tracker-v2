@@ -6,7 +6,7 @@
     "confidence": 70,
     "components": {
       "fearGreed": {
-        "score": 67,
+        "score": 66,
         "weight": 0.35
       },
       "market": {
@@ -45,7 +45,7 @@
   },
   "indicators": {
     "fearGreed": {
-      "value": 67,
+      "value": 66,
       "label": "Greed",
       "message": "Markets showing greed",
       "color": "#f59e0b"
@@ -79,5 +79,5 @@
       "iwm": "IWM options data unavailable"
     }
   },
-  "lastAnalyzed": "2025-07-30T22:45:37.569Z"
+  "lastAnalyzed": "2025-07-31T11:16:09.546Z"
 }
