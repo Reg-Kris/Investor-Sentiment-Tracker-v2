@@ -1,6 +1,6 @@
 {
-  "lastUpdated": "2025-07-31T11:15:40.578Z",
-  "generatedAt": "2025-07-31T11:15:40.578Z",
+  "lastUpdated": "2025-07-31T11:16:31.210Z",
+  "generatedAt": "2025-07-31T11:16:31.210Z",
   "fearGreed": {
     "current": {
       "date": "2025-07-31",
@@ -20,27 +20,27 @@
       },
       {
         "date": "2025-07-29",
-        "value": 63.99,
+        "value": 70.46,
         "rating": "Greed"
       },
       {
         "date": "2025-07-28",
-        "value": 65.13,
+        "value": 67.5,
         "rating": "Greed"
       },
       {
         "date": "2025-07-27",
-        "value": 70.29,
+        "value": 69.56,
         "rating": "Greed"
       },
       {
         "date": "2025-07-26",
-        "value": 64.88,
+        "value": 63.56,
         "rating": "Greed"
       },
       {
         "date": "2025-07-25",
-        "value": 62.07,
+        "value": 61.18,
         "rating": "Greed"
       },
       {
@@ -50,116 +50,116 @@
       },
       {
         "date": "2025-07-23",
-        "value": 64.89,
+        "value": 61.56,
         "rating": "Greed"
       },
       {
         "date": "2025-07-22",
-        "value": 65.16,
+        "value": 61.85,
         "rating": "Greed"
       },
       {
         "date": "2025-07-21",
-        "value": 65.75,
+        "value": 63.37,
         "rating": "Greed"
       },
       {
         "date": "2025-07-20",
-        "value": 61.82,
+        "value": 69.3,
         "rating": "Greed"
       },
       {
         "date": "2025-07-19",
-        "value": 63.43,
+        "value": 63.49,
         "rating": "Greed"
       },
       {
         "date": "2025-07-18",
-        "value": 62.47,
+        "value": 70.2,
         "rating": "Greed"
       },
       {
         "date": "2025-07-17",
-        "value": 69.53,
+        "value": 61.17,
         "rating": "Greed"
       },
       {
         "date": "2025-07-16",
-        "value": 70.57,
+        "value": 66.08,
         "rating": "Greed"
       },
       {
         "date": "2025-07-15",
-        "value": 69.23,
+        "value": 68.93,
         "rating": "Greed"
       },
       {
         "date": "2025-07-14",
-        "value": 66.91,
+        "value": 65.56,
         "rating": "Greed"
       },
       {
         "date": "2025-07-13",
-        "value": 61.37,
+        "value": 67.16,
         "rating": "Greed"
       },
       {
         "date": "2025-07-12",
-        "value": 65.01,
+        "value": 70.45,
         "rating": "Greed"
       },
       {
         "date": "2025-07-11",
-        "value": 63.75,
+        "value": 63.41,
         "rating": "Greed"
       },
       {
         "date": "2025-07-10",
-        "value": 61.71,
+        "value": 61.31,
         "rating": "Greed"
       },
       {
         "date": "2025-07-09",
-        "value": 68.2,
+        "value": 63.86,
         "rating": "Greed"
       },
       {
         "date": "2025-07-08",
-        "value": 61.88,
+        "value": 63.96,
         "rating": "Greed"
       },
       {
         "date": "2025-07-07",
-        "value": 64.37,
+        "value": 62.16,
         "rating": "Greed"
       },
       {
         "date": "2025-07-06",
-        "value": 66.76,
+        "value": 63.22,
         "rating": "Greed"
       },
       {
         "date": "2025-07-05",
-        "value": 66.63,
+        "value": 67.31,
         "rating": "Greed"
       },
       {
         "date": "2025-07-04",
-        "value": 65.73,
+        "value": 66.39,
         "rating": "Greed"
       },
       {
         "date": "2025-07-03",
-        "value": 68.96,
+        "value": 64.09,
         "rating": "Greed"
       },
       {
         "date": "2025-07-02",
-        "value": 70.55,
+        "value": 61.66,
         "rating": "Greed"
       }
     ],
-    "lastUpdated": "2025-07-31T11:15:41.405Z"
+    "lastUpdated": "2025-07-31T11:16:32.246Z"
   },
   "spy": {
     "symbol": "SPY",
@@ -352,7 +352,7 @@
         "change": -2.6800000000000637
       }
     ],
-    "lastUpdated": "2025-07-31T11:15:43.623Z"
+    "lastUpdated": "2025-07-31T11:16:34.719Z"
   },
   "vix": {
     "current": {
@@ -481,7 +481,7 @@
         "value": 20.14
       }
     ],
-    "lastUpdated": "2025-07-31T11:15:45.949Z"
+    "lastUpdated": "2025-07-31T11:16:37.178Z"
   },
   "qqq": {
     "symbol": "QQQ",
@@ -674,7 +674,7 @@
         "change": -2.6299999999999955
       }
     ],
-    "lastUpdated": "2025-07-31T11:15:48.131Z"
+    "lastUpdated": "2025-07-31T11:16:39.519Z"
   },
   "iwm": {
     "symbol": "IWM",
@@ -867,16 +867,16 @@
         "change": -0.5099999999999909
       }
     ],
-    "lastUpdated": "2025-07-31T11:15:50.318Z"
+    "lastUpdated": "2025-07-31T11:16:41.716Z"
   },
   "options": {
-    "market": "Market options show bearish sentiment (P/C: 1.11)",
-    "ratio": 1.11,
-    "putVolume": 204810,
-    "callVolume": 183998,
-    "sentiment": "bearish",
+    "market": "Market options show very bearish sentiment (P/C: 1.31)",
+    "ratio": 1.31,
+    "putVolume": 229300,
+    "callVolume": 175632,
+    "sentiment": "very bearish",
     "successfulFetches": 3,
     "totalSymbols": 3,
-    "lastUpdated": "2025-07-31T11:15:52.686Z"
+    "lastUpdated": "2025-07-31T11:16:44.273Z"
   }
 }

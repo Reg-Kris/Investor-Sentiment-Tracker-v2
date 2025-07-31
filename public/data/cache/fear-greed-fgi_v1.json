@@ -1,163 +1,163 @@
 {
-  "timestamp": "2025-07-30T22:45:26.312Z",
+  "timestamp": "2025-07-31T11:16:32.246Z",
   "data": {
     "current": {
-      "date": "2025-07-30",
-      "value": 67,
+      "date": "2025-07-31",
+      "value": 66,
       "rating": "Greed"
     },
     "historical": [
       {
+        "date": "2025-07-31",
+        "value": 66,
+        "rating": "Greed"
+      },
+      {
         "date": "2025-07-30",
-        "value": 67,
+        "value": 66,
         "rating": "Greed"
       },
       {
         "date": "2025-07-29",
-        "value": 69,
+        "value": 70.46,
         "rating": "Greed"
       },
       {
         "date": "2025-07-28",
-        "value": 63.19,
+        "value": 67.5,
         "rating": "Greed"
       },
       {
         "date": "2025-07-27",
-        "value": 62.4,
+        "value": 69.56,
         "rating": "Greed"
       },
       {
         "date": "2025-07-26",
-        "value": 63.8,
+        "value": 63.56,
         "rating": "Greed"
       },
       {
         "date": "2025-07-25",
-        "value": 69.89,
+        "value": 61.18,
         "rating": "Greed"
       },
       {
         "date": "2025-07-24",
-        "value": 70.37,
+        "value": 74,
         "rating": "Greed"
       },
       {
         "date": "2025-07-23",
-        "value": 76,
-        "rating": "Extreme Greed"
+        "value": 61.56,
+        "rating": "Greed"
       },
       {
         "date": "2025-07-22",
-        "value": 62.41,
+        "value": 61.85,
         "rating": "Greed"
       },
       {
         "date": "2025-07-21",
-        "value": 68.18,
+        "value": 63.37,
         "rating": "Greed"
       },
       {
         "date": "2025-07-20",
-        "value": 70.76,
+        "value": 69.3,
         "rating": "Greed"
       },
       {
         "date": "2025-07-19",
-        "value": 68.61,
+        "value": 63.49,
         "rating": "Greed"
       },
       {
         "date": "2025-07-18",
-        "value": 65.77,
+        "value": 70.2,
         "rating": "Greed"
       },
       {
         "date": "2025-07-17",
-        "value": 71.46,
+        "value": 61.17,
         "rating": "Greed"
       },
       {
         "date": "2025-07-16",
-        "value": 65.32,
+        "value": 66.08,
         "rating": "Greed"
       },
       {
         "date": "2025-07-15",
-        "value": 68.66,
+        "value": 68.93,
         "rating": "Greed"
       },
       {
         "date": "2025-07-14",
-        "value": 65.15,
+        "value": 65.56,
         "rating": "Greed"
       },
       {
         "date": "2025-07-13",
-        "value": 64.97,
+        "value": 67.16,
         "rating": "Greed"
       },
       {
         "date": "2025-07-12",
-        "value": 62.91,
+        "value": 70.45,
         "rating": "Greed"
       },
       {
         "date": "2025-07-11",
-        "value": 62.54,
+        "value": 63.41,
         "rating": "Greed"
       },
       {
         "date": "2025-07-10",
-        "value": 66.12,
+        "value": 61.31,
         "rating": "Greed"
       },
       {
         "date": "2025-07-09",
-        "value": 68.73,
+        "value": 63.86,
         "rating": "Greed"
       },
       {
         "date": "2025-07-08",
-        "value": 68.38,
+        "value": 63.96,
         "rating": "Greed"
       },
       {
         "date": "2025-07-07",
-        "value": 66.61,
+        "value": 62.16,
         "rating": "Greed"
       },
       {
         "date": "2025-07-06",
-        "value": 68.82,
+        "value": 63.22,
         "rating": "Greed"
       },
       {
         "date": "2025-07-05",
-        "value": 63.12,
+        "value": 67.31,
         "rating": "Greed"
       },
       {
         "date": "2025-07-04",
-        "value": 63.48,
+        "value": 66.39,
         "rating": "Greed"
       },
       {
         "date": "2025-07-03",
-        "value": 66.04,
+        "value": 64.09,
         "rating": "Greed"
       },
       {
         "date": "2025-07-02",
-        "value": 66.27,
-        "rating": "Greed"
-      },
-      {
-        "date": "2025-07-01",
-        "value": 62.63,
+        "value": 61.66,
         "rating": "Greed"
       }
     ],
-    "lastUpdated": "2025-07-30T22:45:26.312Z"
+    "lastUpdated": "2025-07-31T11:16:32.246Z"
   }
 }
