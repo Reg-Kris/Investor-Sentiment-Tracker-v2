@@ -1,15 +1,15 @@
 {
-  "timestamp": "2025-08-01T14:47:32.071Z",
+  "timestamp": "2025-08-01T18:53:28.466Z",
   "data": {
     "current": {
       "date": "2025-08-01",
-      "value": 51,
+      "value": 49,
       "rating": "Neutral"
     },
     "historical": [
       {
         "date": "2025-08-01",
-        "value": 51,
+        "value": 49,
         "rating": "Neutral"
       },
       {
@@ -19,27 +19,27 @@
       },
       {
         "date": "2025-07-30",
-        "value": 49.68,
+        "value": 50.23,
         "rating": "Neutral"
       },
       {
         "date": "2025-07-29",
-        "value": 50.24,
+        "value": 51.84,
         "rating": "Neutral"
       },
       {
         "date": "2025-07-28",
-        "value": 52.29,
+        "value": 47.68,
         "rating": "Neutral"
       },
       {
         "date": "2025-07-27",
-        "value": 46.48,
+        "value": 45.52,
         "rating": "Neutral"
       },
       {
         "date": "2025-07-26",
-        "value": 54.21,
+        "value": 49.59,
         "rating": "Neutral"
       },
       {
@@ -49,115 +49,115 @@
       },
       {
         "date": "2025-07-24",
-        "value": 53.9,
-        "rating": "Neutral"
+        "value": 44.59,
+        "rating": "Fear"
       },
       {
         "date": "2025-07-23",
-        "value": 54.07,
+        "value": 50.18,
         "rating": "Neutral"
       },
       {
         "date": "2025-07-22",
-        "value": 46.94,
+        "value": 46.52,
         "rating": "Neutral"
       },
       {
         "date": "2025-07-21",
-        "value": 47.51,
+        "value": 52.36,
         "rating": "Neutral"
       },
       {
         "date": "2025-07-20",
-        "value": 53.09,
+        "value": 46.77,
         "rating": "Neutral"
       },
       {
         "date": "2025-07-19",
-        "value": 53.44,
+        "value": 52.28,
         "rating": "Neutral"
       },
       {
         "date": "2025-07-18",
-        "value": 48.78,
+        "value": 49.11,
         "rating": "Neutral"
       },
       {
         "date": "2025-07-17",
-        "value": 54.01,
-        "rating": "Neutral"
+        "value": 44.05,
+        "rating": "Fear"
       },
       {
         "date": "2025-07-16",
-        "value": 48.31,
+        "value": 46.72,
         "rating": "Neutral"
       },
       {
         "date": "2025-07-15",
-        "value": 54.31,
+        "value": 50.55,
         "rating": "Neutral"
       },
       {
         "date": "2025-07-14",
-        "value": 52.62,
-        "rating": "Neutral"
+        "value": 44.13,
+        "rating": "Fear"
       },
       {
         "date": "2025-07-13",
-        "value": 50.07,
-        "rating": "Neutral"
+        "value": 44.12,
+        "rating": "Fear"
       },
       {
         "date": "2025-07-12",
-        "value": 48.53,
-        "rating": "Neutral"
+        "value": 44.02,
+        "rating": "Fear"
       },
       {
         "date": "2025-07-11",
-        "value": 51.96,
+        "value": 46.92,
         "rating": "Neutral"
       },
       {
         "date": "2025-07-10",
-        "value": 55.81,
-        "rating": "Greed"
-      },
-      {
-        "date": "2025-07-09",
-        "value": 50.36,
+        "value": 46.11,
         "rating": "Neutral"
       },
       {
+        "date": "2025-07-09",
+        "value": 44.81,
+        "rating": "Fear"
+      },
+      {
         "date": "2025-07-08",
-        "value": 51.85,
+        "value": 50.84,
         "rating": "Neutral"
       },
       {
         "date": "2025-07-07",
-        "value": 47.75,
+        "value": 51.62,
         "rating": "Neutral"
       },
       {
         "date": "2025-07-06",
-        "value": 51.85,
+        "value": 48.51,
         "rating": "Neutral"
       },
       {
         "date": "2025-07-05",
-        "value": 49.57,
+        "value": 50.81,
         "rating": "Neutral"
       },
       {
         "date": "2025-07-04",
-        "value": 47.85,
+        "value": 52.2,
         "rating": "Neutral"
       },
       {
         "date": "2025-07-03",
-        "value": 49.49,
+        "value": 50.97,
         "rating": "Neutral"
       }
     ],
-    "lastUpdated": "2025-08-01T14:47:32.071Z"
+    "lastUpdated": "2025-08-01T18:53:28.466Z"
   }
 }

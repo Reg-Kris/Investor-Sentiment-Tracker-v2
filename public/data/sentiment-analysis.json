@@ -1,12 +1,12 @@
 {
   "overall": {
-    "score": 57,
+    "score": 56,
     "sentiment": "MILD GREED",
     "message": "Markets are slightly bullish",
     "confidence": 70,
     "components": {
       "fearGreed": {
-        "score": 51,
+        "score": 49,
         "weight": 0.35
       },
       "market": {
@@ -25,13 +25,13 @@
   },
   "timeframes": {
     "1d": {
-      "score": 55,
-      "sentiment": "MILD GREED",
-      "message": "Markets are slightly bullish",
+      "score": 54,
+      "sentiment": "NEUTRAL",
+      "message": "Markets are balanced",
       "trend": "neutral"
     },
     "5d": {
-      "score": 54,
+      "score": 53,
       "sentiment": "NEUTRAL",
       "message": "Markets are balanced",
       "trend": "stable"
@@ -45,7 +45,7 @@
   },
   "indicators": {
     "fearGreed": {
-      "value": 51,
+      "value": 49,
       "label": "Neutral",
       "message": "Market sentiment balanced",
       "color": "#6b7280"
@@ -79,5 +79,5 @@
       "iwm": "IWM options data unavailable"
     }
   },
-  "lastAnalyzed": "2025-08-01T14:47:43.345Z"
+  "lastAnalyzed": "2025-08-01T18:53:39.860Z"
 }
