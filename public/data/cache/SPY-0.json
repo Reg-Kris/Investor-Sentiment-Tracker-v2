@@ -1,15 +1,21 @@
 {
-  "timestamp": "2025-08-01T18:53:30.641Z",
+  "timestamp": "2025-08-01T22:45:19.468Z",
   "data": {
     "symbol": "SPY",
     "current": {
-      "date": "2025-07-31",
-      "price": 632.08,
-      "volume": 103385246,
-      "change": -7.375,
-      "changePercent": -0.38
+      "date": "2025-08-01",
+      "price": 621.72,
+      "volume": 138472786,
+      "change": -4.579999999999927,
+      "changePercent": -1.64
     },
     "historical": [
+      {
+        "date": "2025-08-01",
+        "price": 621.72,
+        "volume": 138472786,
+        "change": -4.579999999999927
+      },
       {
         "date": "2025-07-31",
         "price": 632.08,
@@ -183,14 +189,8 @@
         "price": 594.28,
         "volume": 94051374,
         "change": -4.100000000000023
-      },
-      {
-        "date": "2025-06-18",
-        "price": 597.44,
-        "volume": 76605029,
-        "change": -1
       }
     ],
-    "lastUpdated": "2025-08-01T18:53:30.641Z"
+    "lastUpdated": "2025-08-01T22:45:19.468Z"
   }
 }

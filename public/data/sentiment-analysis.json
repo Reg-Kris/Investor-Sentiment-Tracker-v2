@@ -1,16 +1,16 @@
 {
   "overall": {
-    "score": 56,
-    "sentiment": "MILD GREED",
-    "message": "Markets are slightly bullish",
+    "score": 53,
+    "sentiment": "NEUTRAL",
+    "message": "Markets are balanced",
     "confidence": 70,
     "components": {
       "fearGreed": {
-        "score": 49,
+        "score": 50,
         "weight": 0.35
       },
       "market": {
-        "score": 44,
+        "score": 31,
         "weight": 0.25
       },
       "volatility": {
@@ -25,19 +25,19 @@
   },
   "timeframes": {
     "1d": {
-      "score": 54,
-      "sentiment": "NEUTRAL",
-      "message": "Markets are balanced",
+      "score": 55,
+      "sentiment": "MILD GREED",
+      "message": "Markets are slightly bullish",
       "trend": "neutral"
     },
     "5d": {
-      "score": 53,
+      "score": 47,
       "sentiment": "NEUTRAL",
       "message": "Markets are balanced",
       "trend": "stable"
     },
     "1m": {
-      "score": 75,
+      "score": 74,
       "sentiment": "GREED",
       "message": "Investors are greedy",
       "trend": "stable"
@@ -45,27 +45,27 @@
   },
   "indicators": {
     "fearGreed": {
-      "value": 49,
+      "value": 50,
       "label": "Neutral",
       "message": "Market sentiment balanced",
       "color": "#6b7280"
     },
     "spy": {
-      "price": 632.08,
-      "change": -0.38,
-      "message": "S&P 500 trading flat",
+      "price": 621.72,
+      "change": -1.64,
+      "message": "S&P 500 under pressure",
       "color": "#ef4444"
     },
     "qqq": {
-      "price": 565.01,
-      "change": -0.53,
+      "price": 553.88,
+      "change": -1.97,
       "message": "Nasdaq 100 under pressure",
       "color": "#ef4444"
     },
     "iwm": {
-      "price": 219.39,
-      "change": -0.98,
-      "message": "Russell 2000 under pressure",
+      "price": 214.92,
+      "change": -2.04,
+      "message": "Russell 2000 declining sharply",
       "color": "#ef4444"
     },
     "vix": {
@@ -79,5 +79,5 @@
       "iwm": "IWM options data unavailable"
     }
   },
-  "lastAnalyzed": "2025-08-01T18:53:39.860Z"
+  "lastAnalyzed": "2025-08-01T22:45:29.365Z"
 }
