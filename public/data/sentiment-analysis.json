@@ -1,12 +1,12 @@
 {
   "overall": {
-    "score": 61,
+    "score": 57,
     "sentiment": "MILD GREED",
     "message": "Markets are slightly bullish",
     "confidence": 70,
     "components": {
       "fearGreed": {
-        "score": 61,
+        "score": 51,
         "weight": 0.35
       },
       "market": {
@@ -14,7 +14,7 @@
         "weight": 0.25
       },
       "volatility": {
-        "score": 78,
+        "score": 73,
         "weight": 0.2
       },
       "options": {
@@ -25,19 +25,19 @@
   },
   "timeframes": {
     "1d": {
-      "score": 60,
+      "score": 55,
       "sentiment": "MILD GREED",
       "message": "Markets are slightly bullish",
       "trend": "neutral"
     },
     "5d": {
-      "score": 58,
-      "sentiment": "MILD GREED",
-      "message": "Markets are slightly bullish",
+      "score": 54,
+      "sentiment": "NEUTRAL",
+      "message": "Markets are balanced",
       "trend": "stable"
     },
     "1m": {
-      "score": 79,
+      "score": 75,
       "sentiment": "GREED",
       "message": "Investors are greedy",
       "trend": "stable"
@@ -45,10 +45,10 @@
   },
   "indicators": {
     "fearGreed": {
-      "value": 61,
-      "label": "Greed",
-      "message": "Markets showing greed",
-      "color": "#f59e0b"
+      "value": 51,
+      "label": "Neutral",
+      "message": "Market sentiment balanced",
+      "color": "#6b7280"
     },
     "spy": {
       "price": 632.08,
@@ -69,7 +69,7 @@
       "color": "#ef4444"
     },
     "vix": {
-      "value": 15.5,
+      "value": 16.7,
       "message": "Markets are calm",
       "color": "#10b981"
     },
@@ -79,5 +79,5 @@
       "iwm": "IWM options data unavailable"
     }
   },
-  "lastAnalyzed": "2025-08-01T11:16:13.701Z"
+  "lastAnalyzed": "2025-08-01T14:47:43.345Z"
 }
