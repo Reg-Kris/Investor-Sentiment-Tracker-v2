@@ -31,7 +31,7 @@
       "trend": "neutral"
     },
     "5d": {
-      "score": 57,
+      "score": 58,
       "sentiment": "MILD GREED",
       "message": "Markets are slightly bullish",
       "trend": "stable"
@@ -79,5 +79,5 @@
       "iwm": "IWM options data unavailable"
     }
   },
-  "lastAnalyzed": "2025-08-01T11:15:40.980Z"
+  "lastAnalyzed": "2025-08-01T11:16:13.701Z"
 }
