@@ -3,6 +3,13 @@
 import { useEffect, useRef } from 'react';
 // Removed logger import for static build compatibility
 
+interface WebVitalsMetric {
+  name: string;
+  value: number;
+  id: string;
+  delta: number;
+}
+
 interface PerformanceMetrics {
   navigation: {
     loadComplete: number;

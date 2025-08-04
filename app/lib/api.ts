@@ -3,7 +3,7 @@ import { SentimentData, SentimentLevel, APIResponse } from './types';
 
 class APIService {
   private static instance: APIService;
-  private cache: Map<string, { data: unknown; timestamp: number }> = new Map();
+  private cache: Map<string, { data: any; timestamp: number }> = new Map();
   private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
   private rateLimitTracker: Map<string, { count: number; resetTime: number }> = new Map();
   private errorCounts: Map<string, number> = new Map();
@@ -68,7 +68,7 @@ class APIService {
     const cached = this.cache.get(key);
     if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
       console.log(`Cache hit for ${key}`, { cacheAge: Date.now() - cached.timestamp });
-      return cached.data;
+      return cached.data as T;
     }
 
     console.time(`api-fetch-${key}`);
@@ -91,7 +91,7 @@ class APIService {
           cacheAge: Date.now() - cached.timestamp,
           error: error instanceof Error ? error.message : 'Unknown error'
         });
-        return cached.data;
+        return cached.data as T;
       }
       throw error;
     }
