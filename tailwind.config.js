@@ -154,64 +154,64 @@ module.exports = {
             },
           }
         },
-        // Tremor color palette (keeping for compatibility)
+        // Tremor color palette (fixed for proper contrast)
         tremor: {
           brand: {
-            faint: '#eff6ff', // blue-50
-            muted: '#bfdbfe', // blue-200
-            subtle: '#60a5fa', // blue-400
-            DEFAULT: '#00C884', // Updated to fintech primary
-            emphasis: '#047857', // Updated to fintech primary dark
+            faint: '#fdf2f8', // pink-50 but very light
+            muted: '#f3e8ff', // purple-100 for subtle contrast
+            subtle: '#a855f7', // purple-500 for visibility
+            DEFAULT: '#de8eac', // fintech primary
+            emphasis: '#9f1239', // rose-800 for strong contrast
             inverted: '#ffffff', // white
           },
           background: {
-            muted: '#f8fafc', // Updated to fintech light
-            subtle: '#f1f5f9', // Updated 
+            muted: '#fefce8', // yellow-50 for warmth but contrast
+            subtle: '#fef3c7', // yellow-100 for subtle backgrounds
             DEFAULT: '#ffffff', // white
-            emphasis: '#374151', // gray-700
+            emphasis: '#1f2937', // gray-800 for dark elements
           },
           border: {
-            DEFAULT: '#e2e8f0', // Updated to match new theme
+            DEFAULT: '#d1d5db', // gray-300 for visible borders
           },
           ring: {
-            DEFAULT: '#e2e8f0', // Updated
+            DEFAULT: '#d1d5db', // gray-300
           },
           content: {
-            subtle: '#64748b', // Updated
-            DEFAULT: '#475569', // Updated
-            emphasis: '#334155', // Updated
-            strong: '#0f172a', // Updated
+            subtle: '#6b7280', // gray-500 for subtle text
+            DEFAULT: '#374151', // gray-700 for regular text  
+            emphasis: '#1f2937', // gray-800 for emphasized text
+            strong: '#111827', // gray-900 for strong text
             inverted: '#ffffff', // white
           },
         },
-        // Dark mode colors
+        // Dark mode colors (fixed for proper contrast)
         dark: {
           tremor: {
             brand: {
-              faint: '#0B1229', // custom
-              muted: '#172554', // blue-900
-              subtle: '#1e40af', // blue-800
-              DEFAULT: '#00C884', // Updated to fintech primary
-              emphasis: '#34D399', // Updated
+              faint: '#1e1b4b', // indigo-900 for dark subtle
+              muted: '#312e81', // indigo-800
+              subtle: '#6366f1', // indigo-500 for visibility
+              DEFAULT: '#f0b6d3', // light pink for dark mode
+              emphasis: '#fbbf24', // amber-400 for emphasis
               inverted: '#030712', // gray-950
             },
             background: {
-              muted: '#0f172a', // Updated
-              subtle: '#1e293b', // Updated
+              muted: '#1f2937', // gray-800
+              subtle: '#374151', // gray-700
               DEFAULT: '#111827', // gray-900
-              emphasis: '#cbd5e1', // Updated
+              emphasis: '#9ca3af', // gray-400 for emphasis
             },
             border: {
-              DEFAULT: '#334155', // Updated
+              DEFAULT: '#4b5563', // gray-600 for visible borders
             },
             ring: {
-              DEFAULT: '#334155', // Updated
+              DEFAULT: '#4b5563', // gray-600
             },
             content: {
-              subtle: '#64748b', // Updated
-              DEFAULT: '#94a3b8', // Updated
-              emphasis: '#e2e8f0', // Updated
-              strong: '#f1f5f9', // Updated
+              subtle: '#9ca3af', // gray-400 for subtle text
+              DEFAULT: '#d1d5db', // gray-300 for regular text
+              emphasis: '#e5e7eb', // gray-200 for emphasized text  
+              strong: '#f9fafb', // gray-50 for strong text
               inverted: '#000000', // black
             },
           },

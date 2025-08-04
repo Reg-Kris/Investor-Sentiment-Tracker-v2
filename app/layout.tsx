@@ -39,7 +39,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <ThemeProvider defaultTheme="system" storageKey="sentiment-tracker-theme">
-          <div className="min-h-screen bg-tremor-background dark:bg-dark-tremor-background text-tremor-content-strong dark:text-dark-tremor-content-strong">
+          <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
             {children}
           </div>
         </ThemeProvider>

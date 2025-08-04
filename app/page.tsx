@@ -32,10 +32,25 @@ export default function Home() {
         setSentimentData(response.data);
       } else {
         setError(response.error || 'Failed to fetch data');
+        // Always set data even if there's an error - the API provides fallback data
         setSentimentData(response.data);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
+      // Provide fallback data on complete failure
+      setSentimentData({
+        fearGreedIndex: 50,
+        spyChange: 0,
+        spyPrice: 620,
+        qqqqChange: 0,
+        qqqPrice: 540,
+        iwmChange: 0,
+        iwmPrice: 200,
+        vixLevel: 20,
+        putCallRatio: 0.92,
+        overallSentiment: 'neutral',
+        lastUpdated: new Date().toISOString()
+      });
     } finally {
       setLoading(false);
     }
@@ -48,20 +63,20 @@ export default function Home() {
   }, []);
 
 
-  if (!sentimentData) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-tremor-background dark:bg-dark-tremor-background">
+      <div className="min-h-screen bg-white dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-6 py-6 lg:py-8 xl:py-10">
           {/* Header Skeleton */}
           <div className="mb-8">
             <div className="flex justify-between items-center mb-4">
               <div className="space-y-2">
-                <div className="h-8 w-64 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-shimmer" />
-                <div className="h-4 w-96 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-shimmer" />
+                <div className="h-8 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-shimmer" />
+                <div className="h-4 w-96 bg-gray-200 dark:bg-gray-700 rounded animate-shimmer" />
               </div>
               <div className="flex space-x-3">
-                <div className="h-8 w-8 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-shimmer" />
-                <div className="h-8 w-20 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-shimmer" />
+                <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-shimmer" />
+                <div className="h-8 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-shimmer" />
               </div>
             </div>
           </div>
@@ -72,10 +87,10 @@ export default function Home() {
             <Col numColSpan={12} numColSpanLg={4}>
               <div className="glass-card p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <div className="h-5 w-32 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-shimmer" />
-                  <div className="h-6 w-20 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded-full animate-shimmer" />
+                  <div className="h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-shimmer" />
+                  <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full animate-shimmer" />
                 </div>
-                <div className="h-48 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded-lg animate-shimmer" />
+                <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-lg animate-shimmer" />
               </div>
             </Col>
             
@@ -85,9 +100,9 @@ export default function Home() {
                 {Array.from({ length: 4 }, (_, i) => (
                   <Col key={i} numColSpan={1}>
                     <div className="glass-card p-6">
-                      <div className="h-4 w-20 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-pulse mb-4"></div>
-                      <div className="h-8 w-16 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-pulse mb-2"></div>
-                      <div className="h-3 w-24 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-pulse"></div>
+                      <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4"></div>
+                      <div className="h-8 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2"></div>
+                      <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
                     </div>
                   </Col>
                 ))}
@@ -97,20 +112,20 @@ export default function Home() {
             {/* Timeline Chart Skeleton */}
             <Col numColSpan={12} numColSpanLg={8}>
               <div className="glass-card p-6">
-                <div className="h-4 w-32 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-pulse mb-4"></div>
-                <div className="h-40 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-pulse"></div>
+                <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4"></div>
+                <div className="h-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
               </div>
             </Col>
             
             {/* News Skeleton */}
             <Col numColSpan={12} numColSpanLg={4}>
               <div className="glass-card p-6">
-                <div className="h-4 w-20 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-pulse mb-4"></div>
+                <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4"></div>
                 <div className="space-y-3">
                   {Array.from({ length: 3 }, (_, i) => (
                     <div key={i} className="space-y-2">
-                      <div className="h-3 w-full bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-pulse"></div>
-                      <div className="h-3 w-3/4 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-pulse"></div>
+                      <div className="h-3 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                      <div className="h-3 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
                     </div>
                   ))}
                 </div>
@@ -138,9 +153,21 @@ export default function Home() {
     );
   }
 
+  // Ensure sentimentData is not null before rendering
+  if (!sentimentData) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Loading Market Data...</h1>
+          <p className="text-gray-600 dark:text-gray-400">Please wait while we fetch the latest market sentiment data.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <PageTransition>
-      <main className="min-h-screen bg-fintech-surface-light dark:bg-fintech-surface-dark transition-colors duration-300">
+      <main className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-6 py-6 lg:py-8 xl:py-10 relative overflow-hidden">
         {/* Hero Section with Giant Sentiment Gauge */}
         <ViewportAnimation animation="bounce" threshold={0.2}>
@@ -158,10 +185,10 @@ export default function Home() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <Title className="text-tremor-content-strong dark:text-dark-tremor-content-strong text-lg lg:text-xl font-semibold">
+              <Title className="text-gray-900 dark:text-gray-100 text-lg lg:text-xl font-semibold">
                 Market Indicators Explained
               </Title>
-              <Text className="text-tremor-content dark:text-dark-tremor-content mt-1 text-sm lg:text-base">
+              <Text className="text-gray-600 dark:text-gray-400 mt-1 text-sm lg:text-base">
                 Each metric tells you what investors are thinking and feeling
               </Text>
             </motion.div>
@@ -321,7 +348,7 @@ export default function Home() {
         <ViewportAnimation 
           animation="scale" 
           delay={0.3}
-          className="mt-8 lg:mt-12 bg-fintech-surface-light/60 dark:bg-fintech-surface-dark/60 backdrop-blur-sm rounded-xl p-6 lg:p-8 border border-fintech-primary-200/30 dark:border-fintech-primary-700/30 warm-glow"
+          className="mt-8 lg:mt-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-6 lg:p-8 border border-gray-200/50 dark:border-gray-700/50 shadow-lg"
         >
           <div className="text-center mb-6 lg:mb-8">
             <h3 className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
@@ -396,7 +423,7 @@ export default function Home() {
         <ViewportAnimation 
           animation="fadeUp" 
           delay={0.4}
-          className="mt-8 lg:mt-12 p-4 lg:p-6 bg-gradient-to-r from-fintech-secondary-50 to-fintech-accent-50 dark:from-fintech-secondary-950/50 dark:to-fintech-accent-950/50 rounded-xl border border-fintech-secondary-200/50 dark:border-fintech-secondary-800/50 champagne-glow"
+          className="mt-8 lg:mt-12 p-4 lg:p-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/50 dark:to-purple-950/50 rounded-xl border border-blue-200/50 dark:border-blue-800/50 shadow-md"
         >
           <div className="text-center">
             <h3 className="text-base lg:text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
@@ -414,7 +441,7 @@ export default function Home() {
         <ViewportAnimation 
           animation="fadeUp" 
           delay={0.5}
-          className="mt-12 lg:mt-16 pt-6 lg:pt-8 border-t border-fintech-primary-200/30 dark:border-fintech-primary-700/30"
+          className="mt-12 lg:mt-16 pt-6 lg:pt-8 border-t border-gray-200/50 dark:border-gray-700/50"
         >
           <Flex justifyContent="between" alignItems="center" className="flex-col lg:flex-row gap-3 lg:gap-4">
             <motion.div
@@ -423,10 +450,10 @@ export default function Home() {
               transition={{ duration: 0.4, delay: 1.3 }}
               className="text-center lg:text-left"
             >
-              <Text className="text-tremor-content-subtle dark:text-dark-tremor-content-subtle text-xs lg:text-sm">
+              <Text className="text-gray-500 dark:text-gray-400 text-xs lg:text-sm">
                 Market Sentiment Tracker • Helping Novice Investors Understand Market Emotions
               </Text>
-              <Text className="text-tremor-content-subtle dark:text-dark-tremor-content-subtle text-xs mt-1">
+              <Text className="text-gray-500 dark:text-gray-400 text-xs mt-1">
                 Data updates every 5 minutes • Not financial advice - for educational purposes only
               </Text>
             </motion.div>
@@ -446,7 +473,7 @@ export default function Home() {
                   size="xs"
                   icon={Heart}
                   iconPosition="left"
-                  className="text-xs backdrop-blur-sm border border-fintech-primary-200/50 dark:border-fintech-primary-700/50 hover:bg-fintech-primary-50 dark:hover:bg-fintech-primary-950"
+                  className="text-xs backdrop-blur-sm border border-pink-200/50 dark:border-pink-700/50 hover:bg-pink-50 dark:hover:bg-pink-950"
                   onClick={() => window.open('https://revolut.me/kristiuo4b', '_blank')}
                 >
                   Buy me a coffee ☕
@@ -455,9 +482,9 @@ export default function Home() {
               
               <div className="flex items-center space-x-1">
                 <FloatingAnimation intensity={6} duration={3}>
-                  <div className="w-2 h-2 bg-fintech-success-500 rounded-full animate-pulse" />
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                 </FloatingAnimation>
-                <Text className="text-tremor-content-subtle dark:text-dark-tremor-content-subtle text-xs">
+                <Text className="text-gray-500 dark:text-gray-400 text-xs">
                   Live Data
                 </Text>
               </div>

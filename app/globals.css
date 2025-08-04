@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 71, 63, 59;
+  --foreground-rgb: 31, 41, 55; /* Dark gray for better contrast */
   --background-start-rgb: 252, 249, 246;
   --background-end-rgb: 248, 243, 238;
   
@@ -37,7 +37,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb: 255, 240, 245;
+    --foreground-rgb: 248, 250, 252; /* Light gray for dark mode */
     --background-start-rgb: 45, 35, 42;
     --background-end-rgb: 58, 40, 48;
     
@@ -464,7 +464,7 @@ body {
     transform: translateY(0px);
   }
   50% {
-    transform: translateY(-15px);
+    transform: translateY(-4px);
   }
 }
 
@@ -485,7 +485,7 @@ body {
     transform: translateY(0px) scale(1);
   }
   50% {
-    transform: translateY(-12px) scale(1.02);
+    transform: translateY(-3px) scale(1.01);
   }
 }
 
@@ -671,4 +671,40 @@ body {
   50% {
     transform: translateY(-8px) scale(1.03);
   }
+}
+
+/* Layout spacing fixes */
+.proper-spacing {
+  margin-bottom: 1.5rem;
+}
+
+.proper-spacing:last-child {
+  margin-bottom: 0;
+}
+
+/* Grid layout improvements */
+.tremor-Grid-root {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .tremor-Grid-root {
+    gap: 1.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .tremor-Grid-root {
+    gap: 2rem;
+  }
+}
+
+/* Card spacing consistency */
+.glass-card {
+  margin-bottom: 1rem;
+}
+
+.glass-card:last-child {
+  margin-bottom: 0;
 }
