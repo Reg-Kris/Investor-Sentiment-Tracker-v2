@@ -1,6 +1,7 @@
 'use client';
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import Link from 'next/link';
 // Removed logger import for static build compatibility
 
 interface Props {
@@ -52,8 +53,9 @@ class ErrorBoundary extends Component<Props, State> {
     }
 
     // Report to external error tracking service (if configured)
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'exception', {
+    if (typeof window !== 'undefined' && 'gtag' in window) {
+      const gtag = (window as typeof window & { gtag: (cmd: string, type: string, params: object) => void }).gtag;
+      gtag('event', 'exception', {
         description: error.message,
         fatal: true,
         error_id: this.state.errorId
@@ -152,7 +154,7 @@ class ErrorBoundary extends Component<Props, State> {
                 </h2>
                 
                 <p className="mt-2 text-sm text-gray-600">
-                  We've encountered an unexpected error. Our team has been notified.
+                  We&apos;ve encountered an unexpected error. Our team has been notified.
                 </p>
                 
                 <div className="mt-4 text-xs text-gray-500">
@@ -203,12 +205,12 @@ class ErrorBoundary extends Component<Props, State> {
                 </div>
                 
                 <div className="mt-6 text-center">
-                  <a
+                  <Link
                     href="/"
                     className="text-sm text-indigo-600 hover:text-indigo-500"
                   >
                     Return to Home
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

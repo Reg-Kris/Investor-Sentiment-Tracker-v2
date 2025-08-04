@@ -1,7 +1,7 @@
 'use client';
 
 import { MetricCardProps } from '@/app/lib/types';
-import { LineChart, Line, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { TrendingUp, TrendingDown, Activity } from 'lucide-react';
 
 export default function SentimentCard({ title, value, change, chart, sentiment }: MetricCardProps) {

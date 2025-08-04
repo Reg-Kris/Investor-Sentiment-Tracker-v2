@@ -2,6 +2,7 @@
 
 import { Card, Text, Flex, Badge } from '@tremor/react';
 import { clsx } from 'clsx';
+import Image from 'next/image';
 import { ExternalLink, Clock, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 
@@ -126,9 +127,11 @@ export default function NewsCard({
             >
               {showImages && item.imageUrl && (
                 <div className="mb-3">
-                  <img
+                  <Image
                     src={item.imageUrl}
                     alt={item.title}
+                    width={400}
+                    height={128}
                     className="w-full h-32 object-cover rounded-md"
                     loading="lazy"
                   />

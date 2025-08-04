@@ -28,7 +28,11 @@ interface PerformanceMetrics {
 
 declare global {
   interface Window {
-    webVitals?: any;
+    webVitals?: {
+      getLCP?: (callback: (metric: WebVitalsMetric) => void) => void;
+      getFID?: (callback: (metric: WebVitalsMetric) => void) => void;
+      getCLS?: (callback: (metric: WebVitalsMetric) => void) => void;
+    };
   }
 }
 
@@ -152,7 +156,7 @@ const PerformanceMonitor = () => {
             vitalsData.current.lcp = Math.round(lastEntry.startTime);
           });
           lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
-        } catch (e) {
+        } catch (_e) {
           console.log('LCP observer not supported');
         }
 
@@ -167,7 +171,7 @@ const PerformanceMonitor = () => {
             });
           });
           fidObserver.observe({ entryTypes: ['first-input'] });
-        } catch (e) {
+        } catch (_e) {
           console.log('FID observer not supported');
         }
 
@@ -183,7 +187,7 @@ const PerformanceMonitor = () => {
             vitalsData.current.cls = Math.round(clsValue * 10000) / 10000;
           });
           clsObserver.observe({ entryTypes: ['layout-shift'] });
-        } catch (e) {
+        } catch (_e) {
           console.log('CLS observer not supported');
         }
       }

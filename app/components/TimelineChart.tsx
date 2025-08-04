@@ -73,7 +73,7 @@ export default function TimelineChart({
 
   const filterDataByPeriod = (data: TimelineDataPoint[], period: string) => {
     const now = new Date();
-    let startDate = new Date();
+    const startDate = new Date();
 
     switch (period) {
       case '1D':

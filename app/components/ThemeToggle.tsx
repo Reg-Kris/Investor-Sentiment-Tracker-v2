@@ -34,7 +34,7 @@ export default function ThemeToggle({
       <div className={clsx('relative', className)}>
         <select
           value={theme}
-          onChange={(e) => setTheme(e.target.value as any)}
+          onChange={(e) => setTheme(e.target.value as 'system' | 'dark' | 'light')}
           className={clsx(
             'appearance-none bg-tremor-background dark:bg-dark-tremor-background',
             'border border-tremor-border dark:border-dark-tremor-border',
@@ -67,7 +67,7 @@ export default function ThemeToggle({
   const cycleTheme = () => {
     const currentIndex = themes.findIndex(t => t.value === theme);
     const nextIndex = (currentIndex + 1) % themes.length;
-    setTheme(themes[nextIndex].value as any);
+    setTheme(themes[nextIndex].value as 'system' | 'dark' | 'light');
   };
 
   const currentTheme = themes.find(t => t.value === theme);

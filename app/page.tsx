@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { RefreshCw, Heart, Activity, TrendingUp, AlertCircle } from 'lucide-react';
-import { Grid, Col, Title, Text, Flex, Button, Card, Callout } from '@tremor/react';
+import { Grid, Col, Title, Text, Flex, Button, Callout } from '@tremor/react';
 
 // Import new components
 import SentimentGauge from './components/FearGreedGauge';
