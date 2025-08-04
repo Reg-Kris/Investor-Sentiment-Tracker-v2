@@ -1,21 +1,15 @@
 'use client';
 
-import { useState, useEffect, lazy, Suspense } from 'react';
-import { RefreshCw, Heart, Activity, TrendingUp, AlertCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { RefreshCw, Heart, Activity, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
 import { Grid, Col, Title, Text, Flex, Button, Callout } from '@tremor/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import PageTransition, { StaggerContainer, StaggerItem, ChartReveal } from './components/PageTransition';
-import { MetricCardSkeleton, ChartSkeleton, NewsFeedSkeleton } from './components/SkeletonLoader';
-
-// Lazy-loaded components for code splitting
-const SentimentGauge = lazy(() => import('./components/FearGreedGauge'));
-const SectorHeatmap = lazy(() => import('./components/SectorHeatmap'));
-const TimelineChart = lazy(() => import('./components/TimelineChart'));
+import PageTransition, { StaggerContainer, StaggerItem } from './components/PageTransition';
 
 // Import essential components (loaded immediately)
-import MetricCard from './components/MetricCard';
-import NewsCard from './components/NewsCard';
 import ThemeToggle from './components/ThemeToggle';
+import SentimentHero from './components/SentimentHero';
+import EducationalMetricCard from './components/EducationalMetricCard';
 
 // Import utilities
 import APIService from './lib/api';
@@ -53,78 +47,6 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  // Generate mock data for components
-  const generateMockChartData = (baseValue: number, volatility: number = 0.1, length: number = 20) => {
-    return Array.from({ length }, (_, i) => ({
-      name: `${i}`,
-      value: baseValue + (Math.random() - 0.5) * volatility * baseValue
-    }));
-  };
-
-  const generateTimelineData = () => {
-    const now = new Date();
-    return Array.from({ length: 30 }, (_, i) => {
-      const date = new Date(now);
-      date.setDate(date.getDate() - (29 - i));
-      return {
-        date: date.toISOString(),
-        sentiment: 30 + Math.random() * 40 + Math.sin(i * 0.2) * 10,
-        fearGreed: sentimentData?.fearGreedIndex || 50 + Math.random() * 30,
-        vix: 15 + Math.random() * 20,
-        spyPrice: 450 + Math.random() * 50
-      };
-    });
-  };
-
-  const generateSectorData = () => [
-    { name: 'Technology', change: 2.1, volume: 45000000, marketCap: 2800000000000, symbol: 'XLK' },
-    { name: 'Healthcare', change: -0.8, volume: 23000000, marketCap: 1200000000000, symbol: 'XLV' },
-    { name: 'Financials', change: 1.5, volume: 67000000, marketCap: 890000000000, symbol: 'XLF' },
-    { name: 'Energy', change: -2.3, volume: 34000000, marketCap: 567000000000, symbol: 'XLE' },
-    { name: 'Consumer Disc.', change: 0.7, volume: 28000000, marketCap: 1500000000000, symbol: 'XLY' },
-    { name: 'Utilities', change: -0.2, volume: 12000000, marketCap: 345000000000, symbol: 'XLU' },
-    { name: 'Real Estate', change: 1.8, volume: 18000000, marketCap: 234000000000, symbol: 'XLRE' },
-    { name: 'Materials', change: -1.1, volume: 21000000, marketCap: 456000000000, symbol: 'XLB' }
-  ];
-
-  const generateNewsData = () => [
-    {
-      id: '1',
-      title: 'Fed Signals Potential Rate Adjustments Amid Market Volatility',
-      summary: 'Federal Reserve officials hint at possible policy changes as market sentiment indicators show increased uncertainty.',
-      source: 'MarketWatch',
-      publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-      url: '#',
-      sentiment: 'neutral' as const,
-      impact: 'high' as const,
-      category: 'Monetary Policy',
-      keywords: ['Fed', 'Interest Rates', 'Market Sentiment']
-    },
-    {
-      id: '2',
-      title: 'Technology Sector Shows Resilience Despite Broader Market Concerns',
-      summary: 'Major tech stocks continue to outperform as investors seek growth opportunities in uncertain times.',
-      source: 'Bloomberg',
-      publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-      url: '#',
-      sentiment: 'positive' as const,
-      impact: 'medium' as const,
-      category: 'Sector Analysis',
-      keywords: ['Technology', 'Growth', 'Performance']
-    },
-    {
-      id: '3',
-      title: 'VIX Spikes as Earnings Season Approaches',
-      summary: 'Volatility index reaches elevated levels as market participants prepare for upcoming earnings announcements.',
-      source: 'CNBC',
-      publishedAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
-      url: '#',
-      sentiment: 'negative' as const,
-      impact: 'medium' as const,
-      category: 'Market Volatility',
-      keywords: ['VIX', 'Volatility', 'Earnings']
-    }
-  ];
 
   if (!sentimentData) {
     return (
@@ -162,8 +84,10 @@ export default function Home() {
               <Grid numItemsSm={2} numItemsLg={4} className="gap-4 h-full">
                 {Array.from({ length: 4 }, (_, i) => (
                   <Col key={i} numColSpan={1}>
-                    <div className="glass-card">
-                      <MetricCardSkeleton />
+                    <div className="glass-card p-6">
+                      <div className="h-4 w-20 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-pulse mb-4"></div>
+                      <div className="h-8 w-16 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-pulse mb-2"></div>
+                      <div className="h-3 w-24 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-pulse"></div>
                     </div>
                   </Col>
                 ))}
@@ -172,15 +96,24 @@ export default function Home() {
             
             {/* Timeline Chart Skeleton */}
             <Col numColSpan={12} numColSpanLg={8}>
-              <div className="glass-card">
-                <ChartSkeleton />
+              <div className="glass-card p-6">
+                <div className="h-4 w-32 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-pulse mb-4"></div>
+                <div className="h-40 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-pulse"></div>
               </div>
             </Col>
             
             {/* News Skeleton */}
             <Col numColSpan={12} numColSpanLg={4}>
-              <div className="glass-card">
-                <NewsFeedSkeleton />
+              <div className="glass-card p-6">
+                <div className="h-4 w-20 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-pulse mb-4"></div>
+                <div className="space-y-3">
+                  {Array.from({ length: 3 }, (_, i) => (
+                    <div key={i} className="space-y-2">
+                      <div className="h-3 w-full bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-pulse"></div>
+                      <div className="h-3 w-3/4 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-pulse"></div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </Col>
           </Grid>
@@ -209,7 +142,13 @@ export default function Home() {
     <PageTransition>
       <main className="min-h-screen bg-tremor-background dark:bg-dark-tremor-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+        {/* Hero Section with Giant Sentiment Gauge */}
+        <SentimentHero 
+          value={sentimentData.fearGreedIndex} 
+          lastUpdated={sentimentData.lastUpdated} 
+        />
+
+        {/* Quick Actions */}
         <motion.div 
           className="mb-8"
           initial={{ opacity: 0, y: -20 }}
@@ -222,21 +161,12 @@ export default function Home() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <Title className="text-tremor-content-strong dark:text-dark-tremor-content-strong heading-gradient text-2xl font-bold">
-                Market Sentiment Dashboard
+              <Title className="text-tremor-content-strong dark:text-dark-tremor-content-strong text-xl font-semibold">
+                Market Indicators Explained
               </Title>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.4, delay: 0.3 }}
-              >
-                <Text className="text-tremor-content dark:text-dark-tremor-content mt-1 flex items-center space-x-2">
-                  <span>Professional trading intelligence</span>
-                  <span className="text-fintech-primary-500">•</span>
-                  <span>Last updated: {new Date(sentimentData.lastUpdated).toLocaleString()}</span>
-                  <div className="w-2 h-2 bg-fintech-success-500 rounded-full animate-pulse" />
-                </Text>
-              </motion.div>
+              <Text className="text-tremor-content dark:text-dark-tremor-content mt-1">
+                Each metric tells you what investors are thinking and feeling
+              </Text>
             </motion.div>
             <motion.div 
               className="flex items-center space-x-3"
@@ -259,7 +189,7 @@ export default function Home() {
                   size="sm"
                   className="micro-bounce backdrop-blur-sm"
                 >
-                  Refresh
+                  Refresh Data
                 </Button>
               </motion.div>
             </motion.div>
@@ -286,207 +216,215 @@ export default function Home() {
           </AnimatePresence>
         </motion.div>
 
-        {/* Main Dashboard Grid */}
+        {/* Educational Metric Cards */}
         <StaggerContainer>
-          <Grid numItemsSm={1} numItemsLg={12} className="gap-6">
-          {/* Primary Sentiment Gauge */}
-          <StaggerItem>
-            <Col numColSpan={12} numColSpanLg={4}>
-              <Suspense fallback={
-                <div className="glass-card p-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <div className="h-5 w-32 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-shimmer" />
-                    <div className="h-6 w-20 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded-full animate-shimmer" />
-                  </div>
-                  <div className="h-48 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded-lg animate-shimmer" />
-                </div>
-              }>
-                <SentimentGauge 
-                  value={sentimentData.fearGreedIndex} 
-                  title="Fear & Greed Index"
-                  size="lg"
-                />
-              </Suspense>
-            </Col>
-          </StaggerItem>
-
-          {/* Key Metrics */}
-          <StaggerItem>
-            <Col numColSpan={12} numColSpanLg={8}>
-              <Grid numItemsSm={2} numItemsLg={4} className="gap-4 h-full">
-                <Col numColSpan={1}>
-                  <MetricCard
-                  title="SPY Price"
-                  value={`$${(sentimentData.spyPrice || 620).toFixed(2)}`}
+          <Grid numItemsSm={1} numItemsLg={2} className="gap-6">
+            {/* Market Price Indicators */}
+            <StaggerItem>
+              <Col numColSpan={1}>
+                <EducationalMetricCard
+                  title="S&P 500 Price (SPY)"
+                  value={`$${(sentimentData.spyPrice || 450).toFixed(2)}`}
                   change={sentimentData.spyChange}
                   changeType="percentage"
-                  chart={{
-                    data: generateMockChartData(sentimentData.spyPrice || 620, 0.02),
-                    color: sentimentData.spyChange >= 0 ? 'emerald' : 'red'
+                  explanation={{
+                    whatItIs: "The price of the SPDR S&P 500 ETF, which tracks America's 500 largest companies. Think of it as the temperature of the entire U.S. stock market.",
+                    whyItMatters: "When SPY goes up, most stocks go up too. When it falls, most stocks fall. It's like watching the health of the whole economy in one number.",
+                    currentMeaning: sentimentData.spyChange >= 2 ? "Strong market performance - investors are confident and buying" : 
+                                   sentimentData.spyChange >= 0 ? "Steady market performance - cautious optimism" :
+                                   sentimentData.spyChange >= -2 ? "Market under pressure - some selling activity" :
+                                   "Significant market decline - investors are worried and selling",
+                    historicalContext: "SPY typically returns 7-10% annually over long periods, but can swing ±20% in any given year."
                   }}
-                  status={sentimentData.spyChange >= 2 ? 'excellent' : sentimentData.spyChange >= 0 ? 'good' : sentimentData.spyChange >= -2 ? 'fair' : 'poor'}
-                  size="sm"
-                />
-              </Col>
-              <Col numColSpan={1}>
-                <MetricCard
-                  title="QQQ Price"
-                  value={`$${(sentimentData.qqqPrice || 540).toFixed(2)}`}
-                  change={sentimentData.qqqqChange}
-                  changeType="percentage"
-                  chart={{
-                    data: generateMockChartData(sentimentData.qqqPrice || 540, 0.02),
-                    color: sentimentData.qqqqChange >= 0 ? 'emerald' : 'red'
-                  }}
-                  status={sentimentData.qqqqChange >= 2 ? 'excellent' : sentimentData.qqqqChange >= 0 ? 'good' : sentimentData.qqqqChange >= -2 ? 'fair' : 'poor'}
-                  size="sm"
-                />
-              </Col>
-              <Col numColSpan={1}>
-                <MetricCard
-                  title="VIX Level"
-                  value={sentimentData.vixLevel.toFixed(2)}
-                  trend={sentimentData.vixLevel > 25 ? 'up' : sentimentData.vixLevel < 15 ? 'down' : 'neutral'}
-                  chart={{
-                    data: generateMockChartData(sentimentData.vixLevel, 0.1),
-                    color: sentimentData.vixLevel > 25 ? 'red' : 'emerald'
-                  }}
-                  status={sentimentData.vixLevel < 15 ? 'excellent' : sentimentData.vixLevel < 20 ? 'good' : sentimentData.vixLevel < 30 ? 'fair' : 'poor'}
-                  size="sm"
-                />
-              </Col>
-              <Col numColSpan={1}>
-                <MetricCard
-                  title="Put/Call Ratio"
-                  value={sentimentData.putCallRatio.toFixed(3)}
-                  trend={sentimentData.putCallRatio > 1.2 ? 'up' : sentimentData.putCallRatio < 0.8 ? 'down' : 'neutral'}
-                  chart={{
-                    data: generateMockChartData(sentimentData.putCallRatio, 0.1),
-                    color: sentimentData.putCallRatio > 1.0 ? 'red' : 'emerald'
-                  }}
-                  status={sentimentData.putCallRatio < 0.8 ? 'excellent' : sentimentData.putCallRatio < 1.0 ? 'good' : sentimentData.putCallRatio < 1.2 ? 'fair' : 'poor'}
-                  size="sm"
-                  />
-                </Col>
-              </Grid>
-            </Col>
-          </StaggerItem>
-
-          {/* Timeline Chart */}
-          <StaggerItem>
-            <Col numColSpan={12} numColSpanLg={8}>
-              <ChartReveal delay={0.1}>
-                <Suspense fallback={
-                  <div className="glass-card">
-                    <ChartSkeleton />
-                  </div>
-                }>
-                  <TimelineChart
-                    title="Sentiment Timeline"
-                    data={generateTimelineData()}
-                    height={400}
-                    showControls={true}
-                    defaultPeriod="1M"
-                  />
-                </Suspense>
-              </ChartReveal>
-            </Col>
-          </StaggerItem>
-
-          {/* News Feed */}
-          <StaggerItem>
-            <Col numColSpan={12} numColSpanLg={4}>
-              <NewsCard
-                news={generateNewsData()}
-                title="Market News"
-                maxItems={5}
-                showSentiment={true}
-                showCategory={true}
-                layout="list"
-              />
-            </Col>
-          </StaggerItem>
-
-          {/* Sector Heatmap */}
-          <StaggerItem>
-            <Col numColSpan={12}>
-              <Suspense fallback={
-                <div className="glass-card p-6">
-                  <div className="h-5 w-48 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-shimmer mb-4" />
-                  <div className="grid grid-cols-4 gap-4">
-                    {Array.from({ length: 8 }, (_, i) => (
-                      <div key={i} className="h-20 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-shimmer" />
-                    ))}
-                  </div>
-                </div>
-              }>
-                <SectorHeatmap
-                  title="Sector Performance Heatmap"
-                  data={generateSectorData()}
-                  layout="grid"
+                  trafficLight={sentimentData.spyChange >= 1 ? 'green' : sentimentData.spyChange >= -1 ? 'yellow' : 'red'}
+                  icon={<TrendingUp className="h-5 w-5" />}
                   size="md"
                 />
-              </Suspense>
-            </Col>
-          </StaggerItem>
+              </Col>
+            </StaggerItem>
 
-          {/* Additional Metrics */}
-          <StaggerItem>
-            <Col numColSpan={12} numColSpanLg={6}>
-              <MetricCard
-              title="IWM Small Cap Index"
-              value={`$${(sentimentData.iwmPrice || 200).toFixed(2)}`}
-              change={sentimentData.iwmChange}
-              changeType="percentage"
-              chart={{
-                data: generateMockChartData(sentimentData.iwmPrice || 200, 0.02, 30),
-                color: sentimentData.iwmChange >= 0 ? 'emerald' : 'red',
-                showChart: true
-              }}
-              subtitle="Small-cap market performance indicator"
-              target={210}
-              status={sentimentData.iwmChange >= 2 ? 'excellent' : sentimentData.iwmChange >= 0 ? 'good' : sentimentData.iwmChange >= -2 ? 'fair' : 'poor'}
-              icon={<TrendingUp className="h-5 w-5" />}
-              />
-            </Col>
-          </StaggerItem>
+            <StaggerItem>
+              <Col numColSpan={1}>
+                <EducationalMetricCard
+                  title="Tech Stocks Price (QQQ)"
+                  value={`$${(sentimentData.qqqPrice || 380).toFixed(2)}`}
+                  change={sentimentData.qqqqChange}
+                  changeType="percentage"
+                  explanation={{
+                    whatItIs: "The price of the Invesco QQQ Trust, which tracks the 100 largest technology companies like Apple, Microsoft, Google, and Amazon.",
+                    whyItMatters: "Technology stocks often lead market trends. When investors are optimistic about the future, they buy tech stocks. When worried, they sell them first.",
+                    currentMeaning: sentimentData.qqqqChange >= 2 ? "Technology sector is thriving - high investor confidence in innovation and growth" :
+                                   sentimentData.qqqqChange >= 0 ? "Tech sector stable - moderate growth expectations" :
+                                   sentimentData.qqqqChange >= -2 ? "Tech sector facing headwinds - growth concerns" :
+                                   "Tech sector selling off - investors reducing risk and growth exposure",
+                    historicalContext: "QQQ tends to move more dramatically than SPY - rising faster in bull markets but falling harder in bear markets."
+                  }}
+                  trafficLight={sentimentData.qqqqChange >= 1 ? 'green' : sentimentData.qqqqChange >= -1 ? 'yellow' : 'red'}
+                  icon={<Activity className="h-5 w-5" />}
+                  size="md"
+                />
+              </Col>
+            </StaggerItem>
 
-          <StaggerItem>
-            <Col numColSpan={12} numColSpanLg={6}>
-              <MetricCard
-              title="Market Volatility Index"
-              value={`${(sentimentData.vixLevel * 1.2).toFixed(1)}%`}
-              trend={sentimentData.vixLevel > 25 ? 'up' : 'down'}
-              chart={{
-                data: generateMockChartData(sentimentData.vixLevel * 1.2, 0.15, 30),
-                color: sentimentData.vixLevel > 25 ? 'red' : 'blue',
-                showChart: true
-              }}
-              subtitle="Expected 30-day volatility measure"
-              target={20}
-              status={sentimentData.vixLevel < 15 ? 'excellent' : sentimentData.vixLevel < 20 ? 'good' : sentimentData.vixLevel < 30 ? 'fair' : 'poor'}
-              icon={<Activity className="h-5 w-5" />}
-              />
-            </Col>
-          </StaggerItem>
-        </Grid>
-      </StaggerContainer>
+            {/* Volatility Indicators */}
+            <StaggerItem>
+              <Col numColSpan={1}>
+                <EducationalMetricCard
+                  title="Market Fear Gauge (VIX)"
+                  value={sentimentData.vixLevel.toFixed(1)}
+                  explanation={{
+                    whatItIs: "The VIX measures how much volatility (big price swings) investors expect over the next 30 days. It's often called the 'fear gauge' of the market.",
+                    whyItMatters: "When the VIX is high, investors expect wild price swings and uncertainty. When it's low, they expect calm, steady markets. It helps you understand market stress levels.",
+                    currentMeaning: sentimentData.vixLevel < 15 ? "Market is very calm - investors expect small, steady price movements" :
+                                   sentimentData.vixLevel < 25 ? "Normal market conditions - typical day-to-day volatility expected" :
+                                   sentimentData.vixLevel < 35 ? "Elevated stress - investors expect larger price swings and uncertainty" :
+                                   "High market stress - investors expect dramatic price movements and potential crisis conditions",
+                    historicalContext: "VIX typically ranges from 10-30. Readings above 40 often coincide with market crashes, while readings below 12 suggest complacency."
+                  }}
+                  trafficLight={sentimentData.vixLevel < 20 ? 'green' : sentimentData.vixLevel < 30 ? 'yellow' : 'red'}
+                  icon={<AlertCircle className="h-5 w-5" />}
+                  size="md"
+                />
+              </Col>
+            </StaggerItem>
+
+            <StaggerItem>
+              <Col numColSpan={1}>
+                <EducationalMetricCard
+                  title="Options Sentiment (Put/Call)"
+                  value={sentimentData.putCallRatio.toFixed(2)}
+                  explanation={{
+                    whatItIs: "This ratio compares put options (bets that stocks will fall) to call options (bets that stocks will rise). It shows what options traders are expecting.",
+                    whyItMatters: "When the ratio is high, more traders are betting on falling prices (pessimistic). When low, more are betting on rising prices (optimistic). It reveals professional trader sentiment.",
+                    currentMeaning: sentimentData.putCallRatio > 1.2 ? "Heavy bearish sentiment - professional traders expect significant market declines" :
+                                   sentimentData.putCallRatio > 1.0 ? "Moderate bearish sentiment - more traders betting on declines than gains" :
+                                   sentimentData.putCallRatio > 0.8 ? "Balanced sentiment - roughly equal bets on market direction" :
+                                   "Bullish sentiment - more traders betting on market gains than losses",
+                    historicalContext: "Extreme readings (above 1.4 or below 0.6) often signal market turning points, as crowd sentiment tends to be wrong at extremes."
+                  }}
+                  trafficLight={sentimentData.putCallRatio > 1.3 || sentimentData.putCallRatio < 0.7 ? 'red' : 
+                               sentimentData.putCallRatio > 1.1 || sentimentData.putCallRatio < 0.9 ? 'yellow' : 'green'}
+                  icon={<TrendingDown className="h-5 w-5" />}
+                  size="md"
+                />
+              </Col>
+            </StaggerItem>
+          </Grid>
+        </StaggerContainer>
+
+        {/* Educational Guide Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          className="mt-12 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-gray-200/50 dark:border-gray-700/50"
+        >
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+              Understanding Market Sentiment: A Beginner&apos;s Guide
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Learn how to read the market&apos;s emotional state and what it means for your investments
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="space-y-4 p-6 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
+              <div className="text-center">
+                <div className="text-4xl mb-2">🟢</div>
+                <h4 className="font-bold text-green-800 dark:text-green-200 text-lg mb-2">
+                  Markets Are Calm
+                </h4>
+                <p className="text-sm text-green-700 dark:text-green-300 mb-3">
+                  Low VIX • Balanced Put/Call Ratios • Steady Price Movement
+                </p>
+              </div>
+              <p className="text-sm text-green-800 dark:text-green-200">
+                Investors are confident and trading normally. This is a good time for regular investment strategies. 
+                Prices move predictably based on company earnings and economic fundamentals.
+              </p>
+              <div className="bg-green-100 dark:bg-green-900/50 p-3 rounded text-xs text-green-800 dark:text-green-200">
+                <strong>What to do:</strong> Execute your normal investment plan. Good time for dollar-cost averaging.
+              </div>
+            </div>
+            
+            <div className="space-y-4 p-6 bg-yellow-50 dark:bg-yellow-950/30 rounded-lg border border-yellow-200 dark:border-yellow-800">
+              <div className="text-center">
+                <div className="text-4xl mb-2">🟡</div>
+                <h4 className="font-bold text-yellow-800 dark:text-yellow-200 text-lg mb-2">
+                  Markets Are Nervous
+                </h4>
+                <p className="text-sm text-yellow-700 dark:text-yellow-300 mb-3">
+                  Moderate VIX • Slightly Elevated Ratios • Some Uncertainty
+                </p>
+              </div>
+              <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                Some uncertainty is in the air. Investors are more cautious but not panicking. 
+                This is a good time to be patient and avoid making impulsive decisions.
+              </p>
+              <div className="bg-yellow-100 dark:bg-yellow-900/50 p-3 rounded text-xs text-yellow-800 dark:text-yellow-200">
+                <strong>What to do:</strong> Stay disciplined. Watch for opportunities but don&apos;t rush into decisions.
+              </div>
+            </div>
+            
+            <div className="space-y-4 p-6 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200 dark:border-red-800">
+              <div className="text-center">
+                <div className="text-4xl mb-2">🔴</div>
+                <h4 className="font-bold text-red-800 dark:text-red-200 text-lg mb-2">
+                  Markets Are Extreme
+                </h4>
+                <p className="text-sm text-red-700 dark:text-red-300 mb-3">
+                  High VIX • Extreme Ratios • Fear or Greed Dominates
+                </p>
+              </div>
+              <p className="text-sm text-red-800 dark:text-red-200">
+                Fear or greed dominates rational thinking. These extreme moments often create 
+                the best opportunities - buying during fear or being cautious during greed.
+              </p>
+              <div className="bg-red-100 dark:bg-red-900/50 p-3 rounded text-xs text-red-800 dark:text-red-200">
+                <strong>What to do:</strong> Consider contrarian moves. When others panic, stay calm. When others are euphoric, be cautious.
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Educational Note */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 1.0 }}
+          className="mt-12 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 rounded-xl border border-blue-200/50 dark:border-blue-800/50"
+        >
+          <div className="text-center">
+            <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
+              Remember: Markets are Emotional
+            </h3>
+            <p className="text-blue-800 dark:text-blue-200 text-sm max-w-3xl mx-auto">
+              These indicators show you what other investors are feeling - fear, greed, optimism, or panic. 
+              The best investment opportunities often come when others are being too emotional. 
+              When everyone is fearful, markets may be oversold. When everyone is greedy, markets may be overpriced.
+            </p>
+          </div>
+        </motion.div>
 
         {/* Footer */}
         <motion.footer 
           className="mt-16 pt-8 border-t border-tremor-border/50 dark:border-dark-tremor-border/50"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
+          transition={{ duration: 0.6, delay: 1.2 }}
         >
           <Flex justifyContent="between" alignItems="center" className="flex-col sm:flex-row gap-4">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4, delay: 1 }}
+              transition={{ duration: 0.4, delay: 1.3 }}
             >
-              <Text className="text-tremor-content-subtle dark:text-dark-tremor-content-subtle text-sm">
-                Professional Market Sentiment Tracker • Real-time Trading Intelligence
+              <Text className="text-tremor-content-subtle dark:text-dark-tremor-content-subtle text-sm text-center sm:text-left">
+                Market Sentiment Tracker • Helping Novice Investors Understand Market Emotions
+              </Text>
+              <Text className="text-tremor-content-subtle dark:text-dark-tremor-content-subtle text-xs mt-1 text-center sm:text-left">
+                Data updates every 5 minutes • Not financial advice - for educational purposes only
               </Text>
             </motion.div>
             
@@ -494,7 +432,7 @@ export default function Home() {
               className="flex items-center gap-4"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4, delay: 1.1 }}
+              transition={{ duration: 0.4, delay: 1.4 }}
             >
               <motion.div
                 whileHover={{ scale: 1.05, y: -2 }}
@@ -505,17 +443,19 @@ export default function Home() {
                   size="xs"
                   icon={Heart}
                   iconPosition="left"
-                  className="text-xs backdrop-blur-sm border border-fintech-primary-200/50 dark:border-fintech-primary-700/50"
-                  onClick={() => window.open('https://revolut.me/your-revolut-link', '_blank')}
+                  className="text-xs backdrop-blur-sm border border-fintech-primary-200/50 dark:border-fintech-primary-700/50 hover:bg-fintech-primary-50 dark:hover:bg-fintech-primary-950"
+                  onClick={() => window.open('https://revolut.me/kgautam', '_blank')}
                 >
-                  Support Development
+                  Buy me a coffee ☕
                 </Button>
               </motion.div>
               
-              <Text className="text-tremor-content-subtle dark:text-dark-tremor-content-subtle text-xs flex items-center space-x-1">
-                <span>Data updates every 5 minutes</span>
-                <div className="w-1 h-1 bg-fintech-success-500 rounded-full animate-pulse" />
-              </Text>
+              <div className="flex items-center space-x-1">
+                <div className="w-2 h-2 bg-fintech-success-500 rounded-full animate-pulse" />
+                <Text className="text-tremor-content-subtle dark:text-dark-tremor-content-subtle text-xs">
+                  Live Data
+                </Text>
+              </div>
             </motion.div>
           </Flex>
         </motion.footer>

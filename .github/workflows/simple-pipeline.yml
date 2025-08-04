@@ -1,0 +1,77 @@
+name: Simple Daily Pipeline
+
+on:
+  schedule:
+    - cron: '0 16 * * 1-5'  # 12 PM EST weekdays (market hours)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  simple-pipeline:
+    name: Fetch Data → Build → Deploy
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd scripts && npm ci
+
+      - name: Fetch market data
+        run: |
+          echo "🚀 Fetching market data..."
+          cd scripts && node simple-fetch.js
+
+      - name: Commit data updates
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Simple Pipeline"
+          
+          if ! git diff --quiet HEAD -- data/ public/data/; then
+            git add data/ public/data/
+            git commit -m "Daily market data update - $(date -u +"%Y-%m-%d %H:%M UTC")"
+            git push origin main
+          else
+            echo "No data changes to commit"
+          fi
+
+      - name: Build application
+        run: |
+          echo "🏗️ Building application..."
+          npm run build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './out'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Success notification
+        run: |
+          echo "🎉 Pipeline completed successfully!"
+          echo "📈 Data fetched, committed, built, and deployed"
+          echo "🌐 Site URL: ${{ steps.deployment.outputs.page_url }}"

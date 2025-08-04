@@ -1,0 +1,33 @@
+{
+  "timestamp": "2025-08-04T14:54:54.560Z",
+  "stocks": {
+    "SPY": {
+      "symbol": "SPY",
+      "price": 628.9799194335938,
+      "change": 1.1677200464154656,
+      "timestamp": "2025-08-04T14:54:54.874Z"
+    },
+    "QQQ": {
+      "symbol": "QQQ",
+      "price": 561.7550048828125,
+      "change": 1.4217881004146662,
+      "timestamp": "2025-08-04T14:54:55.974Z"
+    },
+    "^VIX": {
+      "symbol": "^VIX",
+      "price": 18.010000228881836,
+      "change": -11.629043324237395,
+      "timestamp": "2025-08-04T14:54:57.132Z"
+    }
+  },
+  "sentiment": {
+    "score": 72,
+    "label": "Bullish",
+    "timestamp": "2025-08-04T14:54:58.140Z"
+  },
+  "fearGreed": {
+    "value": 64,
+    "classification": "Greed",
+    "timestamp": "2025-08-04T14:54:58.507Z"
+  }
+}

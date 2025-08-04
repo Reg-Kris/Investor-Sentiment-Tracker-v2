@@ -1,39 +1,33 @@
 {
-  "timestamp": "2025-08-04T12:29:13.540Z",
-  "fearGreed": {
-    "value": 42,
-    "classification": "Fear",
-    "indicators": {
-      "market_momentum": 35,
-      "stock_price_strength": 28,
-      "stock_price_breadth": 65,
-      "put_call_ratio": 52,
-      "junk_bond_demand": 38,
-      "market_volatility": 45,
-      "safe_haven_demand": 67
-    }
-  },
-  "market": {
-    "sp500": {
-      "value": 4567.89,
-      "change": -23.45,
-      "changePercent": -0.51
+  "timestamp": "2025-08-04T14:56:25.280Z",
+  "stocks": {
+    "SPY": {
+      "symbol": "SPY",
+      "price": 628.89501953125,
+      "change": 1.1540643965498623,
+      "timestamp": "2025-08-04T14:56:25.510Z"
     },
-    "vix": {
-      "value": 18.34,
-      "change": 2.12
+    "QQQ": {
+      "symbol": "QQQ",
+      "price": 561.64501953125,
+      "change": 1.40193084783416,
+      "timestamp": "2025-08-04T14:56:26.661Z"
+    },
+    "^VIX": {
+      "symbol": "^VIX",
+      "price": 18.100000381469727,
+      "change": -11.187433136337342,
+      "timestamp": "2025-08-04T14:56:27.739Z"
     }
   },
-  "news": {
-    "overall_sentiment": -0.23,
-    "positive_articles": 15,
-    "negative_articles": 28,
-    "neutral_articles": 45,
-    "sources": [
-      "Reuters",
-      "Bloomberg",
-      "CNBC",
-      "MarketWatch"
-    ]
+  "sentiment": {
+    "score": 71,
+    "label": "Bullish",
+    "timestamp": "2025-08-04T14:56:28.740Z"
+  },
+  "fearGreed": {
+    "value": 64,
+    "classification": "Greed",
+    "timestamp": "2025-08-04T14:56:29.183Z"
   }
 }
