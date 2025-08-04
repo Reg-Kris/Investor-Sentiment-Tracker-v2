@@ -1,19 +1,26 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import { ThemeProvider } from './components/ThemeProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Market Sentiment Tracker | Iron Condor Trading Intelligence',
-  description: 'Real-time market sentiment analysis for SPY, QQQ, and IWM iron condor trading strategies. Track fear & greed index, VIX levels, and put/call ratios.',
-  keywords: 'market sentiment, iron condor, options trading, SPY, QQQ, IWM, fear greed index, VIX, put call ratio',
+  title: 'Market Sentiment Tracker | Professional Trading Intelligence',
+  description: 'Advanced market sentiment dashboard with real-time analysis for SPY, QQQ, and IWM. Features fear & greed index, VIX levels, sector heatmaps, and comprehensive market intelligence.',
+  keywords: 'market sentiment, trading dashboard, SPY, QQQ, IWM, fear greed index, VIX, sector analysis, market intelligence, trading tools',
   authors: [{ name: 'Market Sentiment Tracker' }],
   openGraph: {
-    title: 'Market Sentiment Tracker',
-    description: 'Professional market sentiment analysis for iron condor trading',
+    title: 'Market Sentiment Tracker - Professional Trading Dashboard',
+    description: 'Advanced market sentiment analysis and trading intelligence platform',
     type: 'website',
   },
+  robots: 'index, follow',
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({
@@ -22,9 +29,16 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} bg-slate-900 min-h-screen`}>
-        {children}
+    <html lang="en" suppressHydrationWarning>
+      <body 
+        className={`${inter.className} min-h-screen transition-colors duration-300`}
+        suppressHydrationWarning
+      >
+        <ThemeProvider defaultTheme="dark" storageKey="sentiment-tracker-theme">
+          <div className="min-h-screen bg-tremor-background dark:bg-dark-tremor-background text-tremor-content-strong dark:text-dark-tremor-content-strong">
+            {children}
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   )

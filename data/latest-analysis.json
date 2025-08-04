@@ -1,0 +1,35 @@
+{
+  "timestamp": "2025-08-04T12:29:13.541Z",
+  "data_points_analyzed": 1,
+  "fear_greed_analysis": {
+    "current_value": 42,
+    "sentiment": "fear",
+    "recommendation": "cautious buying",
+    "trend": "stable",
+    "historical_avg": 42
+  },
+  "market_analysis": {
+    "sp500_trend": "decreasing",
+    "vix_trend": "increasing",
+    "market_condition": "bearish",
+    "current_sp500": 4567.89,
+    "current_vix": 18.34
+  },
+  "news_analysis": {
+    "sentiment_trend": "stable",
+    "average_sentiment": -0.23,
+    "current_sentiment": -0.23,
+    "news_impact": "negative",
+    "total_articles": 88
+  },
+  "overall_analysis": {
+    "overall_sentiment": "bearish",
+    "confidence_level": 65,
+    "sentiment_score": -0.4,
+    "key_drivers": [
+      "fear",
+      "bearish",
+      "negative"
+    ]
+  }
+}

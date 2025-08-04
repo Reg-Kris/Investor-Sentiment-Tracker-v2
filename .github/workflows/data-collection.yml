@@ -1,0 +1,255 @@
+name: Data Collection and Analysis
+
+on:
+  schedule:
+    # Run every 4 hours during market hours (UTC)
+    - cron: '0 14,18,22 * * 1-5'  # 9 AM, 1 PM, 5 PM EST on weekdays
+    # Run once on weekends for news sentiment
+    - cron: '0 18 * * 0,6'  # 1 PM EST on weekends
+  workflow_dispatch:  # Allow manual trigger
+    inputs:
+      force_analysis:
+        description: 'Force analysis even if no new data'
+        required: false
+        default: 'false'
+        type: boolean
+
+permissions:
+  contents: write
+  actions: read
+
+# Prevent concurrent runs to avoid git conflicts
+concurrency:
+  group: data-collection
+  cancel-in-progress: false
+
+jobs:
+  collect-data:
+    runs-on: ubuntu-latest
+    outputs:
+      data-updated: ${{ steps.check-changes.outputs.data-updated }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history for proper git operations
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          # Install additional dependencies for data collection if needed
+          npm install axios cheerio node-cron --save-dev
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Create data directory
+        run: mkdir -p data
+
+      - name: Fetch sentiment data
+        id: fetch-data
+        run: |
+          echo "Starting data collection..."
+          node scripts/fetch-data.js
+          echo "Data collection completed"
+        continue-on-error: true
+
+      - name: Handle fetch errors
+        if: steps.fetch-data.outcome == 'failure'
+        run: |
+          echo "::warning::Data fetching failed, but continuing with analysis of existing data"
+          echo "FETCH_FAILED=true" >> $GITHUB_ENV
+
+      - name: Analyze sentiment data
+        id: analyze-data
+        run: |
+          echo "Starting sentiment analysis..."
+          node scripts/analyze-sentiment.js
+          echo "Analysis completed"
+        continue-on-error: true
+
+      - name: Handle analysis errors
+        if: steps.analyze-data.outcome == 'failure'
+        run: |
+          echo "::error::Sentiment analysis failed"
+          echo "ANALYSIS_FAILED=true" >> $GITHUB_ENV
+
+      - name: Check for data changes
+        id: check-changes
+        run: |
+          if git diff --quiet HEAD -- data/; then
+            echo "No data changes detected"
+            echo "data-updated=false" >> $GITHUB_OUTPUT
+          else
+            echo "Data changes detected"
+            echo "data-updated=true" >> $GITHUB_OUTPUT
+            git add data/
+          fi
+
+      - name: Pull latest changes and rebase
+        if: steps.check-changes.outputs.data-updated == 'true'
+        run: |
+          echo "Pulling latest changes before commit..."
+          git fetch origin main
+          
+          # Attempt to rebase
+          if ! git rebase origin/main; then
+            echo "Rebase failed, attempting to resolve conflicts..."
+            
+            # For data files, we typically want to keep our version
+            git status --porcelain | grep "^UU" | cut -c4- | xargs -r git checkout --ours
+            git add data/
+            git rebase --continue || true
+          fi
+
+      - name: Commit and push changes
+        if: steps.check-changes.outputs.data-updated == 'true'
+        run: |
+          timestamp=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          
+          # Create commit message with status info
+          commit_msg="Update sentiment data - $timestamp"
+          if [[ "$FETCH_FAILED" == "true" ]]; then
+            commit_msg="$commit_msg (fetch failed)"
+          fi
+          if [[ "$ANALYSIS_FAILED" == "true" ]]; then
+            commit_msg="$commit_msg (analysis failed)"
+          fi
+          
+          git commit -m "$commit_msg"
+          
+          # Push with retry logic
+          max_retries=3
+          retry_count=0
+          
+          while [ $retry_count -lt $max_retries ]; do
+            if git push origin main; then
+              echo "Successfully pushed changes"
+              break
+            else
+              retry_count=$((retry_count + 1))
+              echo "Push failed, attempt $retry_count of $max_retries"
+              
+              if [ $retry_count -lt $max_retries ]; then
+                echo "Pulling latest changes and retrying..."
+                git fetch origin main
+                git rebase origin/main
+                sleep 5
+              else
+                echo "::error::Failed to push after $max_retries attempts"
+                exit 1
+              fi
+            fi
+          done
+
+      - name: Create issue on failure
+        if: failure() && (env.FETCH_FAILED == 'true' || env.ANALYSIS_FAILED == 'true')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = 'Data Collection Workflow Failed';
+            const body = `
+            ## Data Collection Failure Report
+            
+            **Timestamp:** ${new Date().toISOString()}
+            **Workflow:** ${context.workflow}
+            **Run ID:** ${context.runId}
+            
+            **Failures:**
+            ${process.env.FETCH_FAILED === 'true' ? '- ❌ Data fetching failed' : '- ✅ Data fetching succeeded'}
+            ${process.env.ANALYSIS_FAILED === 'true' ? '- ❌ Sentiment analysis failed' : '- ✅ Sentiment analysis succeeded'}
+            
+            **Next Steps:**
+            1. Check the workflow logs: https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}
+            2. Verify API endpoints and rate limits
+            3. Check for any service outages
+            4. Manual run may be required
+            
+            This issue was automatically created by the data collection workflow.
+            `;
+            
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['bug', 'automated', 'data-collection']
+            });
+
+  update-app-data:
+    needs: collect-data
+    runs-on: ubuntu-latest
+    if: needs.collect-data.outputs.data-updated == 'true'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main  # Ensure we have the latest changes
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Update app data files
+        run: |
+          # Copy latest analysis to app directory for Next.js to consume
+          mkdir -p app/data
+          
+          if [ -f "data/latest-analysis.json" ]; then
+            cp data/latest-analysis.json app/data/
+            echo "Updated app data with latest analysis"
+          fi
+          
+          if [ -f "data/latest.json" ]; then
+            cp data/latest.json app/data/
+            echo "Updated app data with latest raw data"
+          fi
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Commit app data updates
+        run: |
+          git add app/data/
+          if git diff --staged --quiet; then
+            echo "No app data changes to commit"
+          else
+            git commit -m "Update app data files - $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+            git push origin main
+          fi
+
+  notify-completion:
+    needs: [collect-data, update-app-data]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Notify workflow completion
+        run: |
+          if [[ "${{ needs.collect-data.result }}" == "success" && "${{ needs.update-app-data.result }}" == "success" ]]; then
+            echo "✅ Data collection and analysis completed successfully"
+          elif [[ "${{ needs.collect-data.result }}" == "failure" ]]; then
+            echo "❌ Data collection failed"
+          elif [[ "${{ needs.update-app-data.result }}" == "failure" ]]; then
+            echo "❌ App data update failed"
+          else
+            echo "⚠️ Workflow completed with warnings"
+          fi
