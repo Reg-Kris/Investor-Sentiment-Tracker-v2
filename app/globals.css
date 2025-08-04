@@ -3,49 +3,67 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 248, 250, 252;
-  --background-end-rgb: 241, 245, 249;
+  --foreground-rgb: 71, 63, 59;
+  --background-start-rgb: 252, 249, 246;
+  --background-end-rgb: 248, 243, 238;
   
-  /* Modern Fintech Color Palette */
-  --fintech-primary: 0, 200, 132;
-  --fintech-secondary: 255, 107, 0;
-  --fintech-accent: 99, 102, 241;
-  --fintech-success: 34, 197, 94;
-  --fintech-warning: 245, 158, 11;
-  --fintech-error: 239, 68, 68;
-  --fintech-surface: 255, 255, 255;
-  --fintech-surface-elevated: 249, 250, 251;
+  /* Warm Pink-Beige Fintech Palette (2025 Design Trends) */
+  --fintech-primary: 186, 132, 121; /* Warm terracotta */
+  --fintech-secondary: 218, 165, 142; /* Champagne rose */
+  --fintech-accent: 163, 127, 144; /* Dusty mauve */
+  --fintech-success: 147, 163, 134; /* Sage green */
+  --fintech-warning: 205, 164, 94; /* Warm amber */
+  --fintech-error: 188, 108, 108; /* Muted coral */
+  --fintech-surface: 254, 252, 250; /* Warm white */
+  --fintech-surface-elevated: 250, 246, 242; /* Cream */
   
-  /* Glass morphism variables */
-  --glass-bg: rgba(255, 255, 255, 0.08);
-  --glass-border: rgba(255, 255, 255, 0.2);
-  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  /* Warm glass morphism variables */
+  --glass-bg: rgba(254, 252, 250, 0.12);
+  --glass-border: rgba(186, 132, 121, 0.15);
+  --glass-shadow: 0 8px 32px 0 rgba(163, 127, 144, 0.15);
+  
+  /* Additional warm tones */
+  --warm-blush: 242, 220, 212;
+  --warm-nude: 230, 210, 200;
+  --warm-taupe: 198, 181, 170;
+  --warm-mocha: 141, 110, 99;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 15, 23, 42;
-    --background-end-rgb: 30, 41, 59;
+    --foreground-rgb: 242, 220, 212;
+    --background-start-rgb: 45, 35, 32;
+    --background-end-rgb: 58, 45, 40;
     
-    --fintech-surface: 30, 41, 59;
-    --fintech-surface-elevated: 51, 65, 85;
+    /* Dark mode warm palette */
+    --fintech-primary: 218, 165, 142;
+    --fintech-secondary: 186, 132, 121;
+    --fintech-accent: 163, 127, 144;
+    --fintech-surface: 58, 45, 40;
+    --fintech-surface-elevated: 71, 56, 50;
     
-    --glass-bg: rgba(30, 41, 59, 0.8);
-    --glass-border: rgba(148, 163, 184, 0.2);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    --glass-bg: rgba(58, 45, 40, 0.8);
+    --glass-border: rgba(218, 165, 142, 0.15);
+    --glass-shadow: 0 8px 32px 0 rgba(45, 35, 32, 0.5);
+    
+    /* Dark warm tones */
+    --warm-blush: 120, 88, 78;
+    --warm-nude: 98, 75, 68;
+    --warm-taupe: 85, 68, 61;
+    --warm-mocha: 71, 56, 50;
   }
 }
 
 body {
   color: rgb(var(--foreground-rgb));
   background: 
-    radial-gradient(circle at 20% 80%, rgba(var(--fintech-primary), 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(var(--fintech-accent), 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(var(--fintech-secondary), 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 20% 80%, rgba(var(--fintech-primary), 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 80% 20%, rgba(var(--fintech-accent), 0.06) 0%, transparent 55%),
+    radial-gradient(circle at 40% 40%, rgba(var(--fintech-secondary), 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 60% 80%, rgba(var(--warm-blush), 0.03) 0%, transparent 40%),
     linear-gradient(135deg, rgb(var(--background-start-rgb)) 0%, rgb(var(--background-end-rgb)) 100%);
   min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 @layer utilities {
@@ -90,30 +108,30 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-/* Enhanced Gradient Backgrounds */
+/* Warm Sentiment Gradient Backgrounds */
 .gradient-extreme-fear {
-  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 50%, #7F1D1D 100%);
-  box-shadow: 0 4px 20px rgba(220, 38, 38, 0.3);
+  background: linear-gradient(135deg, rgba(188, 108, 108, 1) 0%, rgba(163, 92, 92, 1) 50%, rgba(138, 76, 76, 1) 100%);
+  box-shadow: 0 4px 20px rgba(188, 108, 108, 0.25);
 }
 
 .gradient-fear {
-  background: linear-gradient(135deg, #EA580C 0%, #DC2626 50%, #B91C1C 100%);
-  box-shadow: 0 4px 20px rgba(234, 88, 12, 0.3);
+  background: linear-gradient(135deg, rgba(205, 164, 94, 1) 0%, rgba(188, 108, 108, 1) 50%, rgba(163, 92, 92, 1) 100%);
+  box-shadow: 0 4px 20px rgba(205, 164, 94, 0.25);
 }
 
 .gradient-neutral {
-  background: linear-gradient(135deg, #D97706 0%, #F59E0B 50%, #EA580C 100%);
-  box-shadow: 0 4px 20px rgba(217, 119, 6, 0.3);
+  background: linear-gradient(135deg, rgba(218, 165, 142, 1) 0%, rgba(205, 164, 94, 1) 50%, rgba(186, 132, 121, 1) 100%);
+  box-shadow: 0 4px 20px rgba(218, 165, 142, 0.25);
 }
 
 .gradient-greed {
-  background: linear-gradient(135deg, #65A30D 0%, #16A34A 50%, #059669 100%);
-  box-shadow: 0 4px 20px rgba(101, 163, 13, 0.3);
+  background: linear-gradient(135deg, rgba(147, 163, 134, 1) 0%, rgba(163, 127, 144, 1) 50%, rgba(186, 132, 121, 1) 100%);
+  box-shadow: 0 4px 20px rgba(147, 163, 134, 0.25);
 }
 
 .gradient-extreme-greed {
-  background: linear-gradient(135deg, #16A34A 0%, #059669 50%, #047857 100%);
-  box-shadow: 0 4px 20px rgba(22, 163, 74, 0.3);
+  background: linear-gradient(135deg, rgba(147, 163, 134, 1) 0%, rgba(132, 147, 119, 1) 50%, rgba(117, 131, 104, 1) 100%);
+  box-shadow: 0 4px 20px rgba(147, 163, 134, 0.25);
 }
 
 /* Modern Fintech Gradients */
@@ -266,14 +284,35 @@ body {
   background: linear-gradient(90deg, transparent, rgba(var(--fintech-primary), 0.5), transparent);
 }
 
-/* Premium Fintech UI Effects */
+/* Premium Warm Fintech UI Effects */
 .fintech-glow {
-  box-shadow: 0 0 20px rgba(var(--fintech-primary), 0.3);
+  box-shadow: 0 0 20px rgba(var(--fintech-primary), 0.15);
   transition: box-shadow 0.3s ease;
 }
 
 .fintech-glow:hover {
-  box-shadow: 0 0 30px rgba(var(--fintech-primary), 0.5);
+  box-shadow: 0 0 30px rgba(var(--fintech-primary), 0.25);
+}
+
+/* New warm-specific effects */
+.warm-glow {
+  box-shadow: 0 0 25px rgba(var(--warm-blush), 0.2);
+  transition: box-shadow 0.3s ease;
+}
+
+.warm-glow:hover {
+  box-shadow: 0 0 35px rgba(var(--warm-blush), 0.3);
+}
+
+.champagne-glow {
+  box-shadow: 0 0 20px rgba(var(--fintech-secondary), 0.2);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(var(--fintech-secondary), 0.1);
+}
+
+.dusty-rose-accent {
+  background: linear-gradient(135deg, rgba(var(--fintech-accent), 0.1), rgba(var(--warm-blush), 0.05));
+  border: 1px solid rgba(var(--fintech-accent), 0.15);
 }
 
 .fintech-border-gradient {
@@ -327,4 +366,34 @@ body {
 
 .interactive-scale:active {
   transform: scale(0.98);
+}
+
+/* New smooth interactions for warm theme */
+.smooth-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.smooth-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(var(--fintech-primary), 0.15);
+}
+
+.gentle-scale {
+  transition: transform 0.25s ease-out;
+}
+
+.gentle-scale:hover {
+  transform: scale(1.01);
+}
+
+.warm-card-hover {
+  transition: all 0.3s ease;
+  background: rgba(var(--fintech-surface), 1);
+  border: 1px solid rgba(var(--fintech-primary), 0.1);
+}
+
+.warm-card-hover:hover {
+  background: rgba(var(--fintech-surface-elevated), 1);
+  border: 1px solid rgba(var(--fintech-primary), 0.2);
+  box-shadow: 0 4px 20px rgba(var(--fintech-primary), 0.1);
 }

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { RefreshCw, Heart, Activity, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
 import { Grid, Col, Title, Text, Flex, Button, Callout } from '@tremor/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import PageTransition, { StaggerContainer, StaggerItem } from './components/PageTransition';
+import PageTransition, { ViewportAnimation, HoverScale, FloatingAnimation } from './components/PageTransition';
 
 // Import essential components (loaded immediately)
 import ThemeToggle from './components/ThemeToggle';
@@ -140,21 +140,18 @@ export default function Home() {
 
   return (
     <PageTransition>
-      <main className="min-h-screen bg-tremor-background dark:bg-dark-tremor-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-6 py-6 lg:py-8 xl:py-10">
+      <main className="min-h-screen bg-fintech-surface-light dark:bg-fintech-surface-dark transition-colors duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-6 py-6 lg:py-8 xl:py-10 relative overflow-hidden">
         {/* Hero Section with Giant Sentiment Gauge */}
-        <SentimentHero 
-          value={sentimentData.fearGreedIndex} 
-          lastUpdated={sentimentData.lastUpdated} 
-        />
+        <ViewportAnimation animation="bounce" threshold={0.2}>
+          <SentimentHero 
+            value={sentimentData.fearGreedIndex} 
+            lastUpdated={sentimentData.lastUpdated} 
+          />
+        </ViewportAnimation>
 
         {/* Quick Actions */}
-        <motion.div 
-          className="mb-8"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-        >
+        <ViewportAnimation animation="fadeUp" delay={0.2} className="mb-8">
           <Flex justifyContent="between" alignItems="center" className="mb-4">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -214,13 +211,13 @@ export default function Home() {
               </motion.div>
             )}
           </AnimatePresence>
-        </motion.div>
+        </ViewportAnimation>
 
         {/* Educational Metric Cards */}
-        <StaggerContainer>
+        <ViewportAnimation animation="slideUp" delay={0.1}>
           <Grid numItemsSm={1} numItemsMd={2} numItemsLg={4} className="gap-4 lg:gap-6">
             {/* Market Price Indicators */}
-            <StaggerItem>
+            <HoverScale className="h-full">
               <Col numColSpan={1}>
                 <EducationalMetricCard
                   title="S&P 500 Price (SPY)"
@@ -241,9 +238,9 @@ export default function Home() {
                   size="md"
                 />
               </Col>
-            </StaggerItem>
+            </HoverScale>
 
-            <StaggerItem>
+            <HoverScale className="h-full">
               <Col numColSpan={1}>
                 <EducationalMetricCard
                   title="Tech Stocks Price (QQQ)"
@@ -264,10 +261,10 @@ export default function Home() {
                   size="md"
                 />
               </Col>
-            </StaggerItem>
+            </HoverScale>
 
             {/* Volatility Indicators */}
-            <StaggerItem>
+            <HoverScale className="h-full">
               <Col numColSpan={1}>
                 <EducationalMetricCard
                   title="Market Fear Gauge (VIX)"
@@ -286,9 +283,9 @@ export default function Home() {
                   size="md"
                 />
               </Col>
-            </StaggerItem>
+            </HoverScale>
 
-            <StaggerItem>
+            <HoverScale className="h-full">
               <Col numColSpan={1}>
                 <EducationalMetricCard
                   title="Options Sentiment (Put/Call)"
@@ -308,16 +305,15 @@ export default function Home() {
                   size="md"
                 />
               </Col>
-            </StaggerItem>
+            </HoverScale>
           </Grid>
-        </StaggerContainer>
+        </ViewportAnimation>
 
         {/* Educational Guide Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-          className="mt-8 lg:mt-12 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 lg:p-8 border border-gray-200/50 dark:border-gray-700/50"
+        <ViewportAnimation 
+          animation="scale" 
+          delay={0.3}
+          className="mt-8 lg:mt-12 bg-fintech-surface-light/60 dark:bg-fintech-surface-dark/60 backdrop-blur-sm rounded-xl p-6 lg:p-8 border border-fintech-primary-200/30 dark:border-fintech-primary-700/30 warm-glow"
         >
           <div className="text-center mb-6 lg:mb-8">
             <h3 className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
@@ -386,14 +382,13 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </ViewportAnimation>
 
         {/* Educational Note */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 1.0 }}
-          className="mt-8 lg:mt-12 p-4 lg:p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 rounded-xl border border-blue-200/50 dark:border-blue-800/50"
+        <ViewportAnimation 
+          animation="fadeUp" 
+          delay={0.4}
+          className="mt-8 lg:mt-12 p-4 lg:p-6 bg-gradient-to-r from-fintech-secondary-50 to-fintech-accent-50 dark:from-fintech-secondary-950/50 dark:to-fintech-accent-950/50 rounded-xl border border-fintech-secondary-200/50 dark:border-fintech-secondary-800/50 champagne-glow"
         >
           <div className="text-center">
             <h3 className="text-base lg:text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
@@ -405,14 +400,13 @@ export default function Home() {
               When everyone is fearful, markets may be oversold. When everyone is greedy, markets may be overpriced.
             </p>
           </div>
-        </motion.div>
+        </ViewportAnimation>
 
         {/* Footer */}
-        <motion.footer 
-          className="mt-12 lg:mt-16 pt-6 lg:pt-8 border-t border-tremor-border/50 dark:border-dark-tremor-border/50"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 1.2 }}
+        <ViewportAnimation 
+          animation="fadeUp" 
+          delay={0.5}
+          className="mt-12 lg:mt-16 pt-6 lg:pt-8 border-t border-fintech-primary-200/30 dark:border-fintech-primary-700/30"
         >
           <Flex justifyContent="between" alignItems="center" className="flex-col lg:flex-row gap-3 lg:gap-4">
             <motion.div
@@ -452,14 +446,16 @@ export default function Home() {
               </motion.div>
               
               <div className="flex items-center space-x-1">
-                <div className="w-2 h-2 bg-fintech-success-500 rounded-full animate-pulse" />
+                <FloatingAnimation intensity={6} duration={3}>
+                  <div className="w-2 h-2 bg-fintech-success-500 rounded-full animate-pulse" />
+                </FloatingAnimation>
                 <Text className="text-tremor-content-subtle dark:text-dark-tremor-content-subtle text-xs">
                   Live Data
                 </Text>
               </div>
             </motion.div>
           </Flex>
-        </motion.footer>
+        </ViewportAnimation>
         </div>
       </main>
     </PageTransition>

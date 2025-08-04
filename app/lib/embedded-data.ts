@@ -1,4 +1,7 @@
-{
+// Auto-generated build-time data injection
+// Generated at: 2025-08-04T17:02:58.560Z
+
+export const BUILD_TIME_MARKET_DATA = {
   "timestamp": "2025-08-04T17:02:50.439Z",
   "stocks": {
     "SPY": {
@@ -37,4 +40,8 @@
     "timestamp": "2025-08-04T17:02:55.341Z"
   },
   "putCallRatio": 0.9
-}
+} as const;
+
+export const DATA_INJECTION_TIMESTAMP = "2025-08-04T17:02:58.561Z";
+
+export const isDataEmbedded = true;

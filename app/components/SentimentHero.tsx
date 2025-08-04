@@ -19,9 +19,9 @@ export default function SentimentHero({ value, lastUpdated }: SentimentHeroProps
         label: 'EXTREME FEAR',
         shortLabel: 'Fear',
         color: 'red',
-        bgGradient: 'from-red-600 to-red-800',
-        textColor: 'text-red-100',
-        shadowColor: 'shadow-red-500/50',
+        bgGradient: 'from-fintech-error-500 to-fintech-error-700',
+        textColor: 'text-fintech-error-50',
+        shadowColor: 'shadow-fintech-error-500/30',
         icon: <AlertCircle className="h-12 w-12" />,
         meaning: 'Investors are PANICKING',
         explanation: 'When fear dominates, investors sell everything. This often creates buying opportunities.',
@@ -35,9 +35,9 @@ export default function SentimentHero({ value, lastUpdated }: SentimentHeroProps
         label: 'FEAR',
         shortLabel: 'Fear',
         color: 'orange',
-        bgGradient: 'from-orange-600 to-red-600',
-        textColor: 'text-orange-100',
-        shadowColor: 'shadow-orange-500/50',
+        bgGradient: 'from-fintech-warning-500 to-fintech-error-600',
+        textColor: 'text-fintech-warning-50',
+        shadowColor: 'shadow-fintech-warning-500/30',
         icon: <TrendingDown className="h-12 w-12" />,
         meaning: 'Investors are WORRIED',
         explanation: 'When investors worry, they prefer cash over stocks. Volatility increases.',
@@ -51,9 +51,9 @@ export default function SentimentHero({ value, lastUpdated }: SentimentHeroProps
         label: 'NEUTRAL',
         shortLabel: 'Neutral',
         color: 'blue',
-        bgGradient: 'from-blue-600 to-indigo-600',
-        textColor: 'text-blue-100',
-        shadowColor: 'shadow-blue-500/50',
+        bgGradient: 'from-fintech-secondary-500 to-fintech-accent-600',
+        textColor: 'text-fintech-secondary-50',
+        shadowColor: 'shadow-fintech-secondary-500/30',
         icon: <Eye className="h-12 w-12" />,
         meaning: 'Investors are BALANCED',
         explanation: 'Neither fear nor greed dominates. Markets move based on fundamentals.',
@@ -67,9 +67,9 @@ export default function SentimentHero({ value, lastUpdated }: SentimentHeroProps
         label: 'GREED',
         shortLabel: 'Greed',
         color: 'emerald',
-        bgGradient: 'from-emerald-600 to-green-600',
-        textColor: 'text-emerald-100',
-        shadowColor: 'shadow-emerald-500/50',
+        bgGradient: 'from-fintech-success-500 to-fintech-primary-600',
+        textColor: 'text-fintech-success-50',
+        shadowColor: 'shadow-fintech-success-500/30',
         icon: <TrendingUp className="h-12 w-12" />,
         meaning: 'Investors are OPTIMISTIC',
         explanation: 'When greed grows, investors buy aggressively. Prices may become stretched.',
@@ -82,9 +82,9 @@ export default function SentimentHero({ value, lastUpdated }: SentimentHeroProps
       label: 'EXTREME GREED',
       shortLabel: 'Greed',
       color: 'green',
-      bgGradient: 'from-green-600 to-emerald-800',
-      textColor: 'text-green-100',
-      shadowColor: 'shadow-green-500/50',
+      bgGradient: 'from-fintech-success-600 to-fintech-success-800',
+      textColor: 'text-fintech-success-50',
+      shadowColor: 'shadow-fintech-success-500/30',
       icon: <DollarSign className="h-12 w-12" />,
       meaning: 'Investors are EUPHORIC',
       explanation: 'When euphoria peaks, everyone buys. This often signals market tops.',
@@ -181,34 +181,64 @@ export default function SentimentHero({ value, lastUpdated }: SentimentHeroProps
                   strokeLinecap="round"
                 />
                 
-                {/* Fear Zone */}
-                <path
-                  d="M 40 140 A 120 120 0 0 0 100 60"
-                  stroke="#DC2626"
+                {/* Extreme Fear Zone (0-20) */}
+                <motion.path
+                  d="M 40 140 A 120 120 0 0 1 104 44"
+                  stroke="rgba(188, 108, 108, 0.9)"
                   strokeWidth="20"
                   fill="none"
                   strokeLinecap="round"
-                  opacity="0.8"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 1.5, delay: 0.5 }}
                 />
                 
-                {/* Neutral Zone */}
-                <path
-                  d="M 120 50 A 120 120 0 0 0 200 50"
-                  stroke="#3B82F6"
+                {/* Fear Zone (20-40) */}
+                <motion.path
+                  d="M 104 44 A 120 120 0 0 1 140 20"
+                  stroke="rgba(205, 164, 94, 0.9)"
                   strokeWidth="20"
                   fill="none"
                   strokeLinecap="round"
-                  opacity="0.8"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 1.5, delay: 0.7 }}
                 />
                 
-                {/* Greed Zone */}
-                <path
-                  d="M 220 60 A 120 120 0 0 0 280 140"
-                  stroke="#059669"
+                {/* Neutral Zone (40-60) */}
+                <motion.path
+                  d="M 140 20 A 120 120 0 0 1 180 20"
+                  stroke="rgba(218, 165, 142, 0.9)"
                   strokeWidth="20"
                   fill="none"
                   strokeLinecap="round"
-                  opacity="0.8"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 1.5, delay: 0.9 }}
+                />
+                
+                {/* Greed Zone (60-80) */}
+                <motion.path
+                  d="M 180 20 A 120 120 0 0 1 216 44"
+                  stroke="rgba(147, 163, 134, 0.9)"
+                  strokeWidth="20"
+                  fill="none"
+                  strokeLinecap="round"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 1.5, delay: 1.1 }}
+                />
+                
+                {/* Extreme Greed Zone (80-100) */}
+                <motion.path
+                  d="M 216 44 A 120 120 0 0 1 280 140"
+                  stroke="rgba(132, 147, 119, 0.9)"
+                  strokeWidth="20"
+                  fill="none"
+                  strokeLinecap="round"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 1.5, delay: 1.3 }}
                 />
                 
                 {/* Needle */}

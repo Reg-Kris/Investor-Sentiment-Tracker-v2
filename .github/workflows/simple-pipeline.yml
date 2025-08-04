@@ -37,6 +37,16 @@ jobs:
         run: |
           echo "🚀 Fetching market data..."
           node simple-fetch.js
+          
+          # Verify data was fetched successfully
+          if [ -f "public/data/market-data.json" ]; then
+            echo "✅ Market data file created successfully"
+            echo "📊 Data preview:"
+            head -10 public/data/market-data.json
+          else
+            echo "❌ Market data file not found!"
+            exit 1
+          fi
 
       - name: Commit data updates
         run: |
@@ -54,7 +64,33 @@ jobs:
       - name: Build application
         run: |
           echo "🏗️ Building application..."
-          npm run build
+          
+          # Ensure data exists before build
+          if [ ! -f "public/data/market-data.json" ]; then
+            echo "⚠️ Market data missing, running fetch again..."
+            node simple-fetch.js
+          fi
+          
+          # Verify data file before build
+          echo "📋 Pre-build data verification:"
+          ls -la public/data/
+          
+          # Inject build-time data and build the application
+          node inject-build-data.cjs
+          npm run build:ci
+          
+          # Verify data was copied to build output
+          echo "📋 Post-build data verification:"
+          ls -la out/data/ || echo "❌ Data directory missing in build output!"
+          
+          # Show final data content
+          if [ -f "out/data/market-data.json" ]; then
+            echo "✅ Data successfully included in build:"
+            head -5 out/data/market-data.json
+          else
+            echo "❌ Data file missing from build output!"
+            exit 1
+          fi
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

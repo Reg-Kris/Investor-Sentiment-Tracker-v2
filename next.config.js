@@ -41,46 +41,42 @@ const nextConfig = {
     }
   }),
   
-  // Headers for caching and security
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY'
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff'
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin'
-          }
-        ]
-      },
-      {
-        source: '/data/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=300, s-maxage=600' // 5 min browser, 10 min CDN
-          }
-        ]
-      },
-      {
-        source: '/_next/static/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable' // 1 year for static assets
-          }
-        ]
-      }
-    ];
-  }
+  // Note: Headers are not supported with output: 'export' for GitHub Pages
+  // GitHub Pages will handle caching automatically
+  
+  // Development headers (only work in dev/serverless mode)
+  ...(!process.env.NODE_ENV || process.env.NODE_ENV === 'development' ? {
+    async headers() {
+      return [
+        {
+          source: '/(.*)',
+          headers: [
+            {
+              key: 'X-Frame-Options',
+              value: 'DENY'
+            },
+            {
+              key: 'X-Content-Type-Options',
+              value: 'nosniff'
+            },
+            {
+              key: 'Referrer-Policy',
+              value: 'strict-origin-when-cross-origin'
+            }
+          ]
+        },
+        {
+          source: '/data/:path*',
+          headers: [
+            {
+              key: 'Cache-Control',
+              value: 'no-cache, no-store, must-revalidate'
+            }
+          ]
+        }
+      ];
+    }
+  } : {})
 }
 
 module.exports = nextConfig

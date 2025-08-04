@@ -424,7 +424,19 @@ class APIService {
           data: jsonData
         };
       } else {
-        console.log('❌ No pre-fetched data available, falling back to API calls');
+        console.log('❌ No pre-fetched data available, trying embedded data fallback...');
+      }
+      
+      // Try embedded build-time data as fallback
+      const embeddedData = await this.loadEmbeddedData();
+      if (embeddedData) {
+        console.log('✅ Using embedded build-time data:', embeddedData);
+        return {
+          success: true,
+          data: embeddedData
+        };
+      } else {
+        console.log('❌ No embedded data available, falling back to API calls');
       }
 
       // Fall back to direct API calls if JSON data unavailable
@@ -475,7 +487,11 @@ class APIService {
 
   private async loadPreFetchedData(): Promise<SentimentData | null> {
     try {
-      const url = '/data/market-data.json';
+      // Handle GitHub Pages basePath in production
+      const basePath = process.env.NODE_ENV === 'production' ? '/Investor-Sentiment-Tracker-v2' : '';
+      // Add cache-busting parameter for GitHub Pages aggressive caching
+      const cacheBuster = Date.now();
+      const url = `${basePath}/data/market-data.json?v=${cacheBuster}`;
       console.log('📥 Fetching:', url);
       console.log('📍 Current location:', typeof window !== 'undefined' ? window.location.href : 'Server-side');
       
@@ -484,8 +500,12 @@ class APIService {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
         },
-        cache: 'no-cache' // Ensure we get fresh data
+        // Add timestamp to prevent aggressive caching on GitHub Pages
+        cache: 'no-store'
       });
       
       console.log('📡 Response received:', {
@@ -611,6 +631,93 @@ class APIService {
       return result;
     } catch (error) {
       console.log('❌ Error loading pre-fetched data:', error);
+      return null;
+    }
+  }
+
+  private async loadEmbeddedData(): Promise<SentimentData | null> {
+    try {
+      // Dynamically import embedded data (only available after build-time injection)
+      const embeddedModule = await import('./embedded-data');
+      const marketData = embeddedModule.BUILD_TIME_MARKET_DATA;
+      
+      console.log('📦 Embedded data loaded from build-time injection');
+      console.log('🕒 Data injection timestamp:', embeddedModule.DATA_INJECTION_TIMESTAMP);
+      
+      // Validate embedded data structure
+      if (!marketData || typeof marketData !== 'object') {
+        console.log('❌ Invalid embedded data structure');
+        return null;
+      }
+      
+      if (!marketData.stocks || typeof marketData.stocks !== 'object') {
+        console.log('❌ Missing or invalid embedded stocks data');
+        return null;
+      }
+      
+      if (!marketData.fearGreed || typeof marketData.fearGreed !== 'object') {
+        console.log('❌ Missing or invalid embedded fearGreed data');
+        return null;
+      }
+
+      // Extract relevant data from the embedded structure (same logic as JSON loading)
+      const stocks = marketData.stocks;
+      const vixData = stocks['^VIX'] || {};
+      const fearGreedData = marketData.fearGreed;
+      
+      // Validate essential stock data
+      if (!stocks.SPY || typeof stocks.SPY.price !== 'number' || typeof stocks.SPY.change !== 'number') {
+        console.log('❌ Missing or invalid embedded SPY data:', stocks.SPY);
+        return null;
+      }
+      
+      if (!stocks.QQQ || typeof stocks.QQQ.price !== 'number' || typeof stocks.QQQ.change !== 'number') {
+        console.log('❌ Missing or invalid embedded QQQ data:', stocks.QQQ);
+        return null;
+      }
+      
+      if (!vixData.price || typeof vixData.price !== 'number') {
+        console.log('❌ Missing or invalid embedded VIX data:', vixData);
+        return null;
+      }
+      
+      if (typeof fearGreedData.value !== 'number') {
+        console.log('❌ Missing or invalid embedded Fear/Greed data:', fearGreedData);
+        return null;
+      }
+
+      // Convert to expected SentimentData format (same logic as JSON loading)
+      const spyChange = stocks.SPY?.change || 0;
+      const spyPrice = stocks.SPY?.price || 500;
+      const qqqChange = stocks.QQQ?.change || 0;
+      const qqqPrice = stocks.QQQ?.price || 400;
+      const iwmChange = stocks.IWM?.change || 0;
+      const iwmPrice = stocks.IWM?.price || 200;
+      const vixLevel = vixData.price || 20;
+      const fearGreedIndex = fearGreedData.value || 50;
+      const putCallRatio = marketData.putCallRatio || this.calculatePutCallProxy(vixLevel, spyChange);
+
+      const stockChanges = [spyChange, qqqChange, iwmChange];
+      const overallSentiment = this.calculateSentiment(fearGreedIndex, stockChanges, vixLevel);
+
+      const result = {
+        fearGreedIndex,
+        spyChange,
+        spyPrice,
+        qqqqChange: qqqChange,
+        qqqPrice,
+        iwmChange,
+        iwmPrice,
+        vixLevel,
+        putCallRatio,
+        overallSentiment,
+        lastUpdated: marketData.timestamp || new Date().toISOString()
+      };
+      
+      console.log('✅ Converted embedded data for UI:', result);
+      return result;
+    } catch (error) {
+      console.log('❌ Error loading embedded data (this is normal if build-time injection not run):', error);
       return null;
     }
   }
