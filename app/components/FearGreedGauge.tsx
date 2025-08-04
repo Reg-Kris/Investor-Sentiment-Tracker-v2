@@ -45,9 +45,9 @@ export default function SentimentGauge({
     if (clampedValue < 60) {
       return {
         label: 'Neutral',
-        color: '#DAA58E', // Champagne rose (secondary)
+        color: '#F8B4C8', // Blush pink (secondary)
         bgColor: 'gradient-neutral',
-        textColor: 'text-[#DAA58E]',
+        textColor: 'text-[#F8B4C8]',
         description: 'Market sentiment is balanced',
         warmColor: 'rgb(218, 165, 142)'
       };
@@ -146,7 +146,7 @@ export default function SentimentGauge({
           <div className="flex h-full rounded-full overflow-hidden">
             <div className="w-[20%] bg-[#BC6C6C]" /> {/* 0-20: Extreme Fear */}
             <div className="w-[20%] bg-[#CDA45E]" /> {/* 20-40: Fear */}
-            <div className="w-[20%] bg-[#DAA58E]" /> {/* 40-60: Neutral */}
+            <div className="w-[20%] bg-[#F8B4C8]" /> {/* 40-60: Neutral */}
             <div className="w-[20%] bg-[#A37F90]" /> {/* 60-80: Greed */}
             <div className="w-[20%] bg-[#93A386]" /> {/* 80-100: Extreme Greed */}
           </div>

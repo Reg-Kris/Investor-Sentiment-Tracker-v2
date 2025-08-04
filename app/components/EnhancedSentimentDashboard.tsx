@@ -99,7 +99,7 @@ export function EnhancedSentimentDashboard({ className = '' }: EnhancedSentiment
   const getScoreColor = (score: number): string => {
     if (score < 20) return 'text-[#93A386]'; // Extreme Fear = Buy (Sage green)
     if (score < 40) return 'text-[#A37F90]'; // Fear = Buy (Dusty mauve)
-    if (score < 60) return 'text-[#DAA58E]'; // Neutral = Hold (Champagne rose)
+    if (score < 60) return 'text-[#F8B4C8]'; // Neutral = Hold (Blush pink)
     if (score < 80) return 'text-[#CDA45E]'; // Greed = Sell (Warm amber)
     return 'text-[#BC6C6C]'; // Extreme Greed = Strong Sell (Muted coral)
   };
@@ -107,7 +107,7 @@ export function EnhancedSentimentDashboard({ className = '' }: EnhancedSentiment
   const getScoreBackground = (score: number): string => {
     if (score < 20) return 'bg-[#93A386]/20'; // Extreme Fear (Sage green)
     if (score < 40) return 'bg-[#A37F90]/20'; // Fear (Dusty mauve)
-    if (score < 60) return 'bg-[#DAA58E]/20'; // Neutral (Champagne rose)
+    if (score < 60) return 'bg-[#F8B4C8]/20'; // Neutral (Blush pink)
     if (score < 80) return 'bg-[#CDA45E]/20'; // Greed (Warm amber)
     return 'bg-[#BC6C6C]/20'; // Extreme Greed (Muted coral)
   };
@@ -116,7 +116,7 @@ export function EnhancedSentimentDashboard({ className = '' }: EnhancedSentiment
     switch (action) {
       case 'STRONG_BUY': return 'text-white bg-[#93A386] shadow-lg';
       case 'BUY': return 'text-white bg-[#A37F90] shadow-lg';
-      case 'HOLD': return 'text-white bg-[#DAA58E] shadow-lg';
+      case 'HOLD': return 'text-white bg-[#F8B4C8] shadow-lg';
       case 'SELL': return 'text-white bg-[#CDA45E] shadow-lg';
       case 'STRONG_SELL': return 'text-white bg-[#BC6C6C] shadow-lg';
       default: return 'text-gray-600 bg-gray-100';
@@ -126,7 +126,7 @@ export function EnhancedSentimentDashboard({ className = '' }: EnhancedSentiment
   const getConfidenceColor = (confidence: string): string => {
     switch (confidence) {
       case 'HIGH': return 'text-[#93A386]';
-      case 'MEDIUM': return 'text-[#DAA58E]';
+      case 'MEDIUM': return 'text-[#F8B4C8]';
       case 'LOW': return 'text-[#BC6C6C]';
       default: return 'text-gray-600';
     }

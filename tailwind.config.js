@@ -22,43 +22,43 @@ module.exports = {
     },
     extend: {
       colors: {
-        // Warm Pink-Beige Fintech Palette (2025 Design Trends)
+        // Soft Pink + Off-White Fintech Palette (2025 Design Trends)
         fintech: {
           primary: {
-            50: '#FDF9F7',
-            100: '#F9EFEB',
-            200: '#F0DDD5',
-            300: '#E5C5B5',
-            400: '#D4A58E',
-            500: '#BA8479', // Warm terracotta
-            600: '#A66B5F',
-            700: '#8B5549',
-            800: '#6D423A',
-            900: '#4A2D28',
+            50: '#FDF7FA',
+            100: '#FBEEF4',
+            200: '#F7DCE7',
+            300: '#F0C2D4',
+            400: '#E8A0BC',
+            500: '#DE8EAC', // Soft dusty rose
+            600: '#C7709A',
+            700: '#A85A82',
+            800: '#844567',
+            900: '#5D3148',
           },
           secondary: {
-            50: '#FDF8F5',
-            100: '#FAEDE6',
-            200: '#F4D8CA',
-            300: '#ECBFA3',
-            400: '#E1A078',
-            500: '#DAA58E', // Champagne rose
-            600: '#C18A6F',
-            700: '#A16F56',
-            800: '#7E5544',
-            900: '#5A3C2F',
+            50: '#FEF9FB',
+            100: '#FDF2F6',
+            200: '#FBE4EB',
+            300: '#F7CEDC',
+            400: '#F2B0C8',
+            500: '#F8B4C8', // Blush pink
+            600: '#E895B5',
+            700: '#D4749E',
+            800: '#B85A82',
+            900: '#904461',
           },
           accent: {
-            50: '#F7F4F6',
-            100: '#EDE6EA',
-            200: '#DBC9D1',
-            300: '#C4A5B3',
-            400: '#A97F90',
-            500: '#A37F90', // Dusty mauve
-            600: '#8F6B7C',
-            700: '#755667',
-            800: '#5B4350',
-            900: '#3E2F38',
+            50: '#F9F6F8',
+            100: '#F2EBF0',
+            200: '#E4D6DF',
+            300: '#D1B8C8',
+            400: '#BA94AB',
+            500: '#CE93B3', // Mauve pink
+            600: '#B67A9C',
+            700: '#9A6483',
+            800: '#7B5066',
+            900: '#5A3A4A',
           },
           success: {
             50: '#F4F6F2',
@@ -73,84 +73,84 @@ module.exports = {
             900: '#3A4130',
           },
           warning: {
-            50: '#FEFAF6',
-            100: '#FCF2E7',
-            200: '#F8E2C6',
-            300: '#F2CE9F',
-            400: '#E9B672',
-            500: '#CDA45E', // Warm amber
-            600: '#B18F4D',
-            700: '#95773D',
-            800: '#755E2F',
-            900: '#534220',
+            50: '#FEF9F6',
+            100: '#FDF1E9',
+            200: '#FBE1D0',
+            300: '#F7CCB0',
+            400: '#F2B088',
+            500: '#F5B88E', // Soft peach
+            600: '#E59E73',
+            700: '#D18359',
+            800: '#B36643',
+            900: '#8F4E31',
           },
           error: {
-            50: '#FDF5F5',
-            100: '#FAE8E8',
-            200: '#F4D0D0',
-            300: '#EBB0B0',
-            400: '#E08A8A',
-            500: '#BC6C6C', // Muted coral
-            600: '#A35757',
-            700: '#854545',
-            800: '#663636',
-            900: '#472626',
+            50: '#FDF6F7',
+            100: '#FBEAED',
+            200: '#F6D3D9',
+            300: '#EEB4C0',
+            400: '#E48FA1',
+            500: '#EB8796', // Soft rose
+            600: '#D66E82',
+            700: '#BD5A6E',
+            800: '#9A4758',
+            900: '#733642',
           },
           surface: {
-            light: '#FEFCFA', // Warm white
-            elevated: '#FAF6F2', // Cream
-            dark: '#3A2D28',
-            'dark-elevated': '#473B34',
+            light: '#FFFCF8', // Creamy off-white
+            elevated: '#FEF9F4', // Warm cream
+            dark: '#3A2D36',
+            'dark-elevated': '#473B42',
           },
-          // Additional warm tones
-          warm: {
+          // Additional pink tones
+          pink: {
             blush: {
-              50: '#FEFBF9',
-              100: '#FDF6F2',
-              200: '#F9EDE6',
-              300: '#F2DCD4',
-              400: '#E8C5B7',
-              500: '#F2DCD4', // Warm blush
-              600: '#D4B8A6',
-              700: '#B5988A',
-              800: '#94786C',
-              900: '#6B5851',
+              50: '#FFFBFC',
+              100: '#FFF5F8',
+              200: '#FEEAF0',
+              300: '#FDD8E5',
+              400: '#FBC0D6',
+              500: '#FFF0F5', // Very light pink
+              600: '#F2B8D0',
+              700: '#E495BB',
+              800: '#D270A1',
+              900: '#B85A87',
             },
             nude: {
-              50: '#FDFAF8',
-              100: '#FAF3EF',
-              200: '#F4E7DE',
-              300: '#EDD6C8',
-              400: '#E3C0AC',
-              500: '#E6D2C8', // Warm nude
-              600: '#C7B5A5',
-              700: '#A8968A',
-              800: '#87786E',
-              900: '#635852',
+              50: '#FDF9FB',
+              100: '#FAF1F5',
+              200: '#F4E2E9',
+              300: '#EDCDDA',
+              400: '#E3B2C7',
+              500: '#FAE6EB', // Soft pink nude
+              600: '#D4B5C1',
+              700: '#B59BA8',
+              800: '#94798A',
+              900: '#6F5C6B',
             },
             taupe: {
-              50: '#FAF8F6',
-              100: '#F3EFEC',
-              200: '#E8E0DA',
-              300: '#DACDC3',
-              400: '#C8B5AA',
-              500: '#C6B5AA', // Warm taupe
-              600: '#A8978E',
-              700: '#8A7973',
-              800: '#6C5E5A',
-              900: '#4E4441',
+              50: '#FAF7F8',
+              100: '#F3EEEF',
+              200: '#E8DADE',
+              300: '#DAC3C9',
+              400: '#C8A7B0',
+              500: '#E1C3CD', // Pink taupe
+              600: '#B8959F',
+              700: '#947A84',
+              800: '#736066',
+              900: '#524649',
             },
             mocha: {
-              50: '#F7F5F3',
-              100: '#EDE8E4',
-              200: '#D9CFC7',
-              300: '#C0B0A5',
-              400: '#A38D7E',
-              500: '#8D6E63', // Warm mocha
-              600: '#785F55',
-              700: '#624E46',
-              800: '#4C3D37',
-              900: '#362C28',
+              50: '#F7F5F6',
+              100: '#EDE8E9',
+              200: '#D9CDD0',
+              300: '#C0ADB3',
+              400: '#A3888F',
+              500: '#C39BAA', // Pink mocha
+              600: '#A17A89',
+              700: '#7F6370',
+              800: '#604D56',
+              900: '#43383E',
             },
           }
         },
