@@ -250,9 +250,9 @@ class APIService {
       ]);
 
       const fearGreedValue = fearGreed.status === 'fulfilled' ? fearGreed.value : 50;
-      const spyData = spy.status === 'fulfilled' ? spy.value : { change: 0 };
-      const qqqData = qqq.status === 'fulfilled' ? qqq.value : { change: 0 };
-      const iwmData = iwm.status === 'fulfilled' ? iwm.value : { change: 0 };
+      const spyData = spy.status === 'fulfilled' ? spy.value : { change: 0, price: 620 };
+      const qqqData = qqq.status === 'fulfilled' ? qqq.value : { change: 0, price: 540 };
+      const iwmData = iwm.status === 'fulfilled' ? iwm.value : { change: 0, price: 200 };
       const vixValue = vix.status === 'fulfilled' ? vix.value : 20;
       const putCallValue = putCall.status === 'fulfilled' ? putCall.value : 1.0;
 
@@ -264,8 +264,11 @@ class APIService {
         data: {
           fearGreedIndex: fearGreedValue,
           spyChange: spyData.change,
+          spyPrice: spyData.price || 500,
           qqqqChange: qqqData.change,
+          qqqPrice: qqqData.price || 400,
           iwmChange: iwmData.change,
+          iwmPrice: iwmData.price || 200,
           vixLevel: vixValue,
           putCallRatio: putCallValue,
           overallSentiment,
@@ -286,8 +289,11 @@ class APIService {
     return {
       fearGreedIndex: 45,
       spyChange: mockChanges[0],
+      spyPrice: 620,
       qqqqChange: mockChanges[1],
+      qqqPrice: 540,
       iwmChange: mockChanges[2],
+      iwmPrice: 200,
       vixLevel: 22,
       putCallRatio: 0.92,
       overallSentiment: this.calculateSentiment(45, mockChanges, 22),

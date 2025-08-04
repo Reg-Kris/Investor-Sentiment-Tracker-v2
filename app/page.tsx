@@ -191,11 +191,11 @@ export default function Home() {
               <Col numColSpan={1}>
                 <MetricCard
                   title="SPY Price"
-                  value={`$${(500 + sentimentData.spyChange * 5).toFixed(2)}`}
+                  value={`$${(sentimentData.spyPrice || 620).toFixed(2)}`}
                   change={sentimentData.spyChange}
                   changeType="percentage"
                   chart={{
-                    data: generateMockChartData(500 + sentimentData.spyChange * 5, 0.02),
+                    data: generateMockChartData(sentimentData.spyPrice || 620, 0.02),
                     color: sentimentData.spyChange >= 0 ? 'emerald' : 'red'
                   }}
                   status={sentimentData.spyChange >= 2 ? 'excellent' : sentimentData.spyChange >= 0 ? 'good' : sentimentData.spyChange >= -2 ? 'fair' : 'poor'}
@@ -205,11 +205,11 @@ export default function Home() {
               <Col numColSpan={1}>
                 <MetricCard
                   title="QQQ Price"
-                  value={`$${(400 + sentimentData.qqqqChange * 4).toFixed(2)}`}
+                  value={`$${(sentimentData.qqqPrice || 540).toFixed(2)}`}
                   change={sentimentData.qqqqChange}
                   changeType="percentage"
                   chart={{
-                    data: generateMockChartData(400 + sentimentData.qqqqChange * 4, 0.02),
+                    data: generateMockChartData(sentimentData.qqqPrice || 540, 0.02),
                     color: sentimentData.qqqqChange >= 0 ? 'emerald' : 'red'
                   }}
                   status={sentimentData.qqqqChange >= 2 ? 'excellent' : sentimentData.qqqqChange >= 0 ? 'good' : sentimentData.qqqqChange >= -2 ? 'fair' : 'poor'}
@@ -282,11 +282,11 @@ export default function Home() {
           <Col numColSpan={12} numColSpanLg={6}>
             <MetricCard
               title="IWM Small Cap Index"
-              value={`$${(200 + sentimentData.iwmChange * 2).toFixed(2)}`}
+              value={`$${(sentimentData.iwmPrice || 200).toFixed(2)}`}
               change={sentimentData.iwmChange}
               changeType="percentage"
               chart={{
-                data: generateMockChartData(200 + sentimentData.iwmChange * 2, 0.02, 30),
+                data: generateMockChartData(sentimentData.iwmPrice || 200, 0.02, 30),
                 color: sentimentData.iwmChange >= 0 ? 'emerald' : 'red',
                 showChart: true
               }}

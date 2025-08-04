@@ -100,39 +100,47 @@ class DataFetcher {
     const cached = cache.get(cacheKey);
     if (cached) return cached;
 
-    await limiters.alphaVantage.acquire();
-
+    // Use Yahoo Finance API (same as React app) for better reliability
     const data = await retryRequest(async () => {
-      const response = await axios.get(API_CONFIG.alphaVantage.baseUrl, {
+      const response = await axios.get(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`, {
         params: {
-          function: 'TIME_SERIES_DAILY',
-          symbol: symbol,
-          apikey: API_CONFIG.alphaVantage.key,
-          outputsize: 'compact'
+          interval: '1d',
+          range: '5d'
         },
-        timeout: 10000
+        timeout: 10000,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
       });
 
-      const timeSeries = response.data['Time Series (Daily)'];
-      if (!timeSeries) {
+      if (!response.data.chart || !response.data.chart.result || !response.data.chart.result[0]) {
         throw new Error(`No data available for ${symbol}`);
       }
 
-      const dates = Object.keys(timeSeries).sort().reverse();
-      const currentData = timeSeries[dates[0]];
-      const previousData = timeSeries[dates[1]];
+      const result = response.data.chart.result[0];
+      if (!result.indicators || !result.indicators.quote || !result.indicators.quote[0] || !result.indicators.quote[0].close) {
+        throw new Error(`No price data available for ${symbol}`);
+      }
 
-      const currentPrice = parseFloat(currentData['4. close']);
-      const previousPrice = parseFloat(previousData['4. close']);
+      const prices = result.indicators.quote[0].close.filter(price => price !== null);
+      const volumes = result.indicators.quote[0].volume?.filter(vol => vol !== null) || [];
+      
+      if (prices.length < 2) {
+        throw new Error(`Insufficient price data for ${symbol}`);
+      }
+
+      const currentPrice = prices[prices.length - 1];
+      const previousPrice = prices[prices.length - 2];
       const change = ((currentPrice - previousPrice) / previousPrice) * 100;
+      const volume = volumes.length > 0 ? volumes[volumes.length - 1] : 0;
       
       return {
         symbol,
         price: currentPrice,
         change: change,
-        volume: parseInt(currentData['5. volume']),
+        volume: volume,
         timestamp: new Date().toISOString(),
-        date: dates[0]
+        date: new Date().toISOString().split('T')[0]
       };
     });
 
@@ -365,30 +373,34 @@ class DataFetcher {
     const cached = cache.get(cacheKey);
     if (cached) return cached;
 
-    await limiters.alphaVantage.acquire();
-
+    // Use Yahoo Finance API for VIX data
     const data = await retryRequest(async () => {
-      const response = await axios.get(API_CONFIG.alphaVantage.baseUrl, {
+      const response = await axios.get('https://query1.finance.yahoo.com/v8/finance/chart/^VIX', {
         params: {
-          function: 'TIME_SERIES_DAILY',
-          symbol: 'VIX',
-          apikey: API_CONFIG.alphaVantage.key,
-          outputsize: 'compact'
+          interval: '1d',
+          range: '5d'
         },
-        timeout: 10000
+        timeout: 10000,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
       });
 
-      const timeSeries = response.data['Time Series (Daily)'];
-      if (!timeSeries) {
+      if (!response.data.chart || !response.data.chart.result || !response.data.chart.result[0] || 
+          !response.data.chart.result[0].indicators || !response.data.chart.result[0].indicators.quote ||
+          !response.data.chart.result[0].indicators.quote[0] || !response.data.chart.result[0].indicators.quote[0].close) {
         throw new Error('No VIX data available');
       }
 
-      const dates = Object.keys(timeSeries).sort().reverse();
-      const currentData = timeSeries[dates[0]];
-      const previousData = timeSeries[dates[1]];
+      const prices = response.data.chart.result[0].indicators.quote[0].close.filter(price => price !== null);
+      const timestamps = response.data.chart.result[0].timestamp || [];
+      
+      if (prices.length < 2) {
+        throw new Error('Insufficient VIX data');
+      }
 
-      const currentVIX = parseFloat(currentData['4. close']);
-      const previousVIX = parseFloat(previousData['4. close']);
+      const currentVIX = prices[prices.length - 1];
+      const previousVIX = prices[prices.length - 2];
       const change = currentVIX - previousVIX;
 
       return {
@@ -396,9 +408,9 @@ class DataFetcher {
         change: change,
         change_percent: (change / previousVIX) * 100,
         classification: currentVIX > 30 ? 'High Volatility' : currentVIX > 20 ? 'Medium Volatility' : 'Low Volatility',
-        history: dates.slice(0, 7).map(date => ({
-          date,
-          value: parseFloat(timeSeries[date]['4. close'])
+        history: prices.slice(-7).map((price, index) => ({
+          date: new Date((timestamps[timestamps.length - 7 + index] || Date.now()) * 1000).toISOString().split('T')[0],
+          value: price
         })),
         timestamp: new Date().toISOString()
       };
@@ -425,6 +437,8 @@ async function fetchAllData() {
       try {
         results.stocks[symbol] = await fetcher.fetchStockData(symbol);
         console.log(`✓ Fetched data for ${symbol}`);
+        // Add delay between requests to avoid rate limiting
+        await sleep(2000);
       } catch (error) {
         console.error(`✗ Failed to fetch ${symbol}:`, error.message);
         results.stocks[symbol] = { error: error.message, timestamp: new Date().toISOString() };

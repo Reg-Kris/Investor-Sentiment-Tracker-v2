@@ -87,8 +87,8 @@ export default function ThemeToggle({
         sizeClasses[size],
         className
       )}
-      aria-label={`Current theme: ${currentTheme?.label}. Click to cycle themes.`}
-      title={currentTheme?.label}
+      aria-label={`Current theme: ${currentTheme?.label}${theme === 'system' ? ` (${resolvedTheme})` : ''}. Click to cycle themes.`}
+      title={`${currentTheme?.label}${theme === 'system' ? ` (currently ${resolvedTheme})` : ''}`}
     >
       <Icon className={iconSizes[size]} />
       

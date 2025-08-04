@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from './components/ThemeProvider'
+import { ThemeScript } from './components/ThemeScript'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -30,11 +31,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <ThemeScript storageKey="sentiment-tracker-theme" />
+      </head>
       <body 
         className={`${inter.className} min-h-screen transition-colors duration-300`}
         suppressHydrationWarning
       >
-        <ThemeProvider defaultTheme="dark" storageKey="sentiment-tracker-theme">
+        <ThemeProvider defaultTheme="system" storageKey="sentiment-tracker-theme">
           <div className="min-h-screen bg-tremor-background dark:bg-dark-tremor-background text-tremor-content-strong dark:text-dark-tremor-content-strong">
             {children}
           </div>

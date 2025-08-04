@@ -1,8 +1,11 @@
 export interface SentimentData {
   fearGreedIndex: number;
   spyChange: number;
+  spyPrice?: number;
   qqqqChange: number;
+  qqqPrice?: number;
   iwmChange: number;
+  iwmPrice?: number;
   vixLevel: number;
   putCallRatio: number;
   overallSentiment: SentimentLevel;
