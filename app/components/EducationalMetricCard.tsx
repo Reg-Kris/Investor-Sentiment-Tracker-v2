@@ -77,9 +77,9 @@ export default function EducationalMetricCard({
   };
 
   const sizeClasses = {
-    sm: { metric: 'text-xl', padding: 'p-4' },
-    md: { metric: 'text-2xl', padding: 'p-6' },
-    lg: { metric: 'text-3xl', padding: 'p-8' }
+    sm: { metric: 'text-lg lg:text-xl', padding: 'p-3 lg:p-4' },
+    md: { metric: 'text-xl lg:text-2xl', padding: 'p-4 lg:p-6' },
+    lg: { metric: 'text-2xl lg:text-3xl', padding: 'p-6 lg:p-8' }
   };
 
   return (
@@ -105,13 +105,13 @@ export default function EducationalMetricCard({
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ duration: 0.3, delay: 0.2 }}
-          className="absolute top-4 right-4 text-2xl"
+          className="absolute top-3 right-3 lg:top-4 lg:right-4 text-xl lg:text-2xl"
         >
           {trafficLightData.emoji}
         </motion.div>
 
         {/* Header */}
-        <Flex justifyContent="start" alignItems="center" className="mb-4">
+        <Flex justifyContent="start" alignItems="center" className="mb-3 lg:mb-4">
           {icon && (
             <motion.div
               initial={{ rotate: -180, opacity: 0 }}

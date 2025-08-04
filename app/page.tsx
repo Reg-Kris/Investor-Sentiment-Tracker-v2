@@ -51,7 +51,7 @@ export default function Home() {
   if (!sentimentData) {
     return (
       <div className="min-h-screen bg-tremor-background dark:bg-dark-tremor-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-6 py-6 lg:py-8 xl:py-10">
           {/* Header Skeleton */}
           <div className="mb-8">
             <div className="flex justify-between items-center mb-4">
@@ -141,7 +141,7 @@ export default function Home() {
   return (
     <PageTransition>
       <main className="min-h-screen bg-tremor-background dark:bg-dark-tremor-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-6 py-6 lg:py-8 xl:py-10">
         {/* Hero Section with Giant Sentiment Gauge */}
         <SentimentHero 
           value={sentimentData.fearGreedIndex} 
@@ -161,10 +161,10 @@ export default function Home() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <Title className="text-tremor-content-strong dark:text-dark-tremor-content-strong text-xl font-semibold">
+              <Title className="text-tremor-content-strong dark:text-dark-tremor-content-strong text-lg lg:text-xl font-semibold">
                 Market Indicators Explained
               </Title>
-              <Text className="text-tremor-content dark:text-dark-tremor-content mt-1">
+              <Text className="text-tremor-content dark:text-dark-tremor-content mt-1 text-sm lg:text-base">
                 Each metric tells you what investors are thinking and feeling
               </Text>
             </motion.div>
@@ -218,7 +218,7 @@ export default function Home() {
 
         {/* Educational Metric Cards */}
         <StaggerContainer>
-          <Grid numItemsSm={1} numItemsLg={2} className="gap-6">
+          <Grid numItemsSm={1} numItemsMd={2} numItemsLg={2} numItemsXl={4} className="gap-4 lg:gap-6">
             {/* Market Price Indicators */}
             <StaggerItem>
               <Col numColSpan={1}>
@@ -317,71 +317,71 @@ export default function Home() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.8 }}
-          className="mt-12 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-gray-200/50 dark:border-gray-700/50"
+          className="mt-8 lg:mt-12 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 lg:p-8 border border-gray-200/50 dark:border-gray-700/50"
         >
-          <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+          <div className="text-center mb-6 lg:mb-8">
+            <h3 className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
               Understanding Market Sentiment: A Beginner&apos;s Guide
             </h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-sm lg:text-base text-gray-600 dark:text-gray-400">
               Learn how to read the market&apos;s emotional state and what it means for your investments
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="space-y-4 p-6 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
+          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            <div className="space-y-3 lg:space-y-4 p-4 lg:p-6 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
               <div className="text-center">
                 <div className="text-4xl mb-2">🟢</div>
-                <h4 className="font-bold text-green-800 dark:text-green-200 text-lg mb-2">
+                <h4 className="font-bold text-green-800 dark:text-green-200 text-base lg:text-lg mb-2">
                   Markets Are Calm
                 </h4>
-                <p className="text-sm text-green-700 dark:text-green-300 mb-3">
+                <p className="text-xs lg:text-sm text-green-700 dark:text-green-300 mb-2 lg:mb-3">
                   Low VIX • Balanced Put/Call Ratios • Steady Price Movement
                 </p>
               </div>
-              <p className="text-sm text-green-800 dark:text-green-200">
+              <p className="text-xs lg:text-sm text-green-800 dark:text-green-200">
                 Investors are confident and trading normally. This is a good time for regular investment strategies. 
                 Prices move predictably based on company earnings and economic fundamentals.
               </p>
-              <div className="bg-green-100 dark:bg-green-900/50 p-3 rounded text-xs text-green-800 dark:text-green-200">
+              <div className="bg-green-100 dark:bg-green-900/50 p-2 lg:p-3 rounded text-xs text-green-800 dark:text-green-200">
                 <strong>What to do:</strong> Execute your normal investment plan. Good time for dollar-cost averaging.
               </div>
             </div>
             
-            <div className="space-y-4 p-6 bg-yellow-50 dark:bg-yellow-950/30 rounded-lg border border-yellow-200 dark:border-yellow-800">
+            <div className="space-y-3 lg:space-y-4 p-4 lg:p-6 bg-yellow-50 dark:bg-yellow-950/30 rounded-lg border border-yellow-200 dark:border-yellow-800">
               <div className="text-center">
                 <div className="text-4xl mb-2">🟡</div>
-                <h4 className="font-bold text-yellow-800 dark:text-yellow-200 text-lg mb-2">
+                <h4 className="font-bold text-yellow-800 dark:text-yellow-200 text-base lg:text-lg mb-2">
                   Markets Are Nervous
                 </h4>
-                <p className="text-sm text-yellow-700 dark:text-yellow-300 mb-3">
+                <p className="text-xs lg:text-sm text-yellow-700 dark:text-yellow-300 mb-2 lg:mb-3">
                   Moderate VIX • Slightly Elevated Ratios • Some Uncertainty
                 </p>
               </div>
-              <p className="text-sm text-yellow-800 dark:text-yellow-200">
+              <p className="text-xs lg:text-sm text-yellow-800 dark:text-yellow-200">
                 Some uncertainty is in the air. Investors are more cautious but not panicking. 
                 This is a good time to be patient and avoid making impulsive decisions.
               </p>
-              <div className="bg-yellow-100 dark:bg-yellow-900/50 p-3 rounded text-xs text-yellow-800 dark:text-yellow-200">
+              <div className="bg-yellow-100 dark:bg-yellow-900/50 p-2 lg:p-3 rounded text-xs text-yellow-800 dark:text-yellow-200">
                 <strong>What to do:</strong> Stay disciplined. Watch for opportunities but don&apos;t rush into decisions.
               </div>
             </div>
             
-            <div className="space-y-4 p-6 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200 dark:border-red-800">
+            <div className="space-y-3 lg:space-y-4 p-4 lg:p-6 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200 dark:border-red-800">
               <div className="text-center">
                 <div className="text-4xl mb-2">🔴</div>
-                <h4 className="font-bold text-red-800 dark:text-red-200 text-lg mb-2">
+                <h4 className="font-bold text-red-800 dark:text-red-200 text-base lg:text-lg mb-2">
                   Markets Are Extreme
                 </h4>
-                <p className="text-sm text-red-700 dark:text-red-300 mb-3">
+                <p className="text-xs lg:text-sm text-red-700 dark:text-red-300 mb-2 lg:mb-3">
                   High VIX • Extreme Ratios • Fear or Greed Dominates
                 </p>
               </div>
-              <p className="text-sm text-red-800 dark:text-red-200">
+              <p className="text-xs lg:text-sm text-red-800 dark:text-red-200">
                 Fear or greed dominates rational thinking. These extreme moments often create 
                 the best opportunities - buying during fear or being cautious during greed.
               </p>
-              <div className="bg-red-100 dark:bg-red-900/50 p-3 rounded text-xs text-red-800 dark:text-red-200">
+              <div className="bg-red-100 dark:bg-red-900/50 p-2 lg:p-3 rounded text-xs text-red-800 dark:text-red-200">
                 <strong>What to do:</strong> Consider contrarian moves. When others panic, stay calm. When others are euphoric, be cautious.
               </div>
             </div>
@@ -393,13 +393,13 @@ export default function Home() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1.0 }}
-          className="mt-12 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 rounded-xl border border-blue-200/50 dark:border-blue-800/50"
+          className="mt-8 lg:mt-12 p-4 lg:p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 rounded-xl border border-blue-200/50 dark:border-blue-800/50"
         >
           <div className="text-center">
-            <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
+            <h3 className="text-base lg:text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
               Remember: Markets are Emotional
             </h3>
-            <p className="text-blue-800 dark:text-blue-200 text-sm max-w-3xl mx-auto">
+            <p className="text-blue-800 dark:text-blue-200 text-xs lg:text-sm max-w-3xl mx-auto">
               These indicators show you what other investors are feeling - fear, greed, optimism, or panic. 
               The best investment opportunities often come when others are being too emotional. 
               When everyone is fearful, markets may be oversold. When everyone is greedy, markets may be overpriced.
@@ -409,27 +409,28 @@ export default function Home() {
 
         {/* Footer */}
         <motion.footer 
-          className="mt-16 pt-8 border-t border-tremor-border/50 dark:border-dark-tremor-border/50"
+          className="mt-12 lg:mt-16 pt-6 lg:pt-8 border-t border-tremor-border/50 dark:border-dark-tremor-border/50"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 1.2 }}
         >
-          <Flex justifyContent="between" alignItems="center" className="flex-col sm:flex-row gap-4">
+          <Flex justifyContent="between" alignItems="center" className="flex-col lg:flex-row gap-3 lg:gap-4">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4, delay: 1.3 }}
+              className="text-center lg:text-left"
             >
-              <Text className="text-tremor-content-subtle dark:text-dark-tremor-content-subtle text-sm text-center sm:text-left">
+              <Text className="text-tremor-content-subtle dark:text-dark-tremor-content-subtle text-xs lg:text-sm">
                 Market Sentiment Tracker • Helping Novice Investors Understand Market Emotions
               </Text>
-              <Text className="text-tremor-content-subtle dark:text-dark-tremor-content-subtle text-xs mt-1 text-center sm:text-left">
+              <Text className="text-tremor-content-subtle dark:text-dark-tremor-content-subtle text-xs mt-1">
                 Data updates every 5 minutes • Not financial advice - for educational purposes only
               </Text>
             </motion.div>
             
             <motion.div 
-              className="flex items-center gap-4"
+              className="flex items-center gap-3 lg:gap-4"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4, delay: 1.4 }}
