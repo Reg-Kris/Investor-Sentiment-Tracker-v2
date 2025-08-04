@@ -218,7 +218,7 @@ export default function Home() {
 
         {/* Educational Metric Cards */}
         <StaggerContainer>
-          <Grid numItemsSm={1} numItemsMd={2} numItemsLg={2} numItemsXl={4} className="gap-4 lg:gap-6">
+          <Grid numItemsSm={1} numItemsMd={2} numItemsLg={4} className="gap-4 lg:gap-6">
             {/* Market Price Indicators */}
             <StaggerItem>
               <Col numColSpan={1}>
