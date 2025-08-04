@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import fs from 'fs/promises';
-import path from 'path';
+const fs = require('fs').promises;
+const path = require('path');
 
 console.log('🚀 Starting simple data fetch...');
 
@@ -142,7 +142,7 @@ async function main() {
   return results;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (require.main === module) {
   main()
     .then(() => process.exit(0))
     .catch(error => {
@@ -151,4 +151,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     });
 }
 
-export default main;
+module.exports = main;
