@@ -11,6 +11,14 @@ const nextConfig = {
   basePath: process.env.NODE_ENV === 'production' ? '/Investor-Sentiment-Tracker-v2' : '',
   assetPrefix: process.env.NODE_ENV === 'production' ? '/Investor-Sentiment-Tracker-v2/' : '',
   
+  // Add build-time environment variables for cache busting
+  env: {
+    BUILD_TIMESTAMP: Date.now().toString(),
+    CACHE_VERSION: Date.now().toString(),
+    BUILD_ID: process.env.GITHUB_SHA || Date.now().toString(),
+    DEPLOYMENT_ENV: process.env.NODE_ENV || 'development',
+  },
+  
   // Performance optimizations
   compress: true,
   poweredByHeader: false,

@@ -414,33 +414,116 @@ class APIService {
 
   async getSentimentData(): Promise<APIResponse<SentimentData>> {
     try {
-      // First try to load data from the pre-fetched JSON file (for static deployment)
-      console.log('🔍 Attempting to load pre-fetched data from JSON file...');
+      // Multi-layer fallback strategy for robust data loading
+      console.log('🔍 Starting multi-layer data loading strategy...');
+      
+      // Layer 1: Try pre-fetched JSON data (production GitHub Pages)
+      console.log('📥 Layer 1: Attempting to load pre-fetched JSON data...');
       const jsonData = await this.loadPreFetchedData();
       if (jsonData) {
-        console.log('✅ Using pre-fetched data from JSON file:', jsonData);
+        console.log('✅ Layer 1 success: Using pre-fetched JSON data');
         return {
           success: true,
-          data: jsonData
+          data: jsonData,
+          source: 'json-file'
         };
-      } else {
-        console.log('❌ No pre-fetched data available, trying embedded data fallback...');
       }
       
-      // Try embedded build-time data as fallback
+      // Layer 2: Try embedded build-time data
+      console.log('📦 Layer 2: Attempting to load embedded build-time data...');
       const embeddedData = await this.loadEmbeddedData();
       if (embeddedData) {
-        console.log('✅ Using embedded build-time data:', embeddedData);
+        console.log('✅ Layer 2 success: Using embedded build-time data');
         return {
           success: true,
-          data: embeddedData
+          data: embeddedData,
+          source: 'embedded-data'
         };
-      } else {
-        console.log('❌ No embedded data available, falling back to API calls');
+      }
+      
+      // Layer 3: Try alternative JSON paths (GitHub Pages edge cases)
+      console.log('🔄 Layer 3: Trying alternative JSON paths...');
+      const alternativeData = await this.loadAlternativePaths();
+      if (alternativeData) {
+        console.log('✅ Layer 3 success: Using alternative path data');
+        return {
+          success: true,
+          data: alternativeData,
+          source: 'alternative-path'
+        };
       }
 
-      // Fall back to direct API calls if JSON data unavailable
-      console.log('JSON data unavailable, falling back to direct API calls');
+      // Layer 4: Try direct API calls (development/fallback)
+      console.log('🌐 Layer 4: Attempting direct API calls...');
+      const apiData = await this.loadFromAPIs();
+      if (apiData) {
+        console.log('✅ Layer 4 success: Using direct API data');
+        return {
+          success: true,
+          data: apiData,
+          source: 'direct-api'
+        };
+      }
+
+      // Layer 5: Last resort - use mock data
+      console.log('⚠️ Layer 5: All data sources failed, using mock data');
+      return {
+        success: false,
+        data: this.getMockData(),
+        error: 'All data sources unavailable, using mock data',
+        source: 'mock-data'
+      };
+      
+    } catch (error) {
+      console.error('💥 Critical error in data loading:', error);
+      return {
+        success: false,
+        data: this.getMockData(),
+        error: error instanceof Error ? error.message : 'Unknown error',
+        source: 'error-fallback'
+      };
+    }
+  }
+
+  private async loadAlternativePaths(): Promise<SentimentData | null> {
+    const basePath = process.env.NODE_ENV === 'production' ? '/Investor-Sentiment-Tracker-v2' : '';
+    const alternativePaths = [
+      `${basePath}/data/market-data.json`, // Proper basePath
+      '/data/market-data.json', // Root path fallback
+      './data/market-data.json', // Relative path
+      '../data/market-data.json', // Parent relative
+      '/Investor-Sentiment-Tracker-v2/data/market-data.json', // Full GitHub path
+      '/public/data/market-data.json', // Public folder direct
+      `${basePath}/public/data/market-data.json`, // Public with basePath
+    ];
+
+    for (const path of alternativePaths) {
+      try {
+        console.log(`🔍 Trying alternative path: ${path}`);
+        const response = await fetch(path, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Cache-Control': 'no-cache'
+          },
+          cache: 'no-store'
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          return this.convertRawDataToSentimentData(data);
+        }
+      } catch (error) {
+        console.log(`❌ Alternative path failed: ${path}`, error);
+        continue;
+      }
+    }
+    
+    return null;
+  }
+
+  private async loadFromAPIs(): Promise<SentimentData | null> {
+    try {
       const [fearGreed, spy, qqq, iwm, vix, putCall] = await Promise.allSettled([
         this.getFearGreedIndex(),
         this.getStockData('SPY'),
@@ -461,27 +544,68 @@ class APIService {
       const overallSentiment = this.calculateSentiment(fearGreedValue, stockChanges, vixValue);
 
       return {
-        success: true,
-        data: {
-          fearGreedIndex: fearGreedValue,
-          spyChange: spyData.change,
-          spyPrice: spyData.price || 500,
-          qqqqChange: qqqData.change,
-          qqqPrice: qqqData.price || 400,
-          iwmChange: iwmData.change,
-          iwmPrice: iwmData.price || 200,
-          vixLevel: vixValue,
-          putCallRatio: putCallValue,
-          overallSentiment,
-          lastUpdated: new Date().toISOString()
-        }
+        fearGreedIndex: fearGreedValue,
+        spyChange: spyData.change,
+        spyPrice: spyData.price || 500,
+        qqqqChange: qqqData.change,
+        qqqPrice: qqqData.price || 400,
+        iwmChange: iwmData.change,
+        iwmPrice: iwmData.price || 200,
+        vixLevel: vixValue,
+        putCallRatio: putCallValue,
+        overallSentiment,
+        lastUpdated: new Date().toISOString()
       };
     } catch (error) {
+      console.error('❌ API loading failed:', error);
+      return null;
+    }
+  }
+
+  private convertRawDataToSentimentData(marketData: any): SentimentData | null {
+    try {
+      if (!marketData || typeof marketData !== 'object') {
+        return null;
+      }
+      
+      // Extract data using the same logic as loadPreFetchedData
+      const stocks = marketData.stocks || {};
+      const vixData = stocks['^VIX'] || {};
+      const fearGreedData = marketData.fearGreed || {};
+      
+      if (!stocks.SPY || !stocks.QQQ || !vixData.price || typeof fearGreedData.value !== 'number') {
+        return null;
+      }
+
+      const spyChange = stocks.SPY?.change || 0;
+      const spyPrice = stocks.SPY?.price || 500;
+      const qqqChange = stocks.QQQ?.change || 0;
+      const qqqPrice = stocks.QQQ?.price || 400;
+      const iwmChange = stocks.IWM?.change || 0;
+      const iwmPrice = stocks.IWM?.price || 200;
+      const vixLevel = vixData.price || 20;
+      const fearGreedIndex = fearGreedData.value || 50;
+      const putCallRatio = marketData.putCallRatio || this.calculatePutCallProxy(vixLevel, spyChange);
+
+      const stockChanges = [spyChange, qqqChange, iwmChange];
+      const overallSentiment = this.calculateSentiment(fearGreedIndex, stockChanges, vixLevel);
+
       return {
-        success: false,
-        data: this.getMockData(),
-        error: error instanceof Error ? error.message : 'Unknown error'
+        fearGreedIndex,
+        spyChange,
+        spyPrice,
+        qqqqChange: qqqChange,
+        qqqPrice,
+        iwmChange,
+        iwmPrice,
+        vixLevel,
+        putCallRatio,
+        overallSentiment,
+        lastUpdated: marketData.timestamp || new Date().toISOString()
       };
+    } catch (error) {
+      console.error('❌ Data conversion failed:', error);
+      return null;
     }
   }
 
@@ -489,10 +613,18 @@ class APIService {
     try {
       // Handle GitHub Pages basePath in production
       const basePath = process.env.NODE_ENV === 'production' ? '/Investor-Sentiment-Tracker-v2' : '';
-      // Add cache-busting parameter for GitHub Pages aggressive caching
-      const cacheBuster = Date.now();
-      const url = `${basePath}/data/market-data.json?v=${cacheBuster}`;
-      console.log('📥 Fetching:', url);
+      
+      // Enhanced multi-layer cache-busting for GitHub Pages aggressive caching
+      const buildTimestamp = process.env.BUILD_TIMESTAMP || Date.now().toString();
+      const cacheVersion = process.env.CACHE_VERSION || buildTimestamp;
+      const sessionCache = Math.floor(Date.now() / (5 * 60 * 1000)); // 5-minute cache groups
+      const hourlyRotation = Math.floor(Date.now() / (60 * 60 * 1000)); // Hourly rotation
+      const randomSalt = Math.random().toString(36).substring(2, 8); // 6-char random
+      const userAgent = typeof window !== 'undefined' ? 
+        btoa(navigator.userAgent.substring(0, 20)).substring(0, 8) : 'ssr';
+      
+      const url = `${basePath}/data/market-data.json?v=${cacheVersion}&build=${buildTimestamp}&session=${sessionCache}&hour=${hourlyRotation}&salt=${randomSalt}&ua=${userAgent}`;
+      console.log('📥 Enhanced cache-busting fetch:', url);
       console.log('📍 Current location:', typeof window !== 'undefined' ? window.location.href : 'Server-side');
       
       const response = await fetch(url, {

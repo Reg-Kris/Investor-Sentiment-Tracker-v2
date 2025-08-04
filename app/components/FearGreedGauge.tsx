@@ -25,45 +25,50 @@ export default function SentimentGauge({
     if (clampedValue < 20) {
       return {
         label: 'Extreme Fear',
-        color: 'red',
-        bgColor: 'bg-red-500',
-        textColor: 'text-red-600 dark:text-red-400',
-        description: 'Market showing extreme pessimism'
+        color: '#BC6C6C', // Warm muted coral
+        bgColor: 'gradient-extreme-fear',
+        textColor: 'text-[#BC6C6C]',
+        description: 'Market showing extreme pessimism',
+        warmColor: 'rgb(188, 108, 108)'
       };
     }
     if (clampedValue < 40) {
       return {
         label: 'Fear',
-        color: 'orange',
-        bgColor: 'bg-orange-500',
-        textColor: 'text-orange-600 dark:text-orange-400',
-        description: 'Market sentiment is bearish'
+        color: '#CDA45E', // Warm amber
+        bgColor: 'gradient-fear',
+        textColor: 'text-[#CDA45E]',
+        description: 'Market sentiment is bearish',
+        warmColor: 'rgb(205, 164, 94)'
       };
     }
     if (clampedValue < 60) {
       return {
         label: 'Neutral',
-        color: 'yellow',
-        bgColor: 'bg-yellow-500',
-        textColor: 'text-yellow-600 dark:text-yellow-400',
-        description: 'Market sentiment is balanced'
+        color: '#DAA58E', // Champagne rose (secondary)
+        bgColor: 'gradient-neutral',
+        textColor: 'text-[#DAA58E]',
+        description: 'Market sentiment is balanced',
+        warmColor: 'rgb(218, 165, 142)'
       };
     }
     if (clampedValue < 80) {
       return {
         label: 'Greed',
-        color: 'emerald',
-        bgColor: 'bg-emerald-500',
-        textColor: 'text-emerald-600 dark:text-emerald-400',
-        description: 'Market sentiment is bullish'
+        color: '#A37F90', // Dusty mauve
+        bgColor: 'gradient-greed',
+        textColor: 'text-[#A37F90]',
+        description: 'Market sentiment is bullish',
+        warmColor: 'rgb(163, 127, 144)'
       };
     }
     return {
       label: 'Extreme Greed',
-      color: 'green',
-      bgColor: 'bg-green-500',
-      textColor: 'text-green-600 dark:text-green-400',
-      description: 'Market showing extreme optimism'
+      color: '#93A386', // Sage green
+      bgColor: 'gradient-extreme-greed',
+      textColor: 'text-[#93A386]',
+      description: 'Market showing extreme optimism',
+      warmColor: 'rgb(147, 163, 134)'
     };
   };
 
@@ -130,17 +135,35 @@ export default function SentimentGauge({
         </div>
       </div>
       
-      {/* Sentiment indicator bar */}
+      {/* Sentiment indicator bar with proper color segments */}
       <div className="mt-4 space-y-2">
         <div className="flex justify-between text-xs text-tremor-content dark:text-dark-tremor-content">
           <span>Extreme Fear</span>
           <span>Extreme Greed</span>
         </div>
-        <div className="relative h-2 bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 rounded-full overflow-hidden">
-          <div 
-            className="absolute top-0 w-1 h-full bg-white dark:bg-gray-900 border border-tremor-border dark:border-dark-tremor-border rounded-full shadow-sm transition-all duration-300"
-            style={{ left: `${value}%`, transform: 'translateX(-50%)' }}
+        <div className="relative h-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
+          {/* Properly segmented color bar that matches sentiment ranges */}
+          <div className="flex h-full rounded-full overflow-hidden">
+            <div className="w-[20%] bg-[#BC6C6C]" /> {/* 0-20: Extreme Fear */}
+            <div className="w-[20%] bg-[#CDA45E]" /> {/* 20-40: Fear */}
+            <div className="w-[20%] bg-[#DAA58E]" /> {/* 40-60: Neutral */}
+            <div className="w-[20%] bg-[#A37F90]" /> {/* 60-80: Greed */}
+            <div className="w-[20%] bg-[#93A386]" /> {/* 80-100: Extreme Greed */}
+          </div>
+          
+          {/* Animated indicator that moves along the curve */}
+          <motion.div 
+            className="absolute top-0 w-3 h-full bg-white dark:bg-gray-900 border-2 border-gray-600 dark:border-gray-300 rounded-full shadow-lg transition-all duration-500 ease-out"
+            style={{ 
+              left: `calc(${Math.min(Math.max(value, 0), 100)}% - 6px)`, // Constrain to 0-100% and center the 12px wide indicator
+              boxShadow: `0 0 12px ${sentimentData.warmColor}, 0 3px 6px rgba(0,0,0,0.3)`
+            }}
             aria-label={`Sentiment indicator at ${value}%`}
+            initial={{ scale: 0, y: -5 }}
+            animate={{ scale: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.8, type: 'spring', stiffness: 250 }}
+            whileHover={{ scale: 1.3, y: -2 }}
+            whileTap={{ scale: 0.9 }}
           />
         </div>
       </div>
@@ -184,10 +207,13 @@ export default function SentimentGauge({
           </Text>
           <motion.div 
             className={clsx(
-              'px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm',
-              sentimentData.bgColor,
-              'text-white shadow-lg'
+              'px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm text-white shadow-lg',
+              sentimentData.bgColor
             )}
+            style={{
+              background: `linear-gradient(135deg, ${sentimentData.warmColor}, ${sentimentData.warmColor}dd)`,
+              boxShadow: `0 4px 12px ${sentimentData.warmColor}40`
+            }}
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ duration: 0.5, delay: 0.4, type: 'spring', stiffness: 200 }}

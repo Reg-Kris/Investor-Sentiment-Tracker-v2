@@ -18,6 +18,7 @@ export interface APIResponse<T> {
   data: T;
   success: boolean;
   error?: string;
+  source?: string;
 }
 
 export interface MetricCardProps {

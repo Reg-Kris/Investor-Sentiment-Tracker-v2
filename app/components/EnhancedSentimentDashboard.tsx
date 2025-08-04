@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
 import AnimatedNumber from './AnimatedNumber';
 
 interface SentimentData {
@@ -64,6 +66,12 @@ export function EnhancedSentimentDashboard({ className = '' }: EnhancedSentiment
   const [sentimentData, setSentimentData] = useState<SentimentData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Viewport animation hooks
+  const { ref: mainRef, inView: mainInView } = useInView({ threshold: 0.2, triggerOnce: true });
+  const { ref: signalsRef, inView: signalsInView } = useInView({ threshold: 0.2, triggerOnce: true });
+  const { ref: componentsRef, inView: componentsInView } = useInView({ threshold: 0.2, triggerOnce: true });
+  const { ref: indicatorsRef, inView: indicatorsInView } = useInView({ threshold: 0.2, triggerOnce: true });
 
   useEffect(() => {
     fetchSentimentData();
@@ -89,37 +97,37 @@ export function EnhancedSentimentDashboard({ className = '' }: EnhancedSentiment
   };
 
   const getScoreColor = (score: number): string => {
-    if (score < 20) return 'text-green-500'; // Extreme Fear = Buy
-    if (score < 40) return 'text-green-400'; // Fear = Buy
-    if (score < 60) return 'text-yellow-500'; // Neutral = Hold
-    if (score < 80) return 'text-orange-500'; // Greed = Sell
-    return 'text-red-500'; // Extreme Greed = Strong Sell
+    if (score < 20) return 'text-[#93A386]'; // Extreme Fear = Buy (Sage green)
+    if (score < 40) return 'text-[#A37F90]'; // Fear = Buy (Dusty mauve)
+    if (score < 60) return 'text-[#DAA58E]'; // Neutral = Hold (Champagne rose)
+    if (score < 80) return 'text-[#CDA45E]'; // Greed = Sell (Warm amber)
+    return 'text-[#BC6C6C]'; // Extreme Greed = Strong Sell (Muted coral)
   };
 
   const getScoreBackground = (score: number): string => {
-    if (score < 20) return 'bg-green-500/20'; // Extreme Fear
-    if (score < 40) return 'bg-green-400/20'; // Fear
-    if (score < 60) return 'bg-yellow-500/20'; // Neutral
-    if (score < 80) return 'bg-orange-500/20'; // Greed
-    return 'bg-red-500/20'; // Extreme Greed
+    if (score < 20) return 'bg-[#93A386]/20'; // Extreme Fear (Sage green)
+    if (score < 40) return 'bg-[#A37F90]/20'; // Fear (Dusty mauve)
+    if (score < 60) return 'bg-[#DAA58E]/20'; // Neutral (Champagne rose)
+    if (score < 80) return 'bg-[#CDA45E]/20'; // Greed (Warm amber)
+    return 'bg-[#BC6C6C]/20'; // Extreme Greed (Muted coral)
   };
 
   const getActionColor = (action: string): string => {
     switch (action) {
-      case 'STRONG_BUY': return 'text-green-600 bg-green-100';
-      case 'BUY': return 'text-green-500 bg-green-50';
-      case 'HOLD': return 'text-yellow-600 bg-yellow-100';
-      case 'SELL': return 'text-orange-600 bg-orange-100';
-      case 'STRONG_SELL': return 'text-red-600 bg-red-100';
+      case 'STRONG_BUY': return 'text-white bg-[#93A386] shadow-lg';
+      case 'BUY': return 'text-white bg-[#A37F90] shadow-lg';
+      case 'HOLD': return 'text-white bg-[#DAA58E] shadow-lg';
+      case 'SELL': return 'text-white bg-[#CDA45E] shadow-lg';
+      case 'STRONG_SELL': return 'text-white bg-[#BC6C6C] shadow-lg';
       default: return 'text-gray-600 bg-gray-100';
     }
   };
 
   const getConfidenceColor = (confidence: string): string => {
     switch (confidence) {
-      case 'HIGH': return 'text-green-600';
-      case 'MEDIUM': return 'text-yellow-600';
-      case 'LOW': return 'text-red-600';
+      case 'HIGH': return 'text-[#93A386]';
+      case 'MEDIUM': return 'text-[#DAA58E]';
+      case 'LOW': return 'text-[#BC6C6C]';
       default: return 'text-gray-600';
     }
   };
@@ -166,39 +174,97 @@ export function EnhancedSentimentDashboard({ className = '' }: EnhancedSentiment
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Main Sentiment Score */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+      <motion.div 
+        ref={mainRef}
+        initial={{ opacity: 0, y: 50 }}
+        animate={mainInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+        transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+        className="glass-card fintech-card-hover rounded-xl p-8"
+      >
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+          <motion.h2 
+            initial={{ opacity: 0, y: -20 }}
+            animate={mainInView ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-2xl font-bold mb-6 fintech-text-gradient"
+          >
             Enhanced Sentiment Analysis
-          </h2>
+          </motion.h2>
           
-          <div className={`inline-flex items-center justify-center w-32 h-32 rounded-full ${getScoreBackground(compositeScore)} mb-4`}>
-            <div className="text-center">
-              <div className={`text-4xl font-bold ${getScoreColor(compositeScore)}`}>
+          <motion.div 
+            className={`inline-flex items-center justify-center w-36 h-36 rounded-full ${getScoreBackground(compositeScore)} mb-6 relative overflow-hidden`}
+            initial={{ scale: 0, rotate: -180 }}
+            animate={mainInView ? { scale: 1, rotate: 0 } : { scale: 0, rotate: -180 }}
+            transition={{ duration: 0.8, delay: 0.4, type: 'spring', stiffness: 200 }}
+            whileHover={{ scale: 1.05, rotate: 5 }}
+            style={{
+              background: `radial-gradient(circle, ${getScoreBackground(compositeScore)}, transparent 70%)`,
+              backdropFilter: 'blur(12px)',
+              border: `2px solid ${getScoreColor(compositeScore).replace('text-', '').replace('[', '').replace(']', '')}40`
+            }}
+          >
+            <motion.div 
+              className="absolute inset-0 rounded-full"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+              style={{
+                background: `conic-gradient(from 0deg, transparent, ${getScoreColor(compositeScore).replace('text-', '').replace('[', '').replace(']', '')}30, transparent)`
+              }}
+            />
+            <div className="text-center relative z-10">
+              <motion.div 
+                className={`text-5xl font-bold ${getScoreColor(compositeScore)}`}
+                initial={{ opacity: 0 }}
+                animate={mainInView ? { opacity: 1 } : { opacity: 0 }}
+                transition={{ duration: 0.6, delay: 0.8 }}
+              >
                 <AnimatedNumber value={compositeScore} />
-              </div>
+              </motion.div>
               <div className="text-sm text-gray-600 dark:text-gray-400">/ 100</div>
             </div>
-          </div>
+          </motion.div>
           
-          <div className={`text-xl font-semibold mb-2 ${getScoreColor(compositeScore)}`}>
+          <motion.div 
+            className={`text-xl font-semibold mb-4 ${getScoreColor(compositeScore)}`}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={mainInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.6, delay: 1 }}
+          >
             {classification}
-          </div>
+          </motion.div>
           
           {primarySignal && (
-            <div className={`inline-block px-4 py-2 rounded-full text-sm font-medium ${getActionColor(primarySignal.action)}`}>
+            <motion.div 
+              className={`inline-block px-6 py-3 rounded-full text-sm font-medium ${getActionColor(primarySignal.action)}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={mainInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.6, delay: 1.2 }}
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+            >
               {primarySignal.action.replace('_', ' ')}
-            </div>
+            </motion.div>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* Actionable Signals */}
       {sentimentData.actionable_signals && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+        <motion.div 
+          ref={signalsRef}
+          initial={{ opacity: 0, x: -50 }}
+          animate={signalsInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="glass-card fintech-card-hover rounded-xl p-6"
+        >
+          <motion.h3 
+            className="text-lg font-semibold mb-4 fintech-text-gradient"
+            initial={{ opacity: 0 }}
+            animate={signalsInView ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
             Trading Signals
-          </h3>
+          </motion.h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
@@ -247,40 +313,82 @@ export function EnhancedSentimentDashboard({ className = '' }: EnhancedSentiment
               </ul>
             </div>
           )}
-        </div>
+        </motion.div>
       )}
 
       {/* Component Breakdown */}
       {sentimentData.sentiment_composite?.components && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+        <motion.div 
+          ref={componentsRef}
+          initial={{ opacity: 0, y: 50 }}
+          animate={componentsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="glass-card fintech-card-hover rounded-xl p-6"
+        >
+          <motion.h3 
+            className="text-lg font-semibold mb-4 fintech-text-gradient"
+            initial={{ opacity: 0 }}
+            animate={componentsInView ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
             Sentiment Components
-          </h3>
+          </motion.h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.entries(sentimentData.sentiment_composite.components).map(([key, value]) => (
-              <div key={key} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            {Object.entries(sentimentData.sentiment_composite.components).map(([key, value], index) => (
+              <motion.div 
+                key={key} 
+                className="glass-subtle rounded-lg p-4 warm-card-hover"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={componentsInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.6, delay: 0.7 + index * 0.1 }}
+                whileHover={{ 
+                  scale: 1.02, 
+                  transition: { duration: 0.2 },
+                  boxShadow: `0 8px 25px ${getScoreColor(value).replace('text-', '').replace('[', '').replace(']', '')}20`
+                }}
+              >
                 <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">
                   {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                 </div>
-                <div className={`text-2xl font-bold ${getScoreColor(value)}`}>
+                <motion.div 
+                  className={`text-2xl font-bold ${getScoreColor(value)}`}
+                  whileHover={{ scale: 1.1 }}
+                >
                   <AnimatedNumber value={Math.round(value)} />
-                </div>
+                </motion.div>
                 <div className="text-xs text-gray-500 dark:text-gray-400">/ 100</div>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* Market Indicators Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <motion.div 
+        ref={indicatorsRef}
+        initial={{ opacity: 0 }}
+        animate={indicatorsInView ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 0.8, delay: 0.4 }}
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+      >
         {/* VIX Analysis */}
         {sentimentData.market_structure && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+          <motion.div 
+            className="glass-card fintech-card-hover rounded-xl p-6"
+            initial={{ opacity: 0, x: -30 }}
+            animate={indicatorsInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            whileHover={{ y: -4 }}
+          >
+            <motion.h3 
+              className="text-lg font-semibold mb-4 fintech-text-gradient"
+              initial={{ opacity: 0 }}
+              animate={indicatorsInView ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+            >
               VIX Analysis
-            </h3>
+            </motion.h3>
             <div className="space-y-3">
               <div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">VIX Level</div>
@@ -298,15 +406,26 @@ export function EnhancedSentimentDashboard({ className = '' }: EnhancedSentiment
                 {sentimentData.market_structure.volatility_interpretation}
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Safe Haven Analysis */}
         {sentimentData.safe_haven_analysis && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+          <motion.div 
+            className="glass-card fintech-card-hover rounded-xl p-6"
+            initial={{ opacity: 0, x: 30 }}
+            animate={indicatorsInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
+            whileHover={{ y: -4 }}
+          >
+            <motion.h3 
+              className="text-lg font-semibold mb-4 fintech-text-gradient"
+              initial={{ opacity: 0 }}
+              animate={indicatorsInView ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ duration: 0.6, delay: 0.9 }}
+            >
               Safe Haven Flows
-            </h3>
+            </motion.h3>
             <div className="space-y-3">
               <div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">Safe Haven Score</div>
@@ -318,9 +437,9 @@ export function EnhancedSentimentDashboard({ className = '' }: EnhancedSentiment
                 {sentimentData.safe_haven_analysis.interpretation}
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
-      </div>
+      </motion.div>
 
       {/* Price Levels (if available) */}
       {sentimentData.actionable_signals?.spy_levels && (

@@ -7,15 +7,21 @@
   --background-start-rgb: 252, 249, 246;
   --background-end-rgb: 248, 243, 238;
   
-  /* Warm Pink-Beige Fintech Palette (2025 Design Trends) */
-  --fintech-primary: 186, 132, 121; /* Warm terracotta */
-  --fintech-secondary: 218, 165, 142; /* Champagne rose */
-  --fintech-accent: 163, 127, 144; /* Dusty mauve */
-  --fintech-success: 147, 163, 134; /* Sage green */
-  --fintech-warning: 205, 164, 94; /* Warm amber */
-  --fintech-error: 188, 108, 108; /* Muted coral */
-  --fintech-surface: 254, 252, 250; /* Warm white */
-  --fintech-surface-elevated: 250, 246, 242; /* Cream */
+  /* Enhanced Warm Pink-Beige Fintech Palette (2025 Design Trends) */
+  --fintech-primary: 186, 132, 121; /* #BA8479 - Warm terracotta */
+  --fintech-secondary: 218, 165, 142; /* #DAA58E - Champagne rose */
+  --fintech-accent: 163, 127, 144; /* #A37F90 - Dusty mauve */
+  --fintech-success: 147, 163, 134; /* #93A386 - Sage green */
+  --fintech-warning: 205, 164, 94; /* #CDA45E - Warm amber */
+  --fintech-error: 188, 108, 108; /* #BC6C6C - Muted coral */
+  --fintech-surface: 254, 252, 250; /* #FEFCFA - Warm white */
+  --fintech-surface-elevated: 250, 246, 242; /* #FAF6F2 - Cream */
+  
+  /* Enhanced warm tone variations */
+  --fintech-primary-light: 218, 165, 142; /* Lighter version of primary */
+  --fintech-primary-dark: 154, 99, 88; /* Darker version of primary */
+  --fintech-accent-light: 198, 170, 187; /* Lighter dusty mauve */
+  --fintech-accent-dark: 128, 84, 101; /* Darker dusty mauve */
   
   /* Warm glass morphism variables */
   --glass-bg: rgba(254, 252, 250, 0.12);
@@ -396,4 +402,164 @@ body {
   background: rgba(var(--fintech-surface-elevated), 1);
   border: 1px solid rgba(var(--fintech-primary), 0.2);
   box-shadow: 0 4px 20px rgba(var(--fintech-primary), 0.1);
+}
+
+/* Enhanced Floating Animations */
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.float-delayed {
+  animation: float 6s ease-in-out infinite;
+  animation-delay: -2s;
+}
+
+.float-slow {
+  animation: float 8s ease-in-out infinite;
+  animation-delay: -1s;
+}
+
+.float-subtle {
+  animation: floatSubtle 4s ease-in-out infinite;
+}
+
+.float-card {
+  animation: floatCard 7s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes floatSubtle {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-4px) rotate(0.5deg);
+  }
+  66% {
+    transform: translateY(-2px) rotate(-0.3deg);
+  }
+}
+
+@keyframes floatCard {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.01);
+  }
+}
+
+.float-gentle {
+  animation: floatGentle 5s ease-in-out infinite;
+}
+
+@keyframes floatGentle {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-3px) rotate(1deg);
+  }
+  66% {
+    transform: translateY(-6px) rotate(-0.5deg);
+  }
+}
+
+.rotate-slow {
+  animation: rotateSlow 20s linear infinite;
+}
+
+@keyframes rotateSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.bounce-gentle {
+  animation: bounceGentle 3s ease-in-out infinite;
+}
+
+@keyframes bounceGentle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Pulsing glow effect */
+.pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes pulseGlow {
+  from {
+    box-shadow: 0 0 20px rgba(var(--fintech-primary), 0.2);
+  }
+  to {
+    box-shadow: 0 0 30px rgba(var(--fintech-primary), 0.4);
+  }
+}
+
+/* Breath animation */
+.breathe {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+/* Warm sparkle effect */
+.sparkle::before {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(circle, rgba(var(--fintech-secondary), 0.8), transparent);
+  border-radius: 50%;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+.sparkle::after {
+  content: '';
+  position: absolute;
+  top: 70%;
+  right: 20%;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, rgba(var(--fintech-accent), 0.6), transparent);
+  border-radius: 50%;
+  animation: sparkle 2.5s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }

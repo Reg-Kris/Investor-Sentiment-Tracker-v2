@@ -219,7 +219,8 @@ export default function Home() {
             {/* Market Price Indicators */}
             <HoverScale className="h-full">
               <Col numColSpan={1}>
-                <EducationalMetricCard
+                <div className="float-subtle">
+                  <EducationalMetricCard
                   title="S&P 500 Price (SPY)"
                   value={`$${(sentimentData.spyPrice || 450).toFixed(2)}`}
                   change={sentimentData.spyChange}
@@ -236,14 +237,16 @@ export default function Home() {
                   trafficLight={sentimentData.spyChange >= 1 ? 'green' : sentimentData.spyChange >= -1 ? 'yellow' : 'red'}
                   icon={<TrendingUp className="h-5 w-5" />}
                   size="md"
-                />
+                  />
+                </div>
               </Col>
             </HoverScale>
 
             <HoverScale className="h-full">
               <Col numColSpan={1}>
-                <EducationalMetricCard
-                  title="Tech Stocks Price (QQQ)"
+                <div className="float-delayed">
+                  <EducationalMetricCard
+                    title="Tech Stocks Price (QQQ)"
                   value={`$${(sentimentData.qqqPrice || 380).toFixed(2)}`}
                   change={sentimentData.qqqqChange}
                   changeType="percentage"
@@ -259,15 +262,17 @@ export default function Home() {
                   trafficLight={sentimentData.qqqqChange >= 1 ? 'green' : sentimentData.qqqqChange >= -1 ? 'yellow' : 'red'}
                   icon={<Activity className="h-5 w-5" />}
                   size="md"
-                />
+                  />
+                </div>
               </Col>
             </HoverScale>
 
             {/* Volatility Indicators */}
             <HoverScale className="h-full">
               <Col numColSpan={1}>
-                <EducationalMetricCard
-                  title="Market Fear Gauge (VIX)"
+                <div className="float-slow">
+                  <EducationalMetricCard
+                    title="Market Fear Gauge (VIX)"
                   value={sentimentData.vixLevel.toFixed(1)}
                   explanation={{
                     whatItIs: "The VIX measures how much volatility (big price swings) investors expect over the next 30 days. It's often called the 'fear gauge' of the market.",
@@ -281,14 +286,16 @@ export default function Home() {
                   trafficLight={sentimentData.vixLevel < 20 ? 'green' : sentimentData.vixLevel < 30 ? 'yellow' : 'red'}
                   icon={<AlertCircle className="h-5 w-5" />}
                   size="md"
-                />
+                  />
+                </div>
               </Col>
             </HoverScale>
 
             <HoverScale className="h-full">
               <Col numColSpan={1}>
-                <EducationalMetricCard
-                  title="Options Sentiment (Put/Call)"
+                <div className="float-card">
+                  <EducationalMetricCard
+                    title="Options Sentiment (Put/Call)"
                   value={sentimentData.putCallRatio.toFixed(2)}
                   explanation={{
                     whatItIs: "This ratio compares put options (bets that stocks will fall) to call options (bets that stocks will rise). It shows what options traders are expecting.",
@@ -303,7 +310,8 @@ export default function Home() {
                                sentimentData.putCallRatio > 1.1 || sentimentData.putCallRatio < 0.9 ? 'yellow' : 'green'}
                   icon={<TrendingDown className="h-5 w-5" />}
                   size="md"
-                />
+                  />
+                </div>
               </Col>
             </HoverScale>
           </Grid>
