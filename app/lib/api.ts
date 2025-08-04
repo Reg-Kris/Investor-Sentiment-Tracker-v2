@@ -333,7 +333,7 @@ class APIService {
         ]);
 
         // Calculate put/call proxy using VIX level and market movement
-        let putCallProxy = this.calculatePutCallProxy(vixData, spyData.change);
+        const putCallProxy = this.calculatePutCallProxy(vixData, spyData.change);
         
         SecurityAuditor.logSecurityEvent('DATA_ACCESS', {
           source: 'put_call_proxy_calculation',
