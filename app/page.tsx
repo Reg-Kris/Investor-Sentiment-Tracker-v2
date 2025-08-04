@@ -445,7 +445,7 @@ export default function Home() {
                   icon={Heart}
                   iconPosition="left"
                   className="text-xs backdrop-blur-sm border border-fintech-primary-200/50 dark:border-fintech-primary-700/50 hover:bg-fintech-primary-50 dark:hover:bg-fintech-primary-950"
-                  onClick={() => window.open('https://revolut.me/kgautam', '_blank')}
+                  onClick={() => window.open('https://revolut.me/kristiuo4b', '_blank')}
                 >
                   Buy me a coffee ☕
                 </Button>

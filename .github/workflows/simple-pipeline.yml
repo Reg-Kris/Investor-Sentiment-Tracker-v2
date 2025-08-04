@@ -2,7 +2,7 @@ name: Simple Daily Pipeline
 
 on:
   schedule:
-    - cron: '0 16 * * 1-5'  # 12 PM EST weekdays (market hours)
+    - cron: '0 13 * * *'  # 3 PM EET daily (13:00 UTC) for premarket/last session data
   workflow_dispatch:
 
 permissions:

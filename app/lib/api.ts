@@ -324,8 +324,75 @@ class APIService {
 
   async getPutCallRatio(): Promise<number> {
     return this.fetchWithCache('put-call', async () => {
-      return 0.85 + Math.random() * 0.3;
+      try {
+        // Since Yahoo Finance free API doesn't provide options volume data,
+        // we'll calculate a proxy put/call ratio using market volatility indicators
+        const [vixData, spyData] = await Promise.all([
+          this.getVIXData(),
+          this.getStockData('SPY')
+        ]);
+
+        // Calculate put/call proxy using VIX level and market movement
+        let putCallProxy = this.calculatePutCallProxy(vixData, spyData.change);
+        
+        SecurityAuditor.logSecurityEvent('DATA_ACCESS', {
+          source: 'put_call_proxy_calculation',
+          vix: vixData,
+          spyChange: spyData.change,
+          calculatedRatio: putCallProxy,
+          method: 'volatility_based_proxy',
+        });
+        
+        return Math.round(putCallProxy * 100) / 100; // Round to 2 decimal places
+        
+      } catch (error) {
+        // Enhanced fallback calculation based on current market conditions
+        SecurityAuditor.logSecurityEvent('API_REQUEST_FAILED', {
+          endpoint: 'put-call-proxy',
+          error: error instanceof Error ? error.message : 'Unknown error',
+          fallbackUsed: true,
+        });
+        
+        // Return a more realistic market-neutral ratio instead of 1.00
+        return 0.92; // Typical market average (slightly bullish bias)
+      }
     });
+  }
+
+  /**
+   * Calculate Put/Call ratio proxy using VIX and market movement
+   * This provides a more realistic estimate than random generation
+   */
+  private calculatePutCallProxy(vixLevel: number, spyChange: number): number {
+    // Base ratio starts at market neutral (0.9 = slightly more calls than puts, typical bull market)
+    let ratio = 0.9;
+    
+    // VIX adjustment (higher VIX = more fear = more puts)
+    // VIX 20-30: normal market conditions
+    // VIX >30: increased fear, more puts
+    // VIX <15: complacency, fewer puts
+    if (vixLevel > 35) {
+      ratio += 0.4; // High fear = much more put activity
+    } else if (vixLevel > 25) {
+      ratio += 0.2; // Moderate fear = more puts
+    } else if (vixLevel < 15) {
+      ratio -= 0.1; // Low fear = fewer puts (more calls)
+    }
+    
+    // Market movement adjustment (down days = more defensive puts)
+    if (spyChange < -2) {
+      ratio += 0.3; // Large down move = defensive put buying
+    } else if (spyChange < -0.5) {
+      ratio += 0.15; // Moderate down move = some put buying
+    } else if (spyChange > 1.5) {
+      ratio -= 0.1; // Strong up move = less put demand
+    }
+    
+    // Ensure ratio stays within realistic bounds (0.4 to 2.0)
+    // Historical data shows ratios rarely go below 0.4 or above 2.0
+    ratio = Math.max(0.4, Math.min(2.0, ratio));
+    
+    return ratio;
   }
 
   private calculateSentiment(fearGreed: number, stockChanges: number[], vix: number): SentimentLevel {
@@ -373,7 +440,7 @@ class APIService {
       const qqqData = qqq.status === 'fulfilled' ? qqq.value : { change: 0, price: 540 };
       const iwmData = iwm.status === 'fulfilled' ? iwm.value : { change: 0, price: 200 };
       const vixValue = vix.status === 'fulfilled' ? vix.value : 20;
-      const putCallValue = putCall.status === 'fulfilled' ? putCall.value : 1.0;
+      const putCallValue = putCall.status === 'fulfilled' ? putCall.value : 0.92;
 
       const stockChanges = [spyData.change, qqqData.change, iwmData.change];
       const overallSentiment = this.calculateSentiment(fearGreedValue, stockChanges, vixValue);
@@ -415,8 +482,8 @@ class APIService {
       
       // Extract relevant data from the JSON structure
       const stocks = marketData.stocks || {};
-      const vixData = marketData.vix || {};
-      const fearGreedData = marketData.fear_greed || {};
+      const vixData = stocks['^VIX'] || {}; // VIX is stored in stocks with ^VIX symbol
+      const fearGreedData = marketData.fearGreed || {}; // fearGreed not fear_greed
 
       // Convert to expected SentimentData format
       const spyChange = stocks.SPY?.change || 0;
@@ -425,9 +492,11 @@ class APIService {
       const qqqPrice = stocks.QQQ?.price || 400;
       const iwmChange = stocks.IWM?.change || 0;
       const iwmPrice = stocks.IWM?.price || 200;
-      const vixLevel = vixData.value || 20;
+      const vixLevel = vixData.price || 20; // VIX price not value
       const fearGreedIndex = fearGreedData.value || 50;
-      const putCallRatio = 0.85 + Math.random() * 0.3; // Still generated randomly
+      // Use pre-calculated put/call ratio from data, fallback to calculation if not available
+      const putCallRatio = marketData.putCallRatio || this.calculatePutCallProxy(vixLevel, spyChange);
+
 
       const stockChanges = [spyChange, qqqChange, iwmChange];
       const overallSentiment = this.calculateSentiment(fearGreedIndex, stockChanges, vixLevel);
@@ -443,7 +512,7 @@ class APIService {
         vixLevel,
         putCallRatio,
         overallSentiment,
-        lastUpdated: marketData.metadata?.last_updated || new Date().toISOString()
+        lastUpdated: marketData.timestamp || new Date().toISOString()
       };
     } catch (error) {
       console.log('Error loading pre-fetched data:', error);

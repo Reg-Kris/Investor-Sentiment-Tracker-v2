@@ -90,13 +90,43 @@ async function calculateSentiment(marketData) {
   };
 }
 
+function calculatePutCallProxy(vixLevel, spyChange) {
+  // Calculate Put/Call ratio proxy using VIX and market movement
+  // Base ratio starts at market neutral (0.9 = slightly more calls than puts, typical bull market)
+  let ratio = 0.9;
+  
+  // VIX adjustment (higher VIX = more fear = more puts)
+  if (vixLevel > 35) {
+    ratio += 0.4; // High fear = much more put activity
+  } else if (vixLevel > 25) {
+    ratio += 0.2; // Moderate fear = more puts
+  } else if (vixLevel < 15) {
+    ratio -= 0.1; // Low fear = fewer puts (more calls)
+  }
+  
+  // Market movement adjustment (down days = more defensive puts)
+  if (spyChange < -2) {
+    ratio += 0.3; // Large down move = defensive put buying
+  } else if (spyChange < -0.5) {
+    ratio += 0.15; // Moderate down move = some put buying
+  } else if (spyChange > 1.5) {
+    ratio -= 0.1; // Strong up move = less put demand
+  }
+  
+  // Ensure ratio stays within realistic bounds (0.4 to 2.0)
+  ratio = Math.max(0.4, Math.min(2.0, ratio));
+  
+  return Math.round(ratio * 100) / 100; // Round to 2 decimal places
+}
+
 async function main() {
   const symbols = ['SPY', 'QQQ', '^VIX'];
   const results = {
     timestamp: new Date().toISOString(),
     stocks: {},
     sentiment: null,
-    fearGreed: null
+    fearGreed: null,
+    putCallRatio: null
   };
   
   // Fetch stock data
@@ -111,6 +141,13 @@ async function main() {
   console.log('🧠 Calculating sentiment...');
   results.sentiment = await calculateSentiment(results.stocks);
   console.log(`✅ Market Sentiment: ${results.sentiment.label} (${results.sentiment.score}/100)`);
+  
+  // Calculate Put/Call ratio proxy
+  console.log('📈 Calculating Put/Call ratio proxy...');
+  const vixLevel = results.stocks['^VIX']?.price || 20;
+  const spyChange = results.stocks['SPY']?.change || 0;
+  results.putCallRatio = calculatePutCallProxy(vixLevel, spyChange);
+  console.log(`✅ Put/Call Ratio (proxy): ${results.putCallRatio} (VIX: ${vixLevel.toFixed(2)}, SPY: ${spyChange.toFixed(2)}%)`);
   
   // Fetch Fear & Greed Index
   console.log('😨 Fetching Fear & Greed Index...');
