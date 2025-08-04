@@ -3,6 +3,7 @@
 import { Card, Text, Flex, AreaChart, LineChart, Select, SelectItem } from '@tremor/react';
 import { useState } from 'react';
 import { clsx } from 'clsx';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface TimelineDataPoint {
   date: string;
@@ -144,110 +145,167 @@ export default function TimelineChart({
   const change = getChange();
 
   return (
-    <Card className={clsx('p-6', className)}>
-      {/* Header */}
-      <Flex justifyContent="between" alignItems="start" className="mb-6">
-        <div>
-          <Text className="font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
-            {title}
-          </Text>
-          <Flex alignItems="center" className="space-x-4 mt-2">
-            {latestValue && currentMetric && (
-              <>
-                <Text className="text-2xl font-bold text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                  {currentMetric.format(latestValue)}
-                </Text>
-                {change !== null && (
-                  <Text className={clsx(
-                    'text-sm font-medium',
-                    change >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                  )}>
-                    {change >= 0 ? '+' : ''}{change.toFixed(2)}%
-                  </Text>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+    >
+      <Card className={clsx('p-6 glass-subtle fintech-glow', className)}>
+        {/* Header */}
+        <Flex justifyContent="between" alignItems="start" className="mb-6">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
+            <Text className="font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong fintech-text-gradient">
+              {title}
+            </Text>
+            <Flex alignItems="center" className="space-x-4 mt-2">
+              <AnimatePresence mode="wait">
+                {latestValue && currentMetric && (
+                  <motion.div
+                    key={`${selectedMetric}-${latestValue}`}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Text className="text-2xl font-bold text-tremor-content-strong dark:text-dark-tremor-content-strong number-counter">
+                      {currentMetric.format(latestValue)}
+                    </Text>
+                  </motion.div>
                 )}
-              </>
-            )}
-          </Flex>
-        </div>
+              </AnimatePresence>
+              <AnimatePresence>
+                {change !== null && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    transition={{ duration: 0.3, delay: 0.1 }}
+                  >
+                    <Text className={clsx(
+                      'text-sm font-medium px-2 py-1 rounded-full backdrop-blur-sm',
+                      change >= 0 
+                        ? 'text-green-600 dark:text-green-400 bg-green-100/50 dark:bg-green-900/50' 
+                        : 'text-red-600 dark:text-red-400 bg-red-100/50 dark:bg-red-900/50'
+                    )}>
+                      {change >= 0 ? '+' : ''}{change.toFixed(2)}%
+                    </Text>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </Flex>
+          </motion.div>
 
-        {showControls && (
-          <Flex className="space-x-2">
-            <Select 
-              value={selectedMetric} 
-              onValueChange={(value) => setSelectedMetric(value as any)}
-              placeholder="Select metric"
+          {showControls && (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
             >
-              {metrics.map((metric) => (
-                <SelectItem key={metric.value} value={metric.value}>
-                  {metric.label}
-                </SelectItem>
-              ))}
-            </Select>
-            
-            <Select 
-              value={selectedPeriod} 
-              onValueChange={(value) => setSelectedPeriod(value as any)}
-              placeholder="Select period"
-            >
-              {periods.map((period) => (
-                <SelectItem key={period.value} value={period.value}>
-                  {period.label}
-                </SelectItem>
-              ))}
-            </Select>
-          </Flex>
-        )}
+              <Flex className="space-x-2">
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Select 
+                    value={selectedMetric} 
+                    onValueChange={(value) => setSelectedMetric(value as any)}
+                    placeholder="Select metric"
+                  >
+                    {metrics.map((metric) => (
+                      <SelectItem key={metric.value} value={metric.value}>
+                        {metric.label}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                </motion.div>
+                
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Select 
+                    value={selectedPeriod} 
+                    onValueChange={(value) => setSelectedPeriod(value as any)}
+                    placeholder="Select period"
+                  >
+                    {periods.map((period) => (
+                      <SelectItem key={period.value} value={period.value}>
+                        {period.label}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                </motion.div>
+              </Flex>
+            </motion.div>
+          )}
       </Flex>
 
-      {/* Chart */}
-      <div 
-        className="relative"
-        style={{ height: typeof height === 'number' ? `${height}px` : height }}
-      >
-        {chartData.length > 0 ? (
-          chartType === 'area' ? (
-            <AreaChart
-              data={chartData}
-              index="date"
-              categories={[selectedMetric]}
-              colors={[currentMetric?.color || 'blue']}
-              showLegend={false}
-              showYAxis={true}
-              showXAxis={true}
-              showGridLines={true}
-              className="h-full"
-              yAxisWidth={60}
-              curveType="natural"
-              showAnimation={true}
-              animationDuration={1000}
-              valueFormatter={(value) => currentMetric?.format(value) || value.toString()}
-            />
-          ) : (
-            <LineChart
-              data={chartData}
-              index="date"
-              categories={[selectedMetric]}
-              colors={[currentMetric?.color || 'blue']}
-              showLegend={false}
-              showYAxis={true}
-              showXAxis={true}
-              showGridLines={true}
-              className="h-full"
-              yAxisWidth={60}
-              curveType="natural"
-              showAnimation={true}
-              animationDuration={1000}
-              valueFormatter={(value) => currentMetric?.format(value) || value.toString()}
-            />
-          )
-        ) : (
-          <div className="h-full flex items-center justify-center">
-            <Text className="text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
-              No data available for selected period
-            </Text>
-          </div>
-        )}
-      </div>
+        {/* Chart */}
+        <motion.div 
+          className="relative chart-container"
+          style={{ height: typeof height === 'number' ? `${height}px` : height }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        >
+          <AnimatePresence mode="wait">
+            {chartData.length > 0 ? (
+              <motion.div
+                key={`${selectedMetric}-${selectedPeriod}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
+                className="h-full"
+              >
+                {chartType === 'area' ? (
+                  <AreaChart
+                    data={chartData}
+                    index="date"
+                    categories={[selectedMetric]}
+                    colors={[currentMetric?.color || 'blue']}
+                    showLegend={false}
+                    showYAxis={true}
+                    showXAxis={true}
+                    showGridLines={true}
+                    className="h-full"
+                    yAxisWidth={60}
+                    curveType="natural"
+                    showAnimation={true}
+                    animationDuration={1200}
+                    valueFormatter={(value) => currentMetric?.format(value) || value.toString()}
+                  />
+                ) : (
+                  <LineChart
+                    data={chartData}
+                    index="date"
+                    categories={[selectedMetric]}
+                    colors={[currentMetric?.color || 'blue']}
+                    showLegend={false}
+                    showYAxis={true}
+                    showXAxis={true}
+                    showGridLines={true}
+                    className="h-full"
+                    yAxisWidth={60}
+                    curveType="natural"
+                    showAnimation={true}
+                    animationDuration={1200}
+                    valueFormatter={(value) => currentMetric?.format(value) || value.toString()}
+                  />
+                )}
+              </motion.div>
+            ) : (
+              <motion.div 
+                className="h-full flex items-center justify-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Text className="text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
+                  No data available for selected period
+                </Text>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
 
       {/* Sentiment Zones Legend (only for sentiment metrics) */}
       {(selectedMetric === 'sentiment' || selectedMetric === 'fearGreed') && (
@@ -278,6 +336,7 @@ export default function TimelineChart({
           }
         </Text>
       </div>
-    </Card>
+      </Card>
+    </motion.div>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ReactNode } from 'react';
 
 interface PageTransitionProps {
@@ -27,8 +27,8 @@ const pageVariants = {
 };
 
 const pageTransition = {
-  type: 'tween',
-  ease: [0.4, 0, 0.2, 1], // Custom cubic-bezier for smooth feel
+  type: 'tween' as const,
+  ease: [0.4, 0, 0.2, 1] as const, // Custom cubic-bezier for smooth feel
   duration: 0.6
 };
 

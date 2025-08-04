@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, Metric, Text, Flex, BadgeDelta, AreaChart } from '@tremor/react';
+import { Card, Text, Flex, BadgeDelta, AreaChart } from '@tremor/react';
 import { clsx } from 'clsx';
 import { TrendingUp, TrendingDown, Minus, Info, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -39,18 +39,6 @@ export default function MetricCard({
   className,
   size = 'md'
 }: MetricCardProps) {
-  const formatChange = (change: number, type: 'percentage' | 'absolute' | 'basis-points') => {
-    const absChange = Math.abs(change);
-    switch (type) {
-      case 'percentage':
-        return `${absChange.toFixed(2)}%`;
-      case 'basis-points':
-        return `${absChange.toFixed(0)} bps`;
-      case 'absolute':
-      default:
-        return absChange.toFixed(2);
-    }
-  };
 
   const getDeltaType = (change?: number, trend?: 'up' | 'down' | 'neutral') => {
     if (trend === 'neutral' || change === 0) return 'unchanged';

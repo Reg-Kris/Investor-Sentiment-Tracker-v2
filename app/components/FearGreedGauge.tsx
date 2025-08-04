@@ -2,6 +2,7 @@
 
 import { DonutChart, Card, Metric, Text } from '@tremor/react';
 import { clsx } from 'clsx';
+import { motion } from 'framer-motion';
 
 interface SentimentGaugeProps {
   value: number;
@@ -147,31 +148,57 @@ export default function SentimentGauge({
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 1 }}\n      >\n        <Text className="text-center text-xs mt-2 text-tremor-content-subtle dark:text-dark-tremor-content-subtle">\n          {sentimentData.description}\n        </Text>\n      </motion.div>\n    </motion.div>\n  );
+        transition={{ duration: 0.4, delay: 1 }}
+      >
+        <Text className="text-center text-xs mt-2 text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
+          {sentimentData.description}
+        </Text>
+      </motion.div>
+    </div>
+  );
 
   if (!showCard) {
     return content;
   }
 
   return (
-    <Card 
-      className="p-6 animate-fade-in"
-      decoration="top"
-      decorationColor={sentimentData.color}
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+      whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
     >
-      <div className="flex items-center justify-between mb-4">
-        <Text className="font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
-          {title}
-        </Text>
-        <div className={clsx(
-          'px-2 py-1 rounded-full text-xs font-medium',
-          sentimentData.bgColor,
-          'text-white'
-        )}>
-          {sentimentData.label}
-        </div>
-      </div>
-      {content}
-    </Card>
+      <Card 
+        className="p-6 glass-subtle fintech-glow interactive-scale"
+        decoration="top"
+        decorationColor={sentimentData.color}
+      >
+        <motion.div 
+          className="flex items-center justify-between mb-4"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+        >
+          <Text className="font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong fintech-text-gradient">
+            {title}
+          </Text>
+          <motion.div 
+            className={clsx(
+              'px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm',
+              sentimentData.bgColor,
+              'text-white shadow-lg'
+            )}
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ duration: 0.5, delay: 0.4, type: 'spring', stiffness: 200 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            {sentimentData.label}
+          </motion.div>
+        </motion.div>
+        {content}
+      </Card>
+    </motion.div>
   );
 }

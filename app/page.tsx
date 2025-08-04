@@ -1,21 +1,23 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { RefreshCw, Heart, Activity, TrendingUp, AlertCircle } from 'lucide-react';
 import { Grid, Col, Title, Text, Flex, Button, Callout } from '@tremor/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import PageTransition, { StaggerContainer, StaggerItem, MetricCardTransition, ChartReveal } from './components/PageTransition';
+import PageTransition, { StaggerContainer, StaggerItem, ChartReveal } from './components/PageTransition';
 import { MetricCardSkeleton, ChartSkeleton, NewsFeedSkeleton } from './components/SkeletonLoader';
 
-// Import new components
-import SentimentGauge from './components/FearGreedGauge';
+// Lazy-loaded components for code splitting
+const SentimentGauge = lazy(() => import('./components/FearGreedGauge'));
+const SectorHeatmap = lazy(() => import('./components/SectorHeatmap'));
+const TimelineChart = lazy(() => import('./components/TimelineChart'));
+
+// Import essential components (loaded immediately)
 import MetricCard from './components/MetricCard';
-import SectorHeatmap from './components/SectorHeatmap';
-import TimelineChart from './components/TimelineChart';
 import NewsCard from './components/NewsCard';
 import ThemeToggle from './components/ThemeToggle';
 
-// Import existing components and utilities
+// Import utilities
 import APIService from './lib/api';
 import { SentimentData } from './lib/types';
 
@@ -290,11 +292,21 @@ export default function Home() {
           {/* Primary Sentiment Gauge */}
           <StaggerItem>
             <Col numColSpan={12} numColSpanLg={4}>
-              <SentimentGauge 
-                value={sentimentData.fearGreedIndex} 
-                title="Fear & Greed Index"
-                size="lg"
-              />
+              <Suspense fallback={
+                <div className="glass-card p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <div className="h-5 w-32 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-shimmer" />
+                    <div className="h-6 w-20 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded-full animate-shimmer" />
+                  </div>
+                  <div className="h-48 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded-lg animate-shimmer" />
+                </div>
+              }>
+                <SentimentGauge 
+                  value={sentimentData.fearGreedIndex} 
+                  title="Fear & Greed Index"
+                  size="lg"
+                />
+              </Suspense>
             </Col>
           </StaggerItem>
 
@@ -364,13 +376,19 @@ export default function Home() {
           <StaggerItem>
             <Col numColSpan={12} numColSpanLg={8}>
               <ChartReveal delay={0.1}>
-                <TimelineChart
-                  title="Sentiment Timeline"
-                  data={generateTimelineData()}
-                  height={400}
-                  showControls={true}
-                  defaultPeriod="1M"
-                />
+                <Suspense fallback={
+                  <div className="glass-card">
+                    <ChartSkeleton />
+                  </div>
+                }>
+                  <TimelineChart
+                    title="Sentiment Timeline"
+                    data={generateTimelineData()}
+                    height={400}
+                    showControls={true}
+                    defaultPeriod="1M"
+                  />
+                </Suspense>
               </ChartReveal>
             </Col>
           </StaggerItem>
@@ -392,12 +410,23 @@ export default function Home() {
           {/* Sector Heatmap */}
           <StaggerItem>
             <Col numColSpan={12}>
-              <SectorHeatmap
-                title="Sector Performance Heatmap"
-                data={generateSectorData()}
-                layout="grid"
-                size="md"
-              />
+              <Suspense fallback={
+                <div className="glass-card p-6">
+                  <div className="h-5 w-48 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-shimmer mb-4" />
+                  <div className="grid grid-cols-4 gap-4">
+                    {Array.from({ length: 8 }, (_, i) => (
+                      <div key={i} className="h-20 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-shimmer" />
+                    ))}
+                  </div>
+                </div>
+              }>
+                <SectorHeatmap
+                  title="Sector Performance Heatmap"
+                  data={generateSectorData()}
+                  layout="grid"
+                  size="md"
+                />
+              </Suspense>
             </Col>
           </StaggerItem>
 
