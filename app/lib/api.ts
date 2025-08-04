@@ -130,7 +130,6 @@ class APIService {
       
       return data;
     } catch (error) {
-      const responseTime = Date.now() - startTime;
       this.trackError(key, error as Error);
       
       // Use stale cache if available and integrity is valid

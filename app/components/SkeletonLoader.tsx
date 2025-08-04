@@ -41,7 +41,7 @@ export default function SkeletonLoader({
       transition: {
         repeat: Infinity,
         duration: 1.5,
-        ease: 'linear'
+        ease: 'linear' as const
       }
     }
   };
@@ -54,7 +54,7 @@ export default function SkeletonLoader({
         repeat: Infinity,
         duration: 1.2,
         repeatType: 'reverse' as const,
-        ease: 'easeInOut'
+        ease: 'easeInOut' as const
       }
     }
   };

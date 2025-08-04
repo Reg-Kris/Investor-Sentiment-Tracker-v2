@@ -42,7 +42,7 @@ const staggerVariants = {
     y: 0,
     transition: {
       duration: 0.6,
-      ease: [0.4, 0, 0.2, 1],
+      ease: [0.4, 0, 0.2, 1] as const,
       staggerChildren: 0.1,
       delayChildren: 0.2
     }
@@ -59,7 +59,7 @@ const staggerItemVariants = {
     y: 0,
     transition: {
       duration: 0.5,
-      ease: [0.4, 0, 0.2, 1]
+      ease: [0.4, 0, 0.2, 1] as const
     }
   }
 };

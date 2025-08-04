@@ -280,7 +280,6 @@ export class DataEncryption {
       }
 
       const key = this.getEncryptionKey();
-      const iv = Buffer.from(ivHex, 'hex');
       const tag = Buffer.from(tagHex, 'hex');
       
       const decipher = crypto.createDecipher(SECURITY_CONFIG.ENCRYPTION.ALGORITHM, key);
@@ -394,7 +393,6 @@ export class SecurityAuditor {
 
     for (const entry of this.auditLog) {
       const entryString = JSON.stringify({ ...entry, integrity: undefined });
-      const expectedHash = DataEncryption.createHash(entryString);
 
       if (!DataEncryption.verifyHash(entryString, entry.integrity)) {
         corruptedEntries.push(entry.id);
@@ -573,19 +571,35 @@ export class SecureAPIClient {
   /**
    * Sanitize headers for logging
    */
-  private sanitizeHeaders(headers?: Record<string, string>): Record<string, string> {
+  private sanitizeHeaders(headers?: HeadersInit): Record<string, string> {
     if (!headers) return {};
-
-    const sanitized = { ...headers };
+    
+    let headerObj: Record<string, string> = {};
+    
+    if (Array.isArray(headers)) {
+      // Handle [string, string][]
+      headers.forEach(([key, value]) => {
+        headerObj[key.toLowerCase()] = value;
+      });
+    } else if (headers instanceof Headers) {
+      // Handle Headers instance
+      headers.forEach((value, key) => {
+        headerObj[key.toLowerCase()] = value;
+      });
+    } else {
+      // Handle Record<string, string>
+      headerObj = Object.fromEntries(
+        Object.entries(headers).map(([k, v]) => [k.toLowerCase(), v])
+      );
+    }
+    
     const sensitiveHeaders = ['authorization', 'x-api-key', 'cookie', 'x-auth-token'];
-
     for (const header of sensitiveHeaders) {
-      if (header in sanitized) {
-        sanitized[header] = '[REDACTED]';
+      if (header in headerObj) {
+        headerObj[header] = '[REDACTED]';
       }
     }
-
-    return sanitized;
+    return headerObj;
   }
 }
 

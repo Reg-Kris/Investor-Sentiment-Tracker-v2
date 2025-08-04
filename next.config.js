@@ -17,7 +17,6 @@ const nextConfig = {
   
   // Build optimizations
   experimental: {
-    optimizeCss: true,
     optimizePackageImports: [
       '@tremor/react',
       'lucide-react',
