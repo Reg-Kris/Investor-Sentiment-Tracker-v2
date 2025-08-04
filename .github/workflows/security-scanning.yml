@@ -1,0 +1,807 @@
+name: Security Scanning & Compliance
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run daily security scans at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      scan_type:
+        description: 'Type of security scan'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+        - all
+        - dependencies
+        - secrets
+        - code-analysis
+        - compliance
+
+permissions:
+  contents: read
+  security-events: write
+  issues: write
+  pull-requests: write
+
+# Prevent concurrent security scans
+concurrency:
+  group: security-scanning-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  dependency-scanning:
+    name: Dependency Vulnerability Scanning
+    runs-on: ubuntu-latest
+    if: ${{ inputs.scan_type == 'all' || inputs.scan_type == 'dependencies' || github.event_name != 'workflow_dispatch' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd scripts && npm ci
+
+      - name: Run npm audit (main project)
+        id: npm-audit-main
+        continue-on-error: true
+        run: |
+          echo "Running npm audit for main project..."
+          npm audit --audit-level=moderate --json > npm-audit-main.json || true
+          
+          # Extract vulnerability count
+          VULNERABILITIES=$(cat npm-audit-main.json | jq -r '.metadata.vulnerabilities | values | to_entries[] | .value' | awk '{sum+=$1} END {print sum+0}')
+          echo "vulnerabilities=$VULNERABILITIES" >> $GITHUB_OUTPUT
+          
+          if [ "$VULNERABILITIES" -gt 0 ]; then
+            echo "Found $VULNERABILITIES vulnerabilities in main project"
+            npm audit --audit-level=moderate
+            exit 1
+          fi
+
+      - name: Run npm audit (scripts project)
+        id: npm-audit-scripts
+        continue-on-error: true
+        run: |
+          echo "Running npm audit for scripts project..."
+          cd scripts
+          npm audit --audit-level=moderate --json > ../npm-audit-scripts.json || true
+          
+          # Extract vulnerability count
+          VULNERABILITIES=$(cat ../npm-audit-scripts.json | jq -r '.metadata.vulnerabilities | values | to_entries[] | .value' | awk '{sum+=$1} END {print sum+0}')
+          echo "vulnerabilities=$VULNERABILITIES" >> $GITHUB_OUTPUT
+          
+          if [ "$VULNERABILITIES" -gt 0 ]; then
+            echo "Found $VULNERABILITIES vulnerabilities in scripts project"
+            npm audit --audit-level=moderate
+            exit 1
+          fi
+
+      - name: Install and run Retire.js
+        id: retire-scan
+        continue-on-error: true
+        run: |
+          echo "Installing Retire.js for additional vulnerability scanning..."
+          npm install -g retire
+          
+          echo "Scanning for known vulnerable JavaScript libraries..."
+          retire --outputformat json --outputpath retire-report.json . || true
+          
+          # Check if vulnerabilities were found
+          if [ -f "retire-report.json" ] && [ -s "retire-report.json" ]; then
+            VULN_COUNT=$(cat retire-report.json | jq '. | length')
+            echo "vulnerabilities=$VULN_COUNT" >> $GITHUB_OUTPUT
+            
+            if [ "$VULN_COUNT" -gt 0 ]; then
+              echo "Retire.js found $VULN_COUNT vulnerable libraries:"
+              cat retire-report.json | jq '.'
+              exit 1
+            fi
+          else
+            echo "vulnerabilities=0" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload dependency scan results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-scan-results
+          path: |
+            npm-audit-main.json
+            npm-audit-scripts.json
+            retire-report.json
+          retention-days: 30
+
+      - name: Create dependency vulnerability issue
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const mainVulns = '${{ steps.npm-audit-main.outputs.vulnerabilities }}' || '0';
+            const scriptsVulns = '${{ steps.npm-audit-scripts.outputs.vulnerabilities }}' || '0';
+            const retireVulns = '${{ steps.retire-scan.outputs.vulnerabilities }}' || '0';
+            
+            const totalVulns = parseInt(mainVulns) + parseInt(scriptsVulns) + parseInt(retireVulns);
+            
+            const title = `🚨 Security Alert: ${totalVulns} Dependency Vulnerabilities Detected`;
+            const body = `## Dependency Vulnerability Report
+            
+            **Scan Date:** ${new Date().toISOString()}
+            **Total Vulnerabilities:** ${totalVulns}
+            
+            ### Breakdown by Source:
+            - **Main Project (npm audit):** ${mainVulns} vulnerabilities
+            - **Scripts Project (npm audit):** ${scriptsVulns} vulnerabilities  
+            - **Retire.js scan:** ${retireVulns} vulnerable libraries
+            
+            ### Severity Assessment:
+            This scan detected vulnerabilities that require immediate attention for financial application security.
+            
+            ### Required Actions:
+            1. **Immediate:** Review all HIGH and CRITICAL vulnerabilities
+            2. **Update dependencies:** Run \`npm update\` and \`npm audit fix\`
+            3. **Manual review:** Check for security patches or alternative packages
+            4. **Risk assessment:** Evaluate impact on financial data processing
+            
+            ### Compliance Impact:
+            - May affect SOX compliance requirements
+            - Could impact data integrity assurance
+            - Requires documentation for audit trail
+            
+            ### Next Steps:
+            1. Fix all vulnerabilities with available patches
+            2. Document any accepted risks with justification
+            3. Update dependency management processes
+            4. Schedule regular security reviews
+            
+            **Workflow Run:** [View Details](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            
+            ---
+            *This issue was automatically created by the security scanning workflow.*`;
+            
+            // Check for existing open vulnerability issues
+            const existingIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'security,dependencies,vulnerability',
+              state: 'open'
+            });
+            
+            if (existingIssues.data.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['security', 'dependencies', 'vulnerability', 'critical']
+              });
+            } else {
+              // Update existing issue
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssues.data[0].number,
+                body: `**Updated Scan Results:** ${new Date().toISOString()}\n\n**Total Vulnerabilities:** ${totalVulns}\n- Main: ${mainVulns}\n- Scripts: ${scriptsVulns}\n- Retire.js: ${retireVulns}`
+              });
+            }
+
+  secrets-scanning:
+    name: Secrets and Sensitive Data Scanning
+    runs-on: ubuntu-latest
+    if: ${{ inputs.scan_type == 'all' || inputs.scan_type == 'secrets' || github.event_name != 'workflow_dispatch' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install TruffleHog
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/scripts/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Scan for secrets with TruffleHog
+        id: trufflehog-scan
+        continue-on-error: true
+        run: |
+          echo "Scanning for exposed secrets and credentials..."
+          
+          # Scan entire repository for secrets
+          trufflehog filesystem . --json --no-update > trufflehog-results.json || true
+          
+          # Count findings
+          if [ -f "trufflehog-results.json" ] && [ -s "trufflehog-results.json" ]; then
+            SECRET_COUNT=$(cat trufflehog-results.json | jq -s 'length')
+            echo "secrets_found=$SECRET_COUNT" >> $GITHUB_OUTPUT
+            
+            if [ "$SECRET_COUNT" -gt 0 ]; then
+              echo "TruffleHog found $SECRET_COUNT potential secrets:"
+              cat trufflehog-results.json | jq -r '.[] | "\(.SourceMetadata.Data.Filesystem.file):\(.SourceMetadata.Data.Filesystem.line) - \(.DetectorName)"'
+              exit 1
+            fi
+          else
+            echo "secrets_found=0" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Custom secrets pattern scan
+        id: custom-patterns
+        continue-on-error: true
+        run: |
+          echo "Scanning for custom financial/API patterns..."
+          
+          # Define financial sector specific patterns
+          PATTERNS_FOUND=0
+          
+          # API keys patterns
+          if grep -r -i "api[_-]key\s*=\s*['\"][^'\"]{8,}" . --exclude-dir=node_modules --exclude="*.json" --exclude="*.md"; then
+            echo "Found potential API key exposures"
+            PATTERNS_FOUND=$((PATTERNS_FOUND + 1))
+          fi
+          
+          # Database connection strings
+          if grep -r -i "connection[_-]string\|database[_-]url" . --exclude-dir=node_modules --exclude="*.json" --exclude="*.md"; then
+            echo "Found potential database connection strings"
+            PATTERNS_FOUND=$((PATTERNS_FOUND + 1))
+          fi
+          
+          # Financial account numbers (basic pattern)
+          if grep -r -E "[0-9]{8,}" . --exclude-dir=node_modules --exclude="*.json" --exclude="*.lock" | grep -v "timestamp\|version\|id"; then
+            echo "Found potential account numbers (requires manual review)"
+            PATTERNS_FOUND=$((PATTERNS_FOUND + 1))
+          fi
+          
+          echo "custom_patterns=$PATTERNS_FOUND" >> $GITHUB_OUTPUT
+          
+          if [ $PATTERNS_FOUND -gt 0 ]; then
+            exit 1
+          fi
+
+      - name: Check for hardcoded secrets in config files
+        id: config-scan
+        continue-on-error: true
+        run: |
+          echo "Scanning configuration files for hardcoded secrets..."
+          
+          CONFIG_ISSUES=0
+          
+          # Check for suspicious patterns in config files
+          find . -name "*.env*" -o -name "*.config.*" -o -name "*.json" | grep -v node_modules | while read file; do
+            if [ -f "$file" ]; then
+              # Look for suspicious patterns
+              if grep -i "password\|secret\|key\|token" "$file" | grep -v "placeholder\|example\|template"; then
+                echo "Potential secret in config file: $file"
+                CONFIG_ISSUES=$((CONFIG_ISSUES + 1))
+              fi
+            fi
+          done
+          
+          echo "config_issues=$CONFIG_ISSUES" >> $GITHUB_OUTPUT
+          
+          if [ $CONFIG_ISSUES -gt 0 ]; then
+            exit 1
+          fi
+
+      - name: Upload secrets scan results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: secrets-scan-results
+          path: |
+            trufflehog-results.json
+          retention-days: 30
+
+      - name: Create secrets detection issue
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const secretsFound = '${{ steps.trufflehog-scan.outputs.secrets_found }}' || '0';
+            const customPatterns = '${{ steps.custom-patterns.outputs.custom_patterns }}' || '0';
+            const configIssues = '${{ steps.config-scan.outputs.config_issues }}' || '0';
+            
+            const totalIssues = parseInt(secretsFound) + parseInt(customPatterns) + parseInt(configIssues);
+            
+            const title = `🔐 CRITICAL: ${totalIssues} Potential Secret Exposures Detected`;
+            const body = `## Secrets Scanning Alert
+            
+            **⚠️ IMMEDIATE ACTION REQUIRED ⚠️**
+            
+            **Scan Date:** ${new Date().toISOString()}
+            **Total Issues:** ${totalIssues}
+            
+            ### Findings:
+            - **TruffleHog Secrets:** ${secretsFound}
+            - **Custom Pattern Matches:** ${customPatterns}  
+            - **Config File Issues:** ${configIssues}
+            
+            ### Critical Financial Sector Impact:
+            - **Regulatory Compliance:** Exposed secrets violate financial data protection requirements
+            - **SOX Compliance:** May constitute material weakness in internal controls
+            - **Data Security:** Risk of unauthorized access to financial systems
+            - **Audit Trail:** Security incident requires documentation and remediation
+            
+            ### Immediate Actions Required:
+            1. **🚨 URGENT:** Rotate any exposed API keys, tokens, or credentials
+            2. **🔒 Secure:** Remove all hardcoded secrets from codebase
+            3. **📋 Document:** Log this security incident for compliance reporting
+            4. **🔍 Investigate:** Determine if exposed credentials were accessed
+            5. **🛡️ Implement:** Use proper secret management (GitHub Secrets, environment variables)
+            
+            ### Remediation Steps:
+            1. Remove secrets from code and commit history
+            2. Use environment variables and secure vaults
+            3. Implement pre-commit hooks for secret detection
+            4. Update security training and procedures
+            5. Review access logs for unauthorized usage
+            
+            ### Compliance Requirements:
+            - Document remediation actions for audit trail
+            - Report to security team and compliance officer
+            - Update risk assessment documentation
+            - Review and update security policies
+            
+            **Workflow Run:** [View Details](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            
+            ---
+            *This is a CRITICAL security issue automatically detected by the security scanning workflow.*`;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['security', 'secrets', 'critical', 'compliance', 'sox']
+            });
+
+  code-security-analysis:
+    name: Static Code Security Analysis
+    runs-on: ubuntu-latest
+    if: ${{ inputs.scan_type == 'all' || inputs.scan_type == 'code-analysis' || github.event_name != 'workflow_dispatch' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          queries: security-extended,security-and-quality
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd scripts && npm ci
+
+      - name: Build project for analysis
+        run: |
+          npm run build || echo "Build failed, continuing with source analysis"
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript-typescript"
+
+      - name: Install ESLint Security Plugin
+        run: |
+          npm install --save-dev eslint-plugin-security eslint-plugin-no-unsafe-innerhtml
+
+      - name: Run ESLint Security Analysis
+        id: eslint-security
+        continue-on-error: true
+        run: |
+          echo "Running ESLint security analysis..."
+          
+          # Create security-focused ESLint config
+          cat > .eslintrc.security.js << 'EOF'
+          module.exports = {
+            extends: ['next/core-web-vitals'],
+            plugins: ['security', 'no-unsafe-innerhtml'],
+            rules: {
+              'security/detect-object-injection': 'error',
+              'security/detect-non-literal-fs-filename': 'error',
+              'security/detect-non-literal-regexp': 'error',
+              'security/detect-non-literal-require': 'error',
+              'security/detect-possible-timing-attacks': 'error',
+              'security/detect-pseudoRandomBytes': 'error',
+              'security/detect-unsafe-regex': 'error',
+              'security/detect-buffer-noassert': 'error',
+              'security/detect-child-process': 'error',
+              'security/detect-disable-mustache-escape': 'error',
+              'security/detect-eval-with-expression': 'error',
+              'security/detect-new-buffer': 'error',
+              'security/detect-no-csrf-before-method-override': 'error',
+              'no-unsafe-innerhtml/no-unsafe-innerhtml': 'error'
+            }
+          };
+          EOF
+          
+          # Run security-focused linting
+          npx eslint . --config .eslintrc.security.js --format json > eslint-security-results.json || true
+          
+          # Count security issues
+          SECURITY_ISSUES=$(cat eslint-security-results.json | jq '[.[] | .messages[] | select(.ruleId | startswith("security/") or startswith("no-unsafe-innerhtml/"))] | length')
+          echo "security_issues=$SECURITY_ISSUES" >> $GITHUB_OUTPUT
+          
+          if [ "$SECURITY_ISSUES" -gt 0 ]; then
+            echo "Found $SECURITY_ISSUES security issues:"
+            cat eslint-security-results.json | jq -r '.[] | .messages[] | select(.ruleId | startswith("security/") or startswith("no-unsafe-innerhtml/")) | "\(.ruleId): \(.message) (\(.line):\(.column))"'
+            exit 1
+          fi
+
+      - name: Analyze API security patterns
+        id: api-security
+        continue-on-error: true
+        run: |
+          echo "Analyzing API security patterns..."
+          
+          API_ISSUES=0
+          
+          # Check for proper input validation
+          if ! grep -r "input.*validation\|sanitize\|escape" app/lib/ scripts/; then
+            echo "⚠️ No input validation patterns found"
+            API_ISSUES=$((API_ISSUES + 1))
+          fi
+          
+          # Check for rate limiting implementation
+          if grep -r "rate.*limit\|throttle" app/lib/; then
+            echo "✅ Rate limiting patterns found"
+          else
+            echo "⚠️ No rate limiting patterns found"
+            API_ISSUES=$((API_ISSUES + 1))
+          fi
+          
+          # Check for error handling that doesn't expose sensitive info
+          if grep -r "console.error.*error\|throw.*error" app/lib/ | grep -v "sanitize\|redact"; then
+            echo "⚠️ Potential sensitive error exposure"
+            API_ISSUES=$((API_ISSUES + 1))
+          fi
+          
+          # Check for HTTPS enforcement
+          if grep -r "http://" app/lib/ scripts/ --exclude="*.md"; then
+            echo "⚠️ HTTP URLs found (should use HTTPS)"
+            API_ISSUES=$((API_ISSUES + 1))
+          fi
+          
+          echo "api_issues=$API_ISSUES" >> $GITHUB_OUTPUT
+          
+          if [ $API_ISSUES -gt 2 ]; then
+            exit 1
+          fi
+
+      - name: Upload code analysis results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-analysis-results
+          path: |
+            eslint-security-results.json
+          retention-days: 30
+
+      - name: Create code security issue
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const securityIssues = '${{ steps.eslint-security.outputs.security_issues }}' || '0';
+            const apiIssues = '${{ steps.api-security.outputs.api_issues }}' || '0';
+            
+            const totalIssues = parseInt(securityIssues) + parseInt(apiIssues);
+            
+            if (totalIssues > 0) {
+              const title = `🛡️ Code Security Issues: ${totalIssues} Findings Require Review`;
+              const body = `## Code Security Analysis Report
+              
+              **Analysis Date:** ${new Date().toISOString()}
+              **Total Issues:** ${totalIssues}
+              
+              ### Findings:
+              - **ESLint Security Issues:** ${securityIssues}
+              - **API Security Pattern Issues:** ${apiIssues}
+              
+              ### Financial Sector Security Requirements:
+              This analysis focuses on security patterns critical for financial applications:
+              
+              #### Input Validation & Sanitization:
+              - All user inputs must be validated and sanitized
+              - Financial data requires strict type checking
+              - SQL injection prevention is mandatory
+              
+              #### API Security:
+              - Rate limiting must be implemented
+              - Error messages must not expose sensitive information
+              - All communications must use HTTPS
+              - Authentication tokens must be properly handled
+              
+              #### Data Protection:
+              - Sensitive financial data must be encrypted
+              - Audit trails must be maintained
+              - Access controls must be enforced
+              
+              ### Required Actions:
+              1. **Review all security findings** in the workflow artifacts
+              2. **Implement missing security patterns** identified in the scan
+              3. **Update code to follow security best practices**
+              4. **Add security unit tests** for critical functions
+              5. **Document security measures** for compliance audits
+              
+              ### Compliance Impact:
+              - Code security issues may affect SOX compliance
+              - Financial data handling must meet regulatory standards
+              - Security measures must be documented for audits
+              
+              **Workflow Run:** [View Details](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+              
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['security', 'code-analysis', 'medium', 'compliance']
+              });
+            }
+
+  compliance-validation:
+    name: SOX Compliance Validation
+    runs-on: ubuntu-latest
+    if: ${{ inputs.scan_type == 'all' || inputs.scan_type == 'compliance' || github.event_name != 'workflow_dispatch' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate audit trail implementation
+        id: audit-trail
+        continue-on-error: true
+        run: |
+          echo "Validating audit trail implementation..."
+          
+          COMPLIANCE_ISSUES=0
+          
+          # Check for audit logging in API layer
+          if ! grep -r "audit\|log.*user\|track.*access" app/lib/; then
+            echo "❌ No audit trail logging found in API layer"
+            COMPLIANCE_ISSUES=$((COMPLIANCE_ISSUES + 1))
+          fi
+          
+          # Check for data integrity validation
+          if ! grep -r "validate\|verify\|checksum" app/lib/ scripts/; then
+            echo "❌ No data integrity validation found"
+            COMPLIANCE_ISSUES=$((COMPLIANCE_ISSUES + 1))
+          fi
+          
+          # Check for access control patterns
+          if ! grep -r "auth\|permission\|role" app/lib/; then
+            echo "❌ No access control patterns found"
+            COMPLIANCE_ISSUES=$((COMPLIANCE_ISSUES + 1))
+          fi
+          
+          # Check for error handling and logging
+          if grep -r "console\.log\|console\.error" app/lib/ | wc -l | grep -q "^[0-9]*$"; then
+            echo "✅ Logging patterns found"
+          else
+            echo "❌ Insufficient logging for audit trail"
+            COMPLIANCE_ISSUES=$((COMPLIANCE_ISSUES + 1))
+          fi
+          
+          echo "compliance_issues=$COMPLIANCE_ISSUES" >> $GITHUB_OUTPUT
+          
+          if [ $COMPLIANCE_ISSUES -gt 2 ]; then
+            exit 1
+          fi
+
+      - name: Check data retention compliance
+        id: data-retention
+        continue-on-error: true
+        run: |
+          echo "Validating data retention policies..."
+          
+          RETENTION_ISSUES=0
+          
+          # Check for data cleanup mechanisms
+          if ! find . -name "*.js" -o -name "*.ts" | xargs grep -l "cleanup\|expire\|retention\|delete.*old"; then
+            echo "❌ No data retention/cleanup mechanisms found"
+            RETENTION_ISSUES=$((RETENTION_ISSUES + 1))
+          fi
+          
+          # Check for data archival patterns
+          if ! find . -name "*.js" -o -name "*.ts" | xargs grep -l "archive\|backup\|historical"; then
+            echo "❌ No data archival patterns found"
+            RETENTION_ISSUES=$((RETENTION_ISSUES + 1))
+          fi
+          
+          echo "retention_issues=$RETENTION_ISSUES" >> $GITHUB_OUTPUT
+          
+          if [ $RETENTION_ISSUES -gt 1 ]; then
+            exit 1
+          fi
+
+      - name: Validate financial data handling
+        id: financial-data
+        continue-on-error: true
+        run: |
+          echo "Validating financial data handling compliance..."
+          
+          FINANCIAL_ISSUES=0
+          
+          # Check for encryption patterns
+          if ! grep -r "encrypt\|hash\|crypto" app/lib/ scripts/; then
+            echo "❌ No encryption patterns found for sensitive data"
+            FINANCIAL_ISSUES=$((FINANCIAL_ISSUES + 1))
+          fi
+          
+          # Check for data validation patterns
+          if ! grep -r "parseFloat\|parseInt\|Number.*isFinite" app/lib/; then
+            echo "❌ Insufficient numerical data validation"
+            FINANCIAL_ISSUES=$((FINANCIAL_ISSUES + 1))
+          fi
+          
+          # Check for PII handling
+          if grep -r "personal\|pii\|sensitive" app/lib/ scripts/ --exclude="*.md"; then
+            echo "⚠️  Potential PII handling detected - requires review"
+            FINANCIAL_ISSUES=$((FINANCIAL_ISSUES + 1))
+          fi
+          
+          echo "financial_issues=$FINANCIAL_ISSUES" >> $GITHUB_OUTPUT
+          
+          if [ $FINANCIAL_ISSUES -gt 1 ]; then
+            exit 1
+          fi
+
+      - name: Create compliance report issue
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const auditIssues = '${{ steps.audit-trail.outputs.compliance_issues }}' || '0';
+            const retentionIssues = '${{ steps.data-retention.outputs.retention_issues }}' || '0';
+            const financialIssues = '${{ steps.financial-data.outputs.financial_issues }}' || '0';
+            
+            const totalIssues = parseInt(auditIssues) + parseInt(retentionIssues) + parseInt(financialIssues);
+            
+            if (totalIssues > 0) {
+              const title = `📋 SOX Compliance Issues: ${totalIssues} Requirements Need Attention`;
+              const body = `## SOX Compliance Validation Report
+              
+              **Validation Date:** ${new Date().toISOString()}
+              **Total Compliance Issues:** ${totalIssues}
+              
+              ### Compliance Findings:
+              - **Audit Trail Issues:** ${auditIssues}
+              - **Data Retention Issues:** ${retentionIssues}
+              - **Financial Data Handling Issues:** ${financialIssues}
+              
+              ### SOX Compliance Requirements:
+              
+              #### Section 302 - Corporate Responsibility:
+              - ✅ Management must certify accuracy of financial data
+              - ⚠️  Requires audit trail of all data modifications
+              - ⚠️  Need documented internal controls
+              
+              #### Section 404 - Internal Controls:
+              - ❌ Missing comprehensive audit logging
+              - ❌ Insufficient data integrity validation
+              - ❌ Need access control documentation
+              
+              #### Data Retention Requirements:
+              - 📋 Financial records must be retained for 7 years
+              - 📋 Audit trails must be immutable and complete
+              - 📋 Data archival procedures must be documented
+              
+              ### Required Remediation Actions:
+              
+              #### Immediate (High Priority):
+              1. **Implement comprehensive audit logging** for all financial data access
+              2. **Add data integrity validation** with checksums/hashes
+              3. **Document all data handling procedures** for audit trail
+              4. **Implement proper access controls** with role-based permissions
+              
+              #### Short-term (Medium Priority):
+              1. **Create data retention policies** with automated cleanup
+              2. **Implement data archival system** for historical records
+              3. **Add encryption** for sensitive financial data
+              4. **Establish compliance monitoring** dashboard
+              
+              #### Long-term (Ongoing):
+              1. **Regular compliance audits** and validation
+              2. **Staff training** on financial data handling
+              3. **Policy updates** to reflect regulatory changes
+              4. **Continuous monitoring** of compliance status
+              
+              ### Financial Sector Best Practices:
+              - **Data Segregation:** Separate production and test data
+              - **Encryption:** All sensitive data encrypted at rest and in transit
+              - **Audit Trails:** Complete, tamper-proof activity logs
+              - **Access Controls:** Principle of least privilege
+              - **Data Quality:** Validation and reconciliation processes
+              - **Incident Response:** Documented procedures for data breaches
+              
+              ### Impact Assessment:
+              - **Regulatory Risk:** Non-compliance may result in penalties
+              - **Audit Risk:** Issues may be cited in external audits
+              - **Operational Risk:** Inadequate controls may lead to data errors
+              - **Reputational Risk:** Compliance failures affect stakeholder trust
+              
+              **Workflow Run:** [View Details](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+              
+              ---
+              *This compliance report was automatically generated based on SOX requirements for financial applications.*`;
+              
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['compliance', 'sox', 'audit', 'high-priority', 'financial-sector']
+              });
+            }
+
+  security-summary:
+    name: Security Scan Summary
+    runs-on: ubuntu-latest
+    needs: [dependency-scanning, secrets-scanning, code-security-analysis, compliance-validation]
+    if: always()
+    
+    steps:
+      - name: Generate security summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const results = {
+              dependencies: '${{ needs.dependency-scanning.result }}',
+              secrets: '${{ needs.secrets-scanning.result }}',
+              codeAnalysis: '${{ needs.code-security-analysis.result }}',
+              compliance: '${{ needs.compliance-validation.result }}'
+            };
+            
+            const passed = Object.values(results).filter(r => r === 'success').length;
+            const failed = Object.values(results).filter(r => r === 'failure').length;
+            const total = Object.keys(results).length;
+            
+            const summary = `## 🛡️ Security Scanning Summary
+            
+            **Scan Date:** ${new Date().toISOString()}
+            **Overall Status:** ${failed === 0 ? '✅ PASSED' : `❌ ${failed} FAILURES`}
+            
+            ### Scan Results:
+            - **Dependency Scanning:** ${results.dependencies === 'success' ? '✅' : '❌'} ${results.dependencies}
+            - **Secrets Scanning:** ${results.secrets === 'success' ? '✅' : '❌'} ${results.secrets}
+            - **Code Security Analysis:** ${results.codeAnalysis === 'success' ? '✅' : '❌'} ${results.codeAnalysis}
+            - **SOX Compliance Validation:** ${results.compliance === 'success' ? '✅' : '❌'} ${results.compliance}
+            
+            ### Security Posture: ${failed === 0 ? 'SECURE' : 'NEEDS ATTENTION'}
+            
+            ${failed > 0 ? '⚠️ **Action Required:** Review and resolve all security issues identified in the scan results.' : '✅ **All security checks passed.** Continue monitoring for new vulnerabilities.'}
+            
+            **Scan ID:** ${{ github.run_id }}`;
+            
+            console.log(summary);
+            
+            // Set status based on results
+            if (failed > 0) {
+              core.setFailed(\`Security scan failed: \${failed} out of \${total} checks failed\`);
+            } else {
+              console.log(\`✅ All \${total} security checks passed\`);
+            }

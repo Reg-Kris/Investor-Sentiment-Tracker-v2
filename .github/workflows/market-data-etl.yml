@@ -1,0 +1,368 @@
+name: Market Data ETL Pipeline
+
+on:
+  schedule:
+    # Market hours data collection (9:30 AM - 4:00 PM EST = 14:30 - 21:00 UTC)
+    - cron: '30 14,16,18,20 * * 1-5'  # Every 2 hours during market hours
+    # Weekend sentiment analysis for news
+    - cron: '0 18 * * 0,6'  # 1 PM EST on weekends
+  workflow_dispatch:
+    inputs:
+      force_collection:
+        description: 'Force data collection even if recent data exists'
+        required: false
+        default: 'false'
+        type: boolean
+      data_sources:
+        description: 'Data sources to collect'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+        - all
+        - fear-greed-only
+        - market-data-only
+        - news-sentiment-only
+
+permissions:
+  contents: write
+  actions: read
+
+# Prevent concurrent ETL runs to avoid data corruption
+concurrency:
+  group: market-data-etl
+  cancel-in-progress: false
+
+jobs:
+  data-quality-check:
+    name: Pre-ETL Data Quality Check
+    runs-on: ubuntu-latest
+    outputs:
+      needs-collection: ${{ steps.quality-check.outputs.needs-collection }}
+      data-age: ${{ steps.quality-check.outputs.data-age }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1  # Minimal fetch for efficiency
+
+      - name: Check existing data quality
+        id: quality-check
+        run: |
+          echo "Checking existing data quality and freshness..."
+          
+          NEEDS_COLLECTION="false"
+          DATA_AGE="unknown"
+          
+          if [ -f "data/latest.json" ]; then
+            # Check data age (4 hour threshold for market hours)
+            LAST_UPDATE=$(stat -c %Y data/latest.json 2>/dev/null || stat -f %m data/latest.json 2>/dev/null || echo 0)
+            CURRENT_TIME=$(date +%s)
+            AGE_HOURS=$(( (CURRENT_TIME - LAST_UPDATE) / 3600 ))
+            DATA_AGE="${AGE_HOURS}h"
+            
+            echo "Existing data is $AGE_HOURS hours old"
+            
+            # Force collection if requested or data is stale
+            if [ "${{ github.event.inputs.force_collection }}" == "true" ] || [ $AGE_HOURS -gt 4 ]; then
+              NEEDS_COLLECTION="true"
+              echo "✓ Data collection needed (force: ${{ github.event.inputs.force_collection }}, age: ${AGE_HOURS}h)"
+            else
+              echo "⏭ Data is fresh, skipping collection"
+            fi
+          else
+            NEEDS_COLLECTION="true"
+            echo "✓ No existing data found, collection needed"
+          fi
+          
+          echo "needs-collection=$NEEDS_COLLECTION" >> $GITHUB_OUTPUT
+          echo "data-age=$DATA_AGE" >> $GITHUB_OUTPUT
+
+  market-data-extraction:
+    name: Extract Market Data
+    runs-on: ubuntu-latest
+    needs: data-quality-check
+    if: needs.data-quality-check.outputs.needs-collection == 'true'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js with caching
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            scripts/package-lock.json
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        id: cache-node-modules
+        with:
+          path: |
+            node_modules
+            scripts/node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      - name: Install dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: |
+          npm ci
+          cd scripts && npm ci
+
+      - name: Create data directory
+        run: mkdir -p data
+
+      - name: Extract Fear & Greed Index
+        id: extract-fear-greed
+        if: ${{ github.event.inputs.data_sources == 'all' || github.event.inputs.data_sources == 'fear-greed-only' }}
+        continue-on-error: true
+        run: |
+          echo "Extracting Fear & Greed Index data..."
+          timeout 120 node scripts/fetch-data.js --source=fear-greed || echo "FEAR_GREED_FAILED=true" >> $GITHUB_ENV
+
+      - name: Extract Market Data
+        id: extract-market
+        if: ${{ github.event.inputs.data_sources == 'all' || github.event.inputs.data_sources == 'market-data-only' }}
+        continue-on-error: true
+        run: |
+          echo "Extracting market data (SPY, QQQ, VIX)..."
+          timeout 120 node scripts/fetch-data.js --source=market || echo "MARKET_DATA_FAILED=true" >> $GITHUB_ENV
+
+      - name: Extract News Sentiment
+        id: extract-news
+        if: ${{ github.event.inputs.data_sources == 'all' || github.event.inputs.data_sources == 'news-sentiment-only' }}
+        continue-on-error: true
+        run: |
+          echo "Extracting news sentiment data..."
+          timeout 120 node scripts/fetch-data.js --source=news || echo "NEWS_DATA_FAILED=true" >> $GITHUB_ENV
+
+      - name: Upload raw data artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: raw-market-data
+          path: data/
+          retention-days: 7
+
+  data-transformation:
+    name: Transform & Analyze Data
+    runs-on: ubuntu-latest
+    needs: market-data-extraction
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download raw data
+        uses: actions/download-artifact@v4
+        with:
+          name: raw-market-data
+          path: data/
+
+      - name: Setup Node.js with caching
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: scripts/package-lock.json
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: scripts/node_modules
+          key: ${{ runner.os }}-scripts-node-modules-${{ hashFiles('scripts/package-lock.json') }}
+
+      - name: Install analysis dependencies
+        run: cd scripts && npm ci
+
+      - name: Data validation and transformation
+        id: transform-data
+        run: |
+          echo "Validating and transforming extracted data..."
+          timeout 60 node scripts/analyze-sentiment.js || {
+            echo "ANALYSIS_FAILED=true" >> $GITHUB_ENV
+            echo "Data analysis failed, but continuing with available data"
+          }
+
+      - name: Generate data quality report
+        run: |
+          echo "=== Data Quality Report ===" > data/quality-report.txt
+          echo "Timestamp: $(date -u)" >> data/quality-report.txt
+          echo "Fear & Greed Status: ${FEAR_GREED_FAILED:-success}" >> data/quality-report.txt
+          echo "Market Data Status: ${MARKET_DATA_FAILED:-success}" >> data/quality-report.txt
+          echo "News Data Status: ${NEWS_DATA_FAILED:-success}" >> data/quality-report.txt
+          echo "Analysis Status: ${ANALYSIS_FAILED:-success}" >> data/quality-report.txt
+          
+          # Count records for validation
+          if [ -f "data/latest.json" ]; then
+            RECORD_COUNT=$(jq length data/latest.json 2>/dev/null || echo "0")
+            echo "Record Count: $RECORD_COUNT" >> data/quality-report.txt
+          fi
+
+      - name: Upload processed data artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: processed-market-data
+          path: data/
+          retention-days: 30
+
+  data-loading:
+    name: Load Data to Repository
+    runs-on: ubuntu-latest
+    needs: data-transformation
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 1
+
+      - name: Download processed data
+        uses: actions/download-artifact@v4
+        with:
+          name: processed-market-data
+          path: data/
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action ETL"
+
+      - name: Check for data changes
+        id: check-changes
+        run: |
+          if git diff --quiet HEAD -- data/; then
+            echo "No data changes detected"
+            echo "has-changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Data changes detected"
+            echo "has-changes=true" >> $GITHUB_OUTPUT
+            git add data/
+          fi
+
+      - name: Commit and push data updates
+        if: steps.check-changes.outputs.has-changes == 'true'
+        run: |
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
+          DATA_SOURCES="${{ github.event.inputs.data_sources || 'all' }}"
+          
+          # Create comprehensive commit message
+          COMMIT_MSG="Market data ETL update - $TIMESTAMP"
+          
+          # Add status indicators
+          if [[ "$FEAR_GREED_FAILED" == "true" ]]; then
+            COMMIT_MSG="$COMMIT_MSG [fear-greed-failed]"
+          fi
+          if [[ "$MARKET_DATA_FAILED" == "true" ]]; then
+            COMMIT_MSG="$COMMIT_MSG [market-failed]"
+          fi
+          if [[ "$NEWS_DATA_FAILED" == "true" ]]; then
+            COMMIT_MSG="$COMMIT_MSG [news-failed]"
+          fi
+          if [[ "$ANALYSIS_FAILED" == "true" ]]; then
+            COMMIT_MSG="$COMMIT_MSG [analysis-failed]"
+          fi
+          
+          git commit -m "$COMMIT_MSG"
+          git push origin main
+
+      - name: Update application data
+        if: steps.check-changes.outputs.has-changes == 'true'
+        run: |
+          # Copy data for Next.js app consumption
+          mkdir -p public/data
+          
+          if [ -f "data/latest-analysis.json" ]; then
+            cp data/latest-analysis.json public/data/
+          fi
+          if [ -f "data/latest.json" ]; then
+            cp data/latest.json public/data/market-data.json
+          fi
+          
+          # Commit app data updates if any
+          if ! git diff --quiet HEAD -- public/data/; then
+            git add public/data/
+            git commit -m "Update app data files - $(date -u +"%Y-%m-%d %H:%M UTC")"
+            git push origin main
+          fi
+
+  etl-monitoring:
+    name: ETL Pipeline Monitoring
+    runs-on: ubuntu-latest
+    needs: [data-quality-check, market-data-extraction, data-transformation, data-loading]
+    if: always()
+    
+    steps:
+      - name: Evaluate ETL pipeline health
+        run: |
+          echo "=== ETL Pipeline Health Report ==="
+          echo "Timestamp: $(date -u)"
+          echo "Data Age: ${{ needs.data-quality-check.outputs.data-age }}"
+          echo "Collection Needed: ${{ needs.data-quality-check.outputs.needs-collection }}"
+          echo "Extraction Status: ${{ needs.market-data-extraction.result }}"
+          echo "Transformation Status: ${{ needs.data-transformation.result }}"
+          echo "Loading Status: ${{ needs.data-loading.result }}"
+          
+          # Calculate success rate
+          TOTAL_JOBS=3
+          SUCCESS_COUNT=0
+          
+          [[ "${{ needs.market-data-extraction.result }}" == "success" ]] && SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
+          [[ "${{ needs.data-transformation.result }}" == "success" ]] && SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
+          [[ "${{ needs.data-loading.result }}" == "success" ]] && SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
+          
+          SUCCESS_RATE=$((SUCCESS_COUNT * 100 / TOTAL_JOBS))
+          echo "Pipeline Success Rate: $SUCCESS_RATE%"
+          
+          if [ $SUCCESS_RATE -lt 67 ]; then
+            echo "⚠️ ETL pipeline health degraded"
+            exit 1
+          else
+            echo "✅ ETL pipeline healthy"
+          fi
+
+      - name: Create ETL failure alert
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '🚨 CRITICAL: Market Data ETL Pipeline Failure';
+            const body = `## ETL Pipeline Failure Alert
+            
+            **Timestamp:** ${new Date().toISOString()}
+            **Pipeline Run:** ${context.runId}
+            **Trigger:** ${context.eventName}
+            
+            ### Job Status
+            - **Data Quality Check:** ${{ needs.data-quality-check.result }}
+            - **Market Data Extraction:** ${{ needs.market-data-extraction.result }}
+            - **Data Transformation:** ${{ needs.data-transformation.result }}
+            - **Data Loading:** ${{ needs.data-loading.result }}
+            
+            ### Impact
+            - Market sentiment data may be stale
+            - Application may show outdated information
+            - User experience degraded
+            
+            ### Immediate Actions Required
+            1. Check API rate limits and quotas
+            2. Verify external service availability
+            3. Review ETL job logs for specific errors
+            4. Manual data collection may be needed
+            
+            [View Pipeline Run](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+            `;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['critical', 'etl-failure', 'data-pipeline', 'automated']
+            });

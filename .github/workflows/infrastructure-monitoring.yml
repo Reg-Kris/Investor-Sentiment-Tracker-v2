@@ -1,0 +1,689 @@
+name: Infrastructure Monitoring & Health Checks
+
+on:
+  schedule:
+    # Intensive monitoring during market hours (9:30 AM - 4:00 PM EST = 14:30 - 21:00 UTC)
+    - cron: '*/10 14-21 * * 1-5'  # Every 10 minutes during market hours
+    # Reduced monitoring outside market hours
+    - cron: '0 * * * *'           # Every hour outside market hours
+    # Weekend basic health checks
+    - cron: '0 */6 * * 0,6'       # Every 6 hours on weekends
+  workflow_dispatch:
+    inputs:
+      monitoring_scope:
+        description: 'Scope of monitoring checks'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+        - all
+        - critical-only
+        - performance-only
+        - security-only
+        - api-health-only
+      alert_threshold:
+        description: 'Alert sensitivity threshold'
+        required: false
+        default: 'medium'
+        type: choice
+        options:
+        - low
+        - medium
+        - high
+
+permissions:
+  contents: read
+  issues: write
+
+# Prevent concurrent monitoring runs that could create noise
+concurrency:
+  group: infrastructure-monitoring
+  cancel-in-progress: true
+
+env:
+  SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+  MONITORING_VERSION: 'v2'
+
+jobs:
+  critical-health-check:
+    name: Critical Infrastructure Health
+    runs-on: ubuntu-latest
+    outputs:
+      site-status: ${{ steps.site-check.outputs.status }}
+      response-time: ${{ steps.site-check.outputs.response-time }}
+      critical-alerts: ${{ steps.evaluate.outputs.critical-alerts }}
+    
+    steps:
+      - name: Site availability check
+        id: site-check
+        continue-on-error: true
+        run: |
+          echo "Checking critical site availability: $SITE_URL"
+          
+          # Multi-point availability check with detailed metrics
+          ATTEMPTS=5
+          SUCCESS_COUNT=0
+          TOTAL_TIME=0
+          FASTEST_TIME=999
+          SLOWEST_TIME=0
+          ERRORS=""
+          
+          for i in $(seq 1 $ATTEMPTS); do
+            echo "Attempt $i/$ATTEMPTS..."
+            START_TIME=$(date +%s%N)
+            
+            RESPONSE=$(curl -s -w "%{http_code}|%{time_total}|%{time_starttransfer}" \
+              --connect-timeout 10 --max-time 30 "$SITE_URL" || echo "000|timeout|timeout")
+            
+            END_TIME=$(date +%s%N)
+            ACTUAL_TIME=$(( (END_TIME - START_TIME) / 1000000 ))
+            
+            HTTP_CODE=$(echo "$RESPONSE" | cut -d'|' -f1)
+            CURL_TIME=$(echo "$RESPONSE" | cut -d'|' -f2)
+            TTFB=$(echo "$RESPONSE" | cut -d'|' -f3)
+            
+            echo "  Response: HTTP $HTTP_CODE, Time: ${CURL_TIME}s, TTFB: ${TTFB}s"
+            
+            if [ "$HTTP_CODE" = "200" ]; then
+              SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
+              TOTAL_TIME=$(echo "$TOTAL_TIME + $CURL_TIME" | bc -l)
+              
+              # Track fastest/slowest
+              if (( $(echo "$CURL_TIME < $FASTEST_TIME" | bc -l) )); then
+                FASTEST_TIME=$CURL_TIME
+              fi
+              if (( $(echo "$CURL_TIME > $SLOWEST_TIME" | bc -l) )); then
+                SLOWEST_TIME=$CURL_TIME
+              fi
+            else
+              ERRORS="$ERRORS HTTP-$HTTP_CODE "
+            fi
+            
+            sleep 2
+          done
+          
+          # Calculate metrics
+          SUCCESS_RATE=$((SUCCESS_COUNT * 100 / ATTEMPTS))
+          if [ $SUCCESS_COUNT -gt 0 ]; then
+            AVG_TIME=$(echo "scale=3; $TOTAL_TIME / $SUCCESS_COUNT" | bc -l)
+          else
+            AVG_TIME="N/A"
+          fi
+          
+          echo "status=HTTP-$HTTP_CODE" >> $GITHUB_OUTPUT
+          echo "response-time=$AVG_TIME" >> $GITHUB_OUTPUT
+          echo "success-rate=$SUCCESS_RATE" >> $GITHUB_OUTPUT
+          echo "fastest-time=$FASTEST_TIME" >> $GITHUB_OUTPUT
+          echo "slowest-time=$SLOWEST_TIME" >> $GITHUB_OUTPUT
+          echo "errors=$ERRORS" >> $GITHUB_OUTPUT
+          
+          # Health assessment
+          if [ $SUCCESS_RATE -ge 80 ] && (( $(echo "$AVG_TIME < 5.0" | bc -l) )); then
+            echo "health=healthy" >> $GITHUB_OUTPUT
+            echo "✅ Site health: HEALTHY ($SUCCESS_RATE% success, ${AVG_TIME}s avg)"
+          elif [ $SUCCESS_RATE -ge 60 ]; then
+            echo "health=degraded" >> $GITHUB_OUTPUT
+            echo "⚠️ Site health: DEGRADED ($SUCCESS_RATE% success, ${AVG_TIME}s avg)"
+          else
+            echo "health=critical" >> $GITHUB_OUTPUT
+            echo "🚨 Site health: CRITICAL ($SUCCESS_RATE% success, errors: $ERRORS)"
+            exit 1
+          fi
+
+      - name: Content integrity check
+        id: content-check
+        if: steps.site-check.outputs.health != 'critical'
+        continue-on-error: true
+        run: |
+          echo "Checking content integrity..."
+          
+          # Download and analyze page content
+          CONTENT=$(curl -s --connect-timeout 10 --max-time 30 "$SITE_URL" || echo "")
+          
+          # Check for essential elements
+          CHECKS_PASSED=0
+          TOTAL_CHECKS=4
+          
+          # Check 1: HTML structure
+          if echo "$CONTENT" | grep -q "<html"; then
+            echo "✅ Valid HTML structure"
+            CHECKS_PASSED=$((CHECKS_PASSED + 1))
+          else
+            echo "❌ Invalid HTML structure"
+          fi
+          
+          # Check 2: Application bundle loaded
+          if echo "$CONTENT" | grep -q "_next\|react"; then
+            echo "✅ Application bundle present"
+            CHECKS_PASSED=$((CHECKS_PASSED + 1))
+          else
+            echo "❌ Application bundle missing"
+          fi
+          
+          # Check 3: No critical errors in HTML
+          if ! echo "$CONTENT" | grep -qi "error\|exception\|404\|500"; then
+            echo "✅ No critical errors in content"
+            CHECKS_PASSED=$((CHECKS_PASSED + 1))
+          else
+            echo "❌ Critical errors found in content"
+          fi
+          
+          # Check 4: Minimum content length (not empty page)
+          CONTENT_LENGTH=${#CONTENT}
+          if [ $CONTENT_LENGTH -gt 1000 ]; then
+            echo "✅ Adequate content length ($CONTENT_LENGTH chars)"
+            CHECKS_PASSED=$((CHECKS_PASSED + 1))
+          else
+            echo "❌ Content too short ($CONTENT_LENGTH chars)"
+          fi
+          
+          CONTENT_SCORE=$((CHECKS_PASSED * 100 / TOTAL_CHECKS))
+          echo "content-score=$CONTENT_SCORE" >> $GITHUB_OUTPUT
+          echo "content-length=$CONTENT_LENGTH" >> $GITHUB_OUTPUT
+          
+          if [ $CONTENT_SCORE -ge 75 ]; then
+            echo "Content integrity: PASSED ($CONTENT_SCORE%)"
+          else
+            echo "Content integrity: FAILED ($CONTENT_SCORE%)"
+            exit 1
+          fi
+
+      - name: Evaluate critical status
+        id: evaluate
+        run: |
+          SITE_HEALTH="${{ steps.site-check.outputs.health }}"
+          CONTENT_SCORE="${{ steps.content-check.outputs.content-score }}"
+          
+          CRITICAL_ISSUES=""
+          
+          if [ "$SITE_HEALTH" = "critical" ]; then
+            CRITICAL_ISSUES="$CRITICAL_ISSUES site-unreachable"
+          fi
+          
+          if [ "$CONTENT_SCORE" -lt 50 ]; then
+            CRITICAL_ISSUES="$CRITICAL_ISSUES content-integrity-failed"
+          fi
+          
+          echo "critical-alerts=$CRITICAL_ISSUES" >> $GITHUB_OUTPUT
+          
+          if [ -n "$CRITICAL_ISSUES" ]; then
+            echo "🚨 CRITICAL ISSUES DETECTED: $CRITICAL_ISSUES"
+            exit 1
+          else
+            echo "✅ All critical checks passed"
+          fi
+
+  api-dependency-monitoring:
+    name: External API Health Monitoring
+    runs-on: ubuntu-latest
+    if: ${{ inputs.monitoring_scope == 'all' || inputs.monitoring_scope == 'api-health-only' }}
+    outputs:
+      api-health-score: ${{ steps.api-assessment.outputs.health-score }}
+      failed-apis: ${{ steps.api-assessment.outputs.failed-apis }}
+    
+    steps:
+      - name: Fear & Greed Index API monitoring
+        id: fear-greed-monitor
+        continue-on-error: true
+        run: |
+          echo "Monitoring Fear & Greed Index API..."
+          
+          # Rate limit friendly testing
+          SUCCESS_COUNT=0
+          TOTAL_REQUESTS=5
+          RESPONSE_TIMES=()
+          RATE_LIMITED=0
+          
+          for i in $(seq 1 $TOTAL_REQUESTS); do
+            START=$(date +%s%N)
+            RESPONSE=$(curl -s -w "%{http_code}" -o /tmp/fng_$i "https://api.alternative.me/fng/" || echo "000")
+            END=$(date +%s%N)
+            TIME_MS=$(( (END - START) / 1000000 ))
+            RESPONSE_TIMES+=($TIME_MS)
+            
+            if [ "$RESPONSE" = "200" ]; then
+              SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
+            elif [ "$RESPONSE" = "429" ]; then
+              RATE_LIMITED=$((RATE_LIMITED + 1))
+            fi
+            
+            sleep 2  # Rate limit friendly
+          done
+          
+          SUCCESS_RATE=$((SUCCESS_COUNT * 100 / TOTAL_REQUESTS))
+          AVG_TIME=$(echo "${RESPONSE_TIMES[@]}" | tr ' ' '+' | bc | awk -v count=${#RESPONSE_TIMES[@]} '{print $1/count}')
+          
+          echo "fng-success-rate=$SUCCESS_RATE" >> $GITHUB_OUTPUT
+          echo "fng-avg-time=$AVG_TIME" >> $GITHUB_OUTPUT
+          echo "fng-rate-limited=$RATE_LIMITED" >> $GITHUB_OUTPUT
+          
+          echo "Fear & Greed API: $SUCCESS_RATE% success, ${AVG_TIME}ms avg, ${RATE_LIMITED} rate limited"
+
+      - name: Yahoo Finance API monitoring
+        id: yahoo-monitor
+        continue-on-error: true
+        run: |
+          echo "Monitoring Yahoo Finance API..."
+          
+          SYMBOLS=("SPY" "QQQ" "^VIX")
+          TOTAL_SUCCESS=0
+          TOTAL_REQUESTS=0
+          TOTAL_TIME=0
+          RATE_LIMITED=0
+          
+          for symbol in "${SYMBOLS[@]}"; do
+            echo "Testing symbol: $symbol"
+            START=$(date +%s%N)
+            RESPONSE=$(curl -s -w "%{http_code}" -o /tmp/yahoo_$symbol \
+              "https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d" || echo "000")
+            END=$(date +%s%N)
+            TIME_MS=$(( (END - START) / 1000000 ))
+            
+            TOTAL_REQUESTS=$((TOTAL_REQUESTS + 1))
+            TOTAL_TIME=$((TOTAL_TIME + TIME_MS))
+            
+            if [ "$RESPONSE" = "200" ]; then
+              TOTAL_SUCCESS=$((TOTAL_SUCCESS + 1))
+            elif [ "$RESPONSE" = "429" ]; then
+              RATE_LIMITED=$((RATE_LIMITED + 1))
+            fi
+            
+            sleep 3  # Be respectful to Yahoo's rate limits
+          done
+          
+          SUCCESS_RATE=$((TOTAL_SUCCESS * 100 / TOTAL_REQUESTS))
+          AVG_TIME=$((TOTAL_TIME / TOTAL_REQUESTS))
+          
+          echo "yahoo-success-rate=$SUCCESS_RATE" >> $GITHUB_OUTPUT
+          echo "yahoo-avg-time=$AVG_TIME" >> $GITHUB_OUTPUT
+          echo "yahoo-rate-limited=$RATE_LIMITED" >> $GITHUB_OUTPUT
+          
+          echo "Yahoo Finance API: $SUCCESS_RATE% success, ${AVG_TIME}ms avg, ${RATE_LIMITED} rate limited"
+
+      - name: API health assessment
+        id: api-assessment
+        run: |
+          FNG_SUCCESS="${{ steps.fear-greed-monitor.outputs.fng-success-rate }}"
+          YAHOO_SUCCESS="${{ steps.yahoo-monitor.outputs.yahoo-success-rate }}"
+          FNG_RATE_LIMITED="${{ steps.fear-greed-monitor.outputs.fng-rate-limited }}"
+          YAHOO_RATE_LIMITED="${{ steps.yahoo-monitor.outputs.yahoo-rate-limited }}"
+          
+          # Calculate overall API health score
+          TOTAL_APIS=2
+          HEALTHY_APIS=0
+          FAILED_APIS=""
+          
+          # Fear & Greed assessment
+          if [ "${FNG_SUCCESS:-0}" -ge 80 ] && [ "${FNG_RATE_LIMITED:-0}" -le 1 ]; then
+            HEALTHY_APIS=$((HEALTHY_APIS + 1))
+            echo "✅ Fear & Greed API: HEALTHY"
+          else
+            FAILED_APIS="$FAILED_APIS fear-greed"
+            echo "❌ Fear & Greed API: DEGRADED/FAILED"
+          fi
+          
+          # Yahoo Finance assessment
+          if [ "${YAHOO_SUCCESS:-0}" -ge 70 ] && [ "${YAHOO_RATE_LIMITED:-0}" -le 1 ]; then
+            HEALTHY_APIS=$((HEALTHY_APIS + 1))
+            echo "✅ Yahoo Finance API: HEALTHY"
+          else
+            FAILED_APIS="$FAILED_APIS yahoo-finance"
+            echo "❌ Yahoo Finance API: DEGRADED/FAILED"
+          fi
+          
+          HEALTH_SCORE=$((HEALTHY_APIS * 100 / TOTAL_APIS))
+          echo "health-score=$HEALTH_SCORE" >> $GITHUB_OUTPUT
+          echo "failed-apis=$FAILED_APIS" >> $GITHUB_OUTPUT
+          
+          echo "Overall API Health Score: $HEALTH_SCORE%"
+          
+          if [ $HEALTH_SCORE -lt 50 ]; then
+            echo "🚨 CRITICAL: Multiple API failures detected"
+            exit 1
+          elif [ $HEALTH_SCORE -lt 100 ]; then
+            echo "⚠️ Some API degradation detected"
+          fi
+
+  performance-monitoring:
+    name: Performance & Resource Monitoring
+    runs-on: ubuntu-latest
+    if: ${{ inputs.monitoring_scope == 'all' || inputs.monitoring_scope == 'performance-only' }}
+    outputs:
+      performance-score: ${{ steps.perf-analysis.outputs.score }}
+      load-time: ${{ steps.perf-analysis.outputs.load-time }}
+    
+    steps:
+      - name: Performance metrics collection
+        id: perf-metrics
+        run: |
+          echo "Collecting performance metrics for: $SITE_URL"
+          
+          # Multiple performance measurements for accuracy
+          MEASUREMENTS=3
+          LOAD_TIMES=()
+          TTFB_TIMES=()
+          
+          for i in $(seq 1 $MEASUREMENTS); do
+            echo "Performance measurement $i/$MEASUREMENTS..."
+            
+            METRICS=$(curl -w "%{time_total}|%{time_starttransfer}|%{size_download}" \
+              -s -o /dev/null "$SITE_URL" || echo "timeout|timeout|0")
+            
+            LOAD_TIME=$(echo "$METRICS" | cut -d'|' -f1)
+            TTFB=$(echo "$METRICS" | cut -d'|' -f2)
+            SIZE=$(echo "$METRICS" | cut -d'|' -f3)
+            
+            LOAD_TIMES+=($LOAD_TIME)
+            TTFB_TIMES+=($TTFB)
+            
+            echo "  Load: ${LOAD_TIME}s, TTFB: ${TTFB}s, Size: ${SIZE} bytes"
+            sleep 5
+          done
+          
+          # Calculate averages
+          AVG_LOAD=$(echo "${LOAD_TIMES[@]}" | tr ' ' '+' | bc | awk -v count=${#LOAD_TIMES[@]} '{printf "%.3f", $1/count}')
+          AVG_TTFB=$(echo "${TTFB_TIMES[@]}" | tr ' ' '+' | bc | awk -v count=${#TTFB_TIMES[@]} '{printf "%.3f", $1/count}')
+          
+          echo "avg-load-time=$AVG_LOAD" >> $GITHUB_OUTPUT
+          echo "avg-ttfb=$AVG_TTFB" >> $GITHUB_OUTPUT
+          echo "content-size=$SIZE" >> $GITHUB_OUTPUT
+
+      - name: Performance analysis
+        id: perf-analysis
+        run: |
+          LOAD_TIME="${{ steps.perf-metrics.outputs.avg-load-time }}"
+          TTFB="${{ steps.perf-metrics.outputs.avg-ttfb }}"
+          SIZE="${{ steps.perf-metrics.outputs.content-size }}"
+          
+          # Performance scoring (0-100)
+          SCORE=100
+          ISSUES=""
+          
+          # Load time assessment (target: <2s excellent, <3s good, <5s acceptable)
+          if (( $(echo "$LOAD_TIME > 5.0" | bc -l) )); then
+            SCORE=$((SCORE - 40))
+            ISSUES="$ISSUES slow-load-time"
+          elif (( $(echo "$LOAD_TIME > 3.0" | bc -l) )); then
+            SCORE=$((SCORE - 20))
+            ISSUES="$ISSUES moderate-load-time"
+          elif (( $(echo "$LOAD_TIME > 2.0" | bc -l) )); then
+            SCORE=$((SCORE - 10))
+          fi
+          
+          # TTFB assessment (target: <0.5s excellent, <1s good, <2s acceptable)
+          if (( $(echo "$TTFB > 2.0" | bc -l) )); then
+            SCORE=$((SCORE - 30))
+            ISSUES="$ISSUES high-ttfb"
+          elif (( $(echo "$TTFB > 1.0" | bc -l) )); then
+            SCORE=$((SCORE - 15))
+            ISSUES="$ISSUES moderate-ttfb"
+          fi
+          
+          # Content size assessment (warn if >2MB)
+          if [ "$SIZE" -gt 2097152 ]; then
+            SCORE=$((SCORE - 10))
+            ISSUES="$ISSUES large-content-size"
+          fi
+          
+          echo "score=$SCORE" >> $GITHUB_OUTPUT
+          echo "load-time=$LOAD_TIME" >> $GITHUB_OUTPUT
+          echo "ttfb=$TTFB" >> $GITHUB_OUTPUT
+          echo "issues=$ISSUES" >> $GITHUB_OUTPUT
+          
+          # Performance status
+          if [ $SCORE -ge 80 ]; then
+            echo "✅ Performance: EXCELLENT ($SCORE/100)"
+          elif [ $SCORE -ge 60 ]; then
+            echo "⚠️ Performance: GOOD ($SCORE/100)"
+          elif [ $SCORE -ge 40 ]; then
+            echo "⚠️ Performance: ACCEPTABLE ($SCORE/100)"
+          else
+            echo "🚨 Performance: POOR ($SCORE/100) - Issues: $ISSUES"
+            exit 1
+          fi
+
+  security-monitoring:
+    name: Security & Compliance Monitoring
+    runs-on: ubuntu-latest
+    if: ${{ inputs.monitoring_scope == 'all' || inputs.monitoring_scope == 'security-only' }}
+    
+    steps:
+      - name: Security headers check
+        id: security-headers
+        run: |
+          echo "Checking security headers..."
+          
+          HEADERS=$(curl -I -s "$SITE_URL" || echo "")
+          SECURITY_SCORE=0
+          MAX_SCORE=50
+          
+          # Check for important security headers
+          if echo "$HEADERS" | grep -qi "strict-transport-security"; then
+            echo "✅ HSTS header present"
+            SECURITY_SCORE=$((SECURITY_SCORE + 10))
+          else
+            echo "⚠️ HSTS header missing"
+          fi
+          
+          if echo "$HEADERS" | grep -qi "x-frame-options"; then
+            echo "✅ X-Frame-Options header present"
+            SECURITY_SCORE=$((SECURITY_SCORE + 10))
+          else
+            echo "⚠️ X-Frame-Options header missing"
+          fi
+          
+          if echo "$HEADERS" | grep -qi "x-content-type-options"; then
+            echo "✅ X-Content-Type-Options header present"
+            SECURITY_SCORE=$((SECURITY_SCORE + 10))
+          else
+            echo "⚠️ X-Content-Type-Options header missing"
+          fi
+          
+          if echo "$HEADERS" | grep -qi "content-security-policy"; then
+            echo "✅ CSP header present"
+            SECURITY_SCORE=$((SECURITY_SCORE + 15))
+          else
+            echo "⚠️ CSP header missing"
+          fi
+          
+          if echo "$HEADERS" | grep -qi "referrer-policy"; then
+            echo "✅ Referrer-Policy header present"
+            SECURITY_SCORE=$((SECURITY_SCORE + 5))
+          else
+            echo "⚠️ Referrer-Policy header missing"
+          fi
+          
+          SECURITY_PERCENTAGE=$((SECURITY_SCORE * 100 / MAX_SCORE))
+          echo "security-score=$SECURITY_PERCENTAGE" >> $GITHUB_OUTPUT
+          
+          echo "Security Headers Score: $SECURITY_PERCENTAGE%"
+
+      - name: SSL/TLS configuration check
+        id: ssl-check
+        run: |
+          echo "Checking SSL/TLS configuration..."
+          
+          # Check SSL certificate validity
+          SSL_INFO=$(echo | openssl s_client -connect "${SITE_URL#https://}":443 -servername "${SITE_URL#https://}" 2>/dev/null | openssl x509 -noout -dates 2>/dev/null || echo "")
+          
+          if [ -n "$SSL_INFO" ]; then
+            echo "✅ SSL certificate is valid"
+            echo "Certificate info: $SSL_INFO"
+            echo "ssl-valid=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ SSL certificate validation failed"
+            echo "ssl-valid=false" >> $GITHUB_OUTPUT
+          fi
+
+  monitoring-consolidation:
+    name: Consolidate Monitoring Results
+    runs-on: ubuntu-latest
+    needs: [critical-health-check, api-dependency-monitoring, performance-monitoring, security-monitoring]
+    if: always()
+    
+    steps:
+      - name: Generate comprehensive report
+        run: |
+          echo "=== Infrastructure Monitoring Report ==="
+          echo "Timestamp: $(date -u)"
+          echo "Monitoring Scope: ${{ inputs.monitoring_scope || 'all' }}"
+          echo "Alert Threshold: ${{ inputs.alert_threshold || 'medium' }}"
+          echo ""
+          
+          # Critical Health
+          echo "CRITICAL HEALTH:"
+          echo "- Site Status: ${{ needs.critical-health-check.outputs.site-status }}"
+          echo "- Response Time: ${{ needs.critical-health-check.outputs.response-time }}s"
+          echo "- Critical Alerts: ${{ needs.critical-health-check.outputs.critical-alerts }}"
+          echo ""
+          
+          # API Health
+          echo "API DEPENDENCIES:"
+          echo "- Health Score: ${{ needs.api-dependency-monitoring.outputs.api-health-score }}%"
+          echo "- Failed APIs: ${{ needs.api-dependency-monitoring.outputs.failed-apis }}"
+          echo ""
+          
+          # Performance
+          echo "PERFORMANCE:"
+          echo "- Performance Score: ${{ needs.performance-monitoring.outputs.performance-score }}/100"
+          echo "- Load Time: ${{ needs.performance-monitoring.outputs.load-time }}s"
+          echo ""
+          
+          # Overall system health
+          CRITICAL_ISSUES="${{ needs.critical-health-check.outputs.critical-alerts }}"
+          API_HEALTH="${{ needs.api-dependency-monitoring.outputs.api-health-score }}"
+          PERF_SCORE="${{ needs.performance-monitoring.outputs.performance-score }}"
+          
+          if [ -n "$CRITICAL_ISSUES" ]; then
+            echo "🚨 SYSTEM STATUS: CRITICAL"
+            echo "Critical issues must be addressed immediately"
+          elif [ "${API_HEALTH:-100}" -lt 50 ] || [ "${PERF_SCORE:-100}" -lt 40 ]; then
+            echo "⚠️ SYSTEM STATUS: DEGRADED"
+            echo "Performance or API issues detected"
+          else
+            echo "✅ SYSTEM STATUS: HEALTHY"
+            echo "All monitoring checks passed"
+          fi
+
+      - name: Create alerts for issues
+        if: failure() || needs.critical-health-check.result == 'failure' || needs.api-dependency-monitoring.result == 'failure' || needs.performance-monitoring.result == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Determine alert severity
+            const criticalIssues = '${{ needs.critical-health-check.outputs.critical-alerts }}';
+            const apiHealth = parseInt('${{ needs.api-dependency-monitoring.outputs.api-health-score }}' || '100');
+            const perfScore = parseInt('${{ needs.performance-monitoring.outputs.performance-score }}' || '100');
+            const alertThreshold = '${{ inputs.alert_threshold }}' || 'medium';
+            
+            let alertLevel = 'medium';
+            let title = '⚠️ Infrastructure Monitoring Alert';
+            
+            if (criticalIssues || apiHealth < 30 || perfScore < 30) {
+              alertLevel = 'critical';
+              title = '🚨 CRITICAL: Infrastructure Health Failure';
+            } else if (apiHealth < 50 || perfScore < 40) {
+              alertLevel = 'high';
+              title = '🚨 HIGH: Infrastructure Performance Degraded';
+            }
+            
+            // Skip low-severity alerts if threshold is high
+            if (alertThreshold === 'high' && alertLevel === 'medium') {
+              console.log('Skipping medium-level alert due to high threshold setting');
+              return;
+            }
+            
+            const body = `## Infrastructure Monitoring Alert
+            
+            **Alert Level:** ${alertLevel.toUpperCase()}
+            **Timestamp:** ${new Date().toISOString()}
+            **Monitoring Run:** ${context.runId}
+            
+            ### System Status Overview
+            - **Critical Health:** ${{ needs.critical-health-check.result }}
+            - **API Dependencies:** ${{ needs.api-dependency-monitoring.result }}
+            - **Performance:** ${{ needs.performance-monitoring.result }}
+            - **Security:** ${{ needs.security-monitoring.result }}
+            
+            ### Key Metrics
+            - **Site Response Time:** ${{ needs.critical-health-check.outputs.response-time }}s
+            - **API Health Score:** ${{ needs.api-dependency-monitoring.outputs.api-health-score }}%
+            - **Performance Score:** ${{ needs.performance-monitoring.outputs.performance-score }}/100
+            - **Failed APIs:** ${{ needs.api-dependency-monitoring.outputs.failed-apis }}
+            
+            ### Critical Issues
+            ${criticalIssues ? '🚨 **CRITICAL ALERTS:** ' + criticalIssues : '✅ No critical issues detected'}
+            
+            ### Impact Assessment
+            ${criticalIssues ? '- **Site may be inaccessible to users**' : ''}
+            ${apiHealth < 50 ? '- **Data may be stale or unavailable**' : ''}
+            ${perfScore < 40 ? '- **Poor user experience due to slow performance**' : ''}
+            
+            ### Recommended Actions
+            1. **Investigate failed monitoring checks**
+            2. **Check external service dependencies**
+            3. **Review application performance metrics**
+            4. **Verify infrastructure scaling**
+            ${alertLevel === 'critical' ? '5. **Consider emergency response procedures**' : ''}
+            
+            [View Monitoring Details](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+            `;
+            
+            // Check for existing monitoring issues to avoid spam
+            const existingIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'monitoring,infrastructure',
+              state: 'open'
+            });
+            
+            const recentIssue = existingIssues.data.find(issue => 
+              issue.created_at > new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+            );
+            
+            if (recentIssue && alertLevel !== 'critical') {
+              console.log('Skipping alert creation - recent monitoring issue exists');
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: recentIssue.number,
+                body: `**Monitoring Update:** ${new Date().toISOString()}\n\nAlert Level: ${alertLevel}\n\n${body.split('\n').slice(5).join('\n')}`
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: [alertLevel, 'monitoring', 'infrastructure', 'automated']
+              });
+            }
+
+      - name: Auto-close resolved issues
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Close monitoring issues that are now resolved
+            const openIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'monitoring,infrastructure',
+              state: 'open'
+            });
+            
+            for (const issue of openIssues.data) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed'
+              });
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `✅ **Infrastructure Health Restored**\n\nAll monitoring checks are now passing. Auto-closing this issue.\n\n**Resolution Time:** ${new Date().toISOString()}\n**Run:** https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+              });
+            }
