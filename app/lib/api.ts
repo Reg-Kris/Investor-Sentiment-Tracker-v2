@@ -415,13 +415,16 @@ class APIService {
   async getSentimentData(): Promise<APIResponse<SentimentData>> {
     try {
       // First try to load data from the pre-fetched JSON file (for static deployment)
+      console.log('🔍 Attempting to load pre-fetched data from JSON file...');
       const jsonData = await this.loadPreFetchedData();
       if (jsonData) {
-        console.log('Using pre-fetched data from JSON file');
+        console.log('✅ Using pre-fetched data from JSON file:', jsonData);
         return {
           success: true,
           data: jsonData
         };
+      } else {
+        console.log('❌ No pre-fetched data available, falling back to API calls');
       }
 
       // Fall back to direct API calls if JSON data unavailable
@@ -472,36 +475,125 @@ class APIService {
 
   private async loadPreFetchedData(): Promise<SentimentData | null> {
     try {
-      const response = await fetch('/data/market-data.json');
+      const url = '/data/market-data.json';
+      console.log('📥 Fetching:', url);
+      console.log('📍 Current location:', typeof window !== 'undefined' ? window.location.href : 'Server-side');
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-cache' // Ensure we get fresh data
+      });
+      
+      console.log('📡 Response received:', {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url,
+        ok: response.ok,
+        headers: Object.fromEntries(response.headers.entries())
+      });
+      
       if (!response.ok) {
-        console.log('Pre-fetched data file not found or inaccessible');
+        console.log('❌ Pre-fetched data file not found or inaccessible. Status:', response.status, response.statusText);
         return null;
       }
 
-      const marketData = await response.json();
+      const responseText = await response.text();
+      console.log('📄 Raw response text length:', responseText.length);
       
+      if (!responseText || responseText.trim() === '') {
+        console.log('❌ Empty response received');
+        return null;
+      }
+      
+      let marketData;
+      try {
+        marketData = JSON.parse(responseText);
+      } catch (parseError) {
+        console.log('❌ JSON parse error:', parseError);
+        console.log('📄 Response text preview:', responseText.substring(0, 200));
+        return null;
+      }
+      
+      console.log('📊 Raw market data loaded:', marketData);
+      
+      // Validate essential data structure
+      if (!marketData || typeof marketData !== 'object') {
+        console.log('❌ Invalid market data structure');
+        return null;
+      }
+      
+      if (!marketData.stocks || typeof marketData.stocks !== 'object') {
+        console.log('❌ Missing or invalid stocks data');
+        return null;
+      }
+      
+      if (!marketData.fearGreed || typeof marketData.fearGreed !== 'object') {
+        console.log('❌ Missing or invalid fearGreed data');
+        return null;
+      }
+
       // Extract relevant data from the JSON structure
-      const stocks = marketData.stocks || {};
+      const stocks = marketData.stocks;
       const vixData = stocks['^VIX'] || {}; // VIX is stored in stocks with ^VIX symbol
-      const fearGreedData = marketData.fearGreed || {}; // fearGreed not fear_greed
+      const fearGreedData = marketData.fearGreed; // fearGreed not fear_greed
+      
+      console.log('🔍 Data extraction:', {
+        stocks: Object.keys(stocks),
+        vixData: vixData,
+        fearGreedData: fearGreedData,
+        putCallRatio: marketData.putCallRatio
+      });
+      
+      // Validate essential stock data
+      if (!stocks.SPY || typeof stocks.SPY.price !== 'number' || typeof stocks.SPY.change !== 'number') {
+        console.log('❌ Missing or invalid SPY data:', stocks.SPY);
+        return null;
+      }
+      
+      if (!stocks.QQQ || typeof stocks.QQQ.price !== 'number' || typeof stocks.QQQ.change !== 'number') {
+        console.log('❌ Missing or invalid QQQ data:', stocks.QQQ);
+        return null;
+      }
+      
+      if (!vixData.price || typeof vixData.price !== 'number') {
+        console.log('❌ Missing or invalid VIX data:', vixData);
+        return null;
+      }
+      
+      if (typeof fearGreedData.value !== 'number') {
+        console.log('❌ Missing or invalid Fear/Greed data:', fearGreedData);
+        return null;
+      }
+
+      // IWM is optional - if missing, we'll use fallback values
 
       // Convert to expected SentimentData format
       const spyChange = stocks.SPY?.change || 0;
       const spyPrice = stocks.SPY?.price || 500;
       const qqqChange = stocks.QQQ?.change || 0;
       const qqqPrice = stocks.QQQ?.price || 400;
+      // IWM is optional - use fallback if not available
       const iwmChange = stocks.IWM?.change || 0;
       const iwmPrice = stocks.IWM?.price || 200;
       const vixLevel = vixData.price || 20; // VIX price not value
       const fearGreedIndex = fearGreedData.value || 50;
       // Use pre-calculated put/call ratio from data, fallback to calculation if not available
       const putCallRatio = marketData.putCallRatio || this.calculatePutCallProxy(vixLevel, spyChange);
+      
+      console.log('📋 Extracted values before processing:', {
+        spyChange, spyPrice, qqqChange, qqqPrice, iwmChange, iwmPrice,
+        vixLevel, fearGreedIndex, putCallRatio
+      });
 
 
       const stockChanges = [spyChange, qqqChange, iwmChange];
       const overallSentiment = this.calculateSentiment(fearGreedIndex, stockChanges, vixLevel);
 
-      return {
+      const result = {
         fearGreedIndex,
         spyChange,
         spyPrice,
@@ -514,8 +606,11 @@ class APIService {
         overallSentiment,
         lastUpdated: marketData.timestamp || new Date().toISOString()
       };
+      
+      console.log('✅ Converted data for UI:', result);
+      return result;
     } catch (error) {
-      console.log('Error loading pre-fetched data:', error);
+      console.log('❌ Error loading pre-fetched data:', error);
       return null;
     }
   }

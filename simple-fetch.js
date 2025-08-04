@@ -120,7 +120,7 @@ function calculatePutCallProxy(vixLevel, spyChange) {
 }
 
 async function main() {
-  const symbols = ['SPY', 'QQQ', '^VIX'];
+  const symbols = ['SPY', 'QQQ', 'IWM', '^VIX'];
   const results = {
     timestamp: new Date().toISOString(),
     stocks: {},
