@@ -2,7 +2,9 @@
 
 import { Card, Metric, Text, Flex, BadgeDelta, AreaChart } from '@tremor/react';
 import { clsx } from 'clsx';
-import { TrendingUp, TrendingDown, Minus, Info } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Info, Activity } from 'lucide-react';
+import { motion } from 'framer-motion';
+import AnimatedNumber from './AnimatedNumber';
 
 interface MetricCardProps {
   title: string;
@@ -96,15 +98,41 @@ export default function MetricCard({
   };
 
   return (
-    <Card 
-      className={clsx(
-        sizeClasses[size].padding,
-        'animate-fade-in hover:shadow-tremor-card dark:hover:shadow-dark-tremor-card transition-all duration-200',
-        className
-      )}
-      decoration="left"
-      decorationColor={status ? getStatusColor(status) : 'blue'}
+    <motion.div
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+      whileHover={{ 
+        y: -4, 
+        scale: 1.02,
+        transition: { duration: 0.2 }
+      }}
+      whileTap={{ scale: 0.98 }}
     >
+      <Card 
+        className={clsx(
+          sizeClasses[size].padding,
+          'fintech-card-hover glass-subtle group relative overflow-hidden',
+          'border border-tremor-border/50 dark:border-dark-tremor-border/50',
+          'backdrop-blur-sm bg-gradient-to-br from-white/80 to-white/40',
+          'dark:from-slate-800/80 dark:to-slate-900/40',
+          className
+        )}
+        decoration="left"
+        decorationColor={status ? getStatusColor(status) : 'blue'}
+      >
+        {/* Subtle gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-fintech-primary-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        
+        {/* Live data indicator */}
+        {status === 'excellent' && (
+          <div className="absolute top-3 right-3">
+            <div className="flex items-center space-x-1">
+              <div className="w-2 h-2 bg-fintech-success-500 rounded-full animate-pulse" />
+              <Activity className="w-3 h-3 text-fintech-success-500" />
+            </div>
+          </div>
+        )}
       {/* Header */}
       <Flex justifyContent="start" alignItems="center" className="space-x-2 mb-3">
         {icon && <div className="text-tremor-content dark:text-dark-tremor-content">{icon}</div>}
@@ -126,15 +154,27 @@ export default function MetricCard({
       </Flex>
 
       {/* Main Metric */}
-      <div className="mb-4">
-        <Metric 
-          className={clsx(
-            sizeClasses[size].metric,
-            'font-bold text-tremor-content-strong dark:text-dark-tremor-content-strong'
+      <div className="mb-4 relative">
+        <div className={clsx(
+          sizeClasses[size].metric,
+          'font-bold text-tremor-content-strong dark:text-dark-tremor-content-strong'
+        )}>
+          {typeof value === 'number' ? (
+            <AnimatedNumber 
+              value={value} 
+              decimals={2}
+              className="text-inherit"
+            />
+          ) : (
+            <motion.span
+              initial={{ scale: 1.1, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              {value}
+            </motion.span>
           )}
-        >
-          {typeof value === 'number' ? value.toLocaleString() : value}
-        </Metric>
+        </div>
         {subtitle && (
           <Text className="text-tremor-content-subtle dark:text-dark-tremor-content-subtle mt-1">
             {subtitle}
@@ -144,79 +184,131 @@ export default function MetricCard({
 
       {/* Change Indicator */}
       {(change !== undefined || trend) && (
-        <Flex justifyContent="start" alignItems="center" className="space-x-2 mb-4">
-          <BadgeDelta 
-            deltaType={getDeltaType(change, trend)}
-            size="xs"
-          >
-            <Flex alignItems="center" className="space-x-1">
-              {getTrendIcon()}
-              <span>
-                {change !== undefined ? formatChange(change, changeType) : trend}
-              </span>
-            </Flex>
-          </BadgeDelta>
-          <Text className="text-tremor-content-subtle dark:text-dark-tremor-content-subtle text-xs">
-            vs previous period
-          </Text>
-        </Flex>
+        <motion.div
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+        >
+          <Flex justifyContent="start" alignItems="center" className="space-x-2 mb-4">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <BadgeDelta 
+                deltaType={getDeltaType(change, trend)}
+                size="xs"
+                className="backdrop-blur-sm"
+              >
+                <Flex alignItems="center" className="space-x-1">
+                  <motion.div
+                    animate={{ 
+                      rotate: change && change > 0 ? 0 : change && change < 0 ? 180 : 0 
+                    }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {getTrendIcon()}
+                  </motion.div>
+                  {change !== undefined ? (
+                    <AnimatedNumber 
+                      value={Math.abs(change)} 
+                      decimals={2}
+                      suffix={changeType === 'percentage' ? '%' : changeType === 'basis-points' ? ' bps' : ''}
+                      className="text-inherit"
+                    />
+                  ) : (
+                    <span>{trend}</span>
+                  )}
+                </Flex>
+              </BadgeDelta>
+            </motion.div>
+            <Text className="text-tremor-content-subtle dark:text-dark-tremor-content-subtle text-xs">
+              vs previous period
+            </Text>
+          </Flex>
+        </motion.div>
       )}
 
       {/* Progress to Target */}
       {target && typeof value === 'number' && (
-        <div className="mb-4">
+        <motion.div
+          className="mb-4"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+        >
           <Flex justifyContent="between" className="mb-1">
             <Text className="text-xs text-tremor-content dark:text-dark-tremor-content">
               Progress to Target
             </Text>
             <Text className="text-xs text-tremor-content dark:text-dark-tremor-content">
-              {Math.round((value / target) * 100)}%
+              <AnimatedNumber value={(value / target) * 100} decimals={0} suffix="%" />
             </Text>
           </Flex>
-          <div className="w-full bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded-full h-2">
-            <div 
+          <div className="w-full bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded-full h-2 overflow-hidden">
+            <motion.div 
               className={clsx(
-                'h-2 rounded-full transition-all duration-300',
+                'h-2 rounded-full',
                 `bg-${getStatusColor(status)}-500`
               )}
-              style={{ width: `${Math.min((value / target) * 100, 100)}%` }}
+              initial={{ width: 0 }}
+              animate={{ width: `${Math.min((value / target) * 100, 100)}%` }}
+              transition={{ duration: 1, delay: 0.5, ease: [0.4, 0, 0.2, 1] }}
             />
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* Mini Chart */}
       {chart && chart.showChart !== false && chart.data.length > 0 && (
-        <div className={clsx('mt-4', sizeClasses[size].chart)}>
-          <AreaChart
-            data={chart.data}
-            index="name"
-            categories={["value"]}
-            colors={[chart.color]}
-            showXAxis={false}
-            showYAxis={false}
-            showGridLines={false}
-            showLegend={false}
-            showTooltip={false}
-            className="h-full"
-            autoMinValue={true}
-            curveType="natural"
-          />
-        </div>
+        <motion.div 
+          className={clsx('mt-4 relative', sizeClasses[size].chart)}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <div className="chart-container h-full p-2">
+            <AreaChart
+              data={chart.data}
+              index="name"
+              categories={["value"]}
+              colors={[chart.color]}
+              showXAxis={false}
+              showYAxis={false}
+              showGridLines={false}
+              showLegend={false}
+              showTooltip={true}
+              className="h-full"
+              autoMinValue={true}
+              curveType="natural"
+              animationDuration={1000}
+            />
+          </div>
+        </motion.div>
       )}
 
       {/* Status Badge */}
       {status && (
-        <div className="flex justify-end mt-4">
-          <div className={clsx(
-            'px-2 py-1 rounded-full text-xs font-medium',
-            `bg-${getStatusColor(status)}-100 text-${getStatusColor(status)}-700`,
-            `dark:bg-${getStatusColor(status)}-900 dark:text-${getStatusColor(status)}-300`
-          )}>
+        <motion.div 
+          className="flex justify-end mt-4"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3, delay: 0.6 }}
+        >
+          <motion.div 
+            className={clsx(
+              'px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm',
+              'border border-white/20 dark:border-gray-700/20',
+              `bg-${getStatusColor(status)}-100/80 text-${getStatusColor(status)}-700`,
+              `dark:bg-${getStatusColor(status)}-900/80 dark:text-${getStatusColor(status)}-300`
+            )}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
             {status.charAt(0).toUpperCase() + status.slice(1)}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
-    </Card>
+      </Card>
+    </motion.div>
   );
 }

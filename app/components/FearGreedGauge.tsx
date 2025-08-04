@@ -144,11 +144,10 @@ export default function SentimentGauge({
         </div>
       </div>
       
-      <Text className="text-center text-xs mt-2 text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
-        {sentimentData.description}
-      </Text>
-    </div>
-  );
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, delay: 1 }}\n      >\n        <Text className="text-center text-xs mt-2 text-tremor-content-subtle dark:text-dark-tremor-content-subtle">\n          {sentimentData.description}\n        </Text>\n      </motion.div>\n    </motion.div>\n  );
 
   if (!showCard) {
     return content;

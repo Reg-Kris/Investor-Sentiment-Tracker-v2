@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { RefreshCw, Heart, Activity, TrendingUp, AlertCircle } from 'lucide-react';
 import { Grid, Col, Title, Text, Flex, Button, Callout } from '@tremor/react';
+import { motion, AnimatePresence } from 'framer-motion';
+import PageTransition, { StaggerContainer, StaggerItem, MetricCardTransition, ChartReveal } from './components/PageTransition';
+import { MetricCardSkeleton, ChartSkeleton, NewsFeedSkeleton } from './components/SkeletonLoader';
 
 // Import new components
 import SentimentGauge from './components/FearGreedGauge';
@@ -123,73 +126,184 @@ export default function Home() {
 
   if (!sentimentData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-tremor-background dark:bg-dark-tremor-background">
-        <div className="text-center">
-          <RefreshCw className="h-8 w-8 animate-spin text-tremor-brand dark:text-dark-tremor-brand mx-auto mb-4" />
-          <Text className="text-tremor-content dark:text-dark-tremor-content">
-            Loading market intelligence...
-          </Text>
+      <div className="min-h-screen bg-tremor-background dark:bg-dark-tremor-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Header Skeleton */}
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <div className="space-y-2">
+                <div className="h-8 w-64 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-shimmer" />
+                <div className="h-4 w-96 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-shimmer" />
+              </div>
+              <div className="flex space-x-3">
+                <div className="h-8 w-8 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-shimmer" />
+                <div className="h-8 w-20 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-shimmer" />
+              </div>
+            </div>
+          </div>
+          
+          {/* Dashboard Skeleton */}
+          <Grid numItemsSm={1} numItemsLg={12} className="gap-6">
+            {/* Fear & Greed Gauge Skeleton */}
+            <Col numColSpan={12} numColSpanLg={4}>
+              <div className="glass-card p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <div className="h-5 w-32 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded animate-shimmer" />
+                  <div className="h-6 w-20 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded-full animate-shimmer" />
+                </div>
+                <div className="h-48 bg-tremor-background-subtle dark:bg-dark-tremor-background-subtle rounded-lg animate-shimmer" />
+              </div>
+            </Col>
+            
+            {/* Metric Cards Skeleton */}
+            <Col numColSpan={12} numColSpanLg={8}>
+              <Grid numItemsSm={2} numItemsLg={4} className="gap-4 h-full">
+                {Array.from({ length: 4 }, (_, i) => (
+                  <Col key={i} numColSpan={1}>
+                    <div className="glass-card">
+                      <MetricCardSkeleton />
+                    </div>
+                  </Col>
+                ))}
+              </Grid>
+            </Col>
+            
+            {/* Timeline Chart Skeleton */}
+            <Col numColSpan={12} numColSpanLg={8}>
+              <div className="glass-card">
+                <ChartSkeleton />
+              </div>
+            </Col>
+            
+            {/* News Skeleton */}
+            <Col numColSpan={12} numColSpanLg={4}>
+              <div className="glass-card">
+                <NewsFeedSkeleton />
+              </div>
+            </Col>
+          </Grid>
+          
+          {/* Loading indicator */}
+          <motion.div 
+            className="fixed bottom-8 right-8 flex items-center space-x-2 bg-fintech-primary-500 text-white px-4 py-2 rounded-full shadow-lg backdrop-blur-sm"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+            >
+              <RefreshCw className="h-4 w-4" />
+            </motion.div>
+            <span className="text-sm font-medium">Loading market data...</span>
+          </motion.div>
         </div>
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-tremor-background dark:bg-dark-tremor-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <PageTransition>
+      <main className="min-h-screen bg-tremor-background dark:bg-dark-tremor-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
+        <motion.div 
+          className="mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+        >
           <Flex justifyContent="between" alignItems="center" className="mb-4">
-            <div>
-              <Title className="text-tremor-content-strong dark:text-dark-tremor-content-strong">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <Title className="text-tremor-content-strong dark:text-dark-tremor-content-strong heading-gradient text-2xl font-bold">
                 Market Sentiment Dashboard
               </Title>
-              <Text className="text-tremor-content dark:text-dark-tremor-content mt-1">
-                Professional trading intelligence • Last updated: {new Date(sentimentData.lastUpdated).toLocaleString()}
-              </Text>
-            </div>
-            <div className="flex items-center space-x-3">
-              <ThemeToggle />
-              <Button
-                onClick={fetchData}
-                loading={loading}
-                icon={RefreshCw}
-                variant="secondary"
-                size="sm"
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4, delay: 0.3 }}
               >
-                Refresh
-              </Button>
-            </div>
+                <Text className="text-tremor-content dark:text-dark-tremor-content mt-1 flex items-center space-x-2">
+                  <span>Professional trading intelligence</span>
+                  <span className="text-fintech-primary-500">•</span>
+                  <span>Last updated: {new Date(sentimentData.lastUpdated).toLocaleString()}</span>
+                  <div className="w-2 h-2 bg-fintech-success-500 rounded-full animate-pulse" />
+                </Text>
+              </motion.div>
+            </motion.div>
+            <motion.div 
+              className="flex items-center space-x-3"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <ThemeToggle />
+              </motion.div>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button
+                  onClick={fetchData}
+                  loading={loading}
+                  icon={RefreshCw}
+                  variant="secondary"
+                  size="sm"
+                  className="micro-bounce backdrop-blur-sm"
+                >
+                  Refresh
+                </Button>
+              </motion.div>
+            </motion.div>
           </Flex>
 
-          {error && (
-            <Callout
-              title="Data Notice"
-              icon={AlertCircle}
-              color="yellow"
-              className="mt-4"
-            >
-              Using cached/mock data: {error}
-            </Callout>
-          )}
-        </div>
+          <AnimatePresence>
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Callout
+                  title="Data Notice"
+                  icon={AlertCircle}
+                  color="yellow"
+                  className="mt-4 backdrop-blur-sm border border-yellow-200/50 dark:border-yellow-700/50"
+                >
+                  Using cached/mock data: {error}
+                </Callout>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
 
         {/* Main Dashboard Grid */}
-        <Grid numItemsSm={1} numItemsLg={12} className="gap-6">
+        <StaggerContainer>
+          <Grid numItemsSm={1} numItemsLg={12} className="gap-6">
           {/* Primary Sentiment Gauge */}
-          <Col numColSpan={12} numColSpanLg={4}>
-            <SentimentGauge 
-              value={sentimentData.fearGreedIndex} 
-              title="Fear & Greed Index"
-              size="lg"
-            />
-          </Col>
+          <StaggerItem>
+            <Col numColSpan={12} numColSpanLg={4}>
+              <SentimentGauge 
+                value={sentimentData.fearGreedIndex} 
+                title="Fear & Greed Index"
+                size="lg"
+              />
+            </Col>
+          </StaggerItem>
 
           {/* Key Metrics */}
-          <Col numColSpan={12} numColSpanLg={8}>
-            <Grid numItemsSm={2} numItemsLg={4} className="gap-4 h-full">
-              <Col numColSpan={1}>
-                <MetricCard
+          <StaggerItem>
+            <Col numColSpan={12} numColSpanLg={8}>
+              <Grid numItemsSm={2} numItemsLg={4} className="gap-4 h-full">
+                <Col numColSpan={1}>
+                  <MetricCard
                   title="SPY Price"
                   value={`$${(sentimentData.spyPrice || 620).toFixed(2)}`}
                   change={sentimentData.spyChange}
@@ -240,47 +354,57 @@ export default function Home() {
                   }}
                   status={sentimentData.putCallRatio < 0.8 ? 'excellent' : sentimentData.putCallRatio < 1.0 ? 'good' : sentimentData.putCallRatio < 1.2 ? 'fair' : 'poor'}
                   size="sm"
-                />
-              </Col>
-            </Grid>
-          </Col>
+                  />
+                </Col>
+              </Grid>
+            </Col>
+          </StaggerItem>
 
           {/* Timeline Chart */}
-          <Col numColSpan={12} numColSpanLg={8}>
-            <TimelineChart
-              title="Sentiment Timeline"
-              data={generateTimelineData()}
-              height={400}
-              showControls={true}
-              defaultPeriod="1M"
-            />
-          </Col>
+          <StaggerItem>
+            <Col numColSpan={12} numColSpanLg={8}>
+              <ChartReveal delay={0.1}>
+                <TimelineChart
+                  title="Sentiment Timeline"
+                  data={generateTimelineData()}
+                  height={400}
+                  showControls={true}
+                  defaultPeriod="1M"
+                />
+              </ChartReveal>
+            </Col>
+          </StaggerItem>
 
           {/* News Feed */}
-          <Col numColSpan={12} numColSpanLg={4}>
-            <NewsCard
-              news={generateNewsData()}
-              title="Market News"
-              maxItems={5}
-              showSentiment={true}
-              showCategory={true}
-              layout="list"
-            />
-          </Col>
+          <StaggerItem>
+            <Col numColSpan={12} numColSpanLg={4}>
+              <NewsCard
+                news={generateNewsData()}
+                title="Market News"
+                maxItems={5}
+                showSentiment={true}
+                showCategory={true}
+                layout="list"
+              />
+            </Col>
+          </StaggerItem>
 
           {/* Sector Heatmap */}
-          <Col numColSpan={12}>
-            <SectorHeatmap
-              title="Sector Performance Heatmap"
-              data={generateSectorData()}
-              layout="grid"
-              size="md"
-            />
-          </Col>
+          <StaggerItem>
+            <Col numColSpan={12}>
+              <SectorHeatmap
+                title="Sector Performance Heatmap"
+                data={generateSectorData()}
+                layout="grid"
+                size="md"
+              />
+            </Col>
+          </StaggerItem>
 
           {/* Additional Metrics */}
-          <Col numColSpan={12} numColSpanLg={6}>
-            <MetricCard
+          <StaggerItem>
+            <Col numColSpan={12} numColSpanLg={6}>
+              <MetricCard
               title="IWM Small Cap Index"
               value={`$${(sentimentData.iwmPrice || 200).toFixed(2)}`}
               change={sentimentData.iwmChange}
@@ -294,11 +418,13 @@ export default function Home() {
               target={210}
               status={sentimentData.iwmChange >= 2 ? 'excellent' : sentimentData.iwmChange >= 0 ? 'good' : sentimentData.iwmChange >= -2 ? 'fair' : 'poor'}
               icon={<TrendingUp className="h-5 w-5" />}
-            />
-          </Col>
+              />
+            </Col>
+          </StaggerItem>
 
-          <Col numColSpan={12} numColSpanLg={6}>
-            <MetricCard
+          <StaggerItem>
+            <Col numColSpan={12} numColSpanLg={6}>
+              <MetricCard
               title="Market Volatility Index"
               value={`${(sentimentData.vixLevel * 1.2).toFixed(1)}%`}
               trend={sentimentData.vixLevel > 25 ? 'up' : 'down'}
@@ -311,36 +437,61 @@ export default function Home() {
               target={20}
               status={sentimentData.vixLevel < 15 ? 'excellent' : sentimentData.vixLevel < 20 ? 'good' : sentimentData.vixLevel < 30 ? 'fair' : 'poor'}
               icon={<Activity className="h-5 w-5" />}
-            />
-          </Col>
+              />
+            </Col>
+          </StaggerItem>
         </Grid>
+      </StaggerContainer>
 
         {/* Footer */}
-        <footer className="mt-16 pt-8 border-t border-tremor-border dark:border-dark-tremor-border">
+        <motion.footer 
+          className="mt-16 pt-8 border-t border-tremor-border/50 dark:border-dark-tremor-border/50"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+        >
           <Flex justifyContent="between" alignItems="center" className="flex-col sm:flex-row gap-4">
-            <Text className="text-tremor-content-subtle dark:text-dark-tremor-content-subtle text-sm">
-              Professional Market Sentiment Tracker • Real-time Trading Intelligence
-            </Text>
-            
-            <div className="flex items-center gap-4">
-              <Button
-                variant="light"
-                size="xs"
-                icon={Heart}
-                iconPosition="left"
-                className="text-xs"
-                onClick={() => window.open('https://revolut.me/your-revolut-link', '_blank')}
-              >
-                Support Development
-              </Button>
-              
-              <Text className="text-tremor-content-subtle dark:text-dark-tremor-content-subtle text-xs">
-                Data updates every 5 minutes
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 1 }}
+            >
+              <Text className="text-tremor-content-subtle dark:text-dark-tremor-content-subtle text-sm">
+                Professional Market Sentiment Tracker • Real-time Trading Intelligence
               </Text>
-            </div>
+            </motion.div>
+            
+            <motion.div 
+              className="flex items-center gap-4"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 1.1 }}
+            >
+              <motion.div
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button
+                  variant="light"
+                  size="xs"
+                  icon={Heart}
+                  iconPosition="left"
+                  className="text-xs backdrop-blur-sm border border-fintech-primary-200/50 dark:border-fintech-primary-700/50"
+                  onClick={() => window.open('https://revolut.me/your-revolut-link', '_blank')}
+                >
+                  Support Development
+                </Button>
+              </motion.div>
+              
+              <Text className="text-tremor-content-subtle dark:text-dark-tremor-content-subtle text-xs flex items-center space-x-1">
+                <span>Data updates every 5 minutes</span>
+                <div className="w-1 h-1 bg-fintech-success-500 rounded-full animate-pulse" />
+              </Text>
+            </motion.div>
           </Flex>
-        </footer>
-      </div>
-    </main>
+        </motion.footer>
+        </div>
+      </main>
+    </PageTransition>
   );
 }

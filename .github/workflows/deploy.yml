@@ -164,22 +164,53 @@ jobs:
     if: success()
     
     steps:
-      - name: Wait for deployment
-        run: sleep 30
+      - name: Wait for deployment to propagate
+        run: sleep 45
         
       - name: Health check deployed site
+        env:
+          SITE_URL: https://reg-kris.github.io/Investor-Sentiment-Tracker-v2/
         run: |
-          SITE_URL="${{ steps.deployment.outputs.page_url || 'https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}' }}"
           echo "Checking health of: $SITE_URL"
           
-          # Check if site is responding
-          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "$SITE_URL" || echo "000")
+          # Retry mechanism for reliability
+          MAX_RETRIES=5
+          RETRY_COUNT=0
+          SUCCESS=false
           
-          if [ "$RESPONSE" != "200" ]; then
-            echo "❌ Health check failed - HTTP $RESPONSE"
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ] && [ "$SUCCESS" = "false" ]; do
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            echo "Attempt $RETRY_COUNT of $MAX_RETRIES..."
+            
+            # Check if site is responding with detailed output
+            RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 10 --max-time 30 "$SITE_URL" || echo "000")
+            
+            echo "HTTP Response Code: $RESPONSE"
+            
+            if [ "$RESPONSE" = "200" ]; then
+              echo "✅ Health check passed - Site is responding"
+              SUCCESS=true
+            else
+              echo "⚠️  Attempt $RETRY_COUNT failed - HTTP $RESPONSE"
+              if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                echo "Waiting 15 seconds before retry..."
+                sleep 15
+              fi
+            fi
+          done
+          
+          if [ "$SUCCESS" = "false" ]; then
+            echo "❌ Health check failed after $MAX_RETRIES attempts"
+            echo "Final response code: $RESPONSE"
+            
+            # Additional debugging information
+            echo "--- DNS Resolution Check ---"
+            nslookup reg-kris.github.io || echo "DNS lookup failed"
+            
+            echo "--- Curl verbose output ---"
+            curl -v --connect-timeout 10 --max-time 30 "$SITE_URL" || true
+            
             exit 1
-          else
-            echo "✅ Health check passed - Site is responding"
           fi
           
       - name: Notify on health check failure
