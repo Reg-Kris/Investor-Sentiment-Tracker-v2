@@ -2,34 +2,34 @@
   "stocks": {
     "SPY": {
       "symbol": "SPY",
-      "price": 627.3012084960938,
-      "change": 0.8977092671893314,
-      "volume": 4555798,
-      "timestamp": "2025-08-04T13:37:41.271Z",
+      "price": 627.22998046875,
+      "change": 0.8862526579922366,
+      "volume": 6315059,
+      "timestamp": "2025-08-04T13:42:15.856Z",
       "date": "2025-08-04"
     },
     "QQQ": {
       "symbol": "QQQ",
-      "price": 560.6400146484375,
-      "change": 1.220482722978103,
-      "volume": 4265351,
-      "timestamp": "2025-08-04T13:37:43.432Z",
+      "price": 560.7000122070312,
+      "change": 1.2313149534368364,
+      "volume": 5333449,
+      "timestamp": "2025-08-04T13:42:18.089Z",
       "date": "2025-08-04"
     },
     "IWM": {
       "symbol": "IWM",
-      "price": 216.55999755859375,
-      "change": 0.7630743549324149,
-      "volume": 2783832,
-      "timestamp": "2025-08-04T13:37:45.563Z",
+      "price": 216.4149932861328,
+      "change": 0.6956054019748815,
+      "volume": 3531930,
+      "timestamp": "2025-08-04T13:42:20.228Z",
       "date": "2025-08-04"
     },
     "DIA": {
       "symbol": "DIA",
-      "price": 439.0664978027344,
-      "change": 0.7680383210905586,
-      "volume": 365943,
-      "timestamp": "2025-08-04T13:37:47.700Z",
+      "price": 438.92999267578125,
+      "change": 0.7367096865154427,
+      "volume": 461680,
+      "timestamp": "2025-08-04T13:42:22.444Z",
       "date": "2025-08-04"
     }
   },
@@ -46,7 +46,7 @@
         "somewhat_bearish": 0,
         "bearish": 0
       },
-      "timestamp": "2025-08-04T13:37:49.879Z"
+      "timestamp": "2025-08-04T13:42:24.960Z"
     },
     "AAPL": {
       "symbol": "AAPL",
@@ -60,7 +60,7 @@
         "somewhat_bearish": 0,
         "bearish": 0
       },
-      "timestamp": "2025-08-04T13:37:50.027Z"
+      "timestamp": "2025-08-04T13:42:25.353Z"
     },
     "MSFT": {
       "symbol": "MSFT",
@@ -74,7 +74,7 @@
         "somewhat_bearish": 0,
         "bearish": 0
       },
-      "timestamp": "2025-08-04T13:37:50.174Z"
+      "timestamp": "2025-08-04T13:42:25.505Z"
     },
     "TSLA": {
       "symbol": "TSLA",
@@ -88,7 +88,7 @@
         "somewhat_bearish": 0,
         "bearish": 0
       },
-      "timestamp": "2025-08-04T13:37:50.319Z"
+      "timestamp": "2025-08-04T13:42:25.647Z"
     }
   },
   "economic_indicators": {
@@ -98,7 +98,7 @@
       "value": null,
       "change": null,
       "error": "Request failed with status code 400",
-      "timestamp": "2025-08-04T13:37:54.059Z"
+      "timestamp": "2025-08-04T13:42:29.338Z"
     },
     "CPIAUCSL": {
       "series": "CPIAUCSL",
@@ -106,7 +106,7 @@
       "value": null,
       "change": null,
       "error": "Request failed with status code 400",
-      "timestamp": "2025-08-04T13:37:57.577Z"
+      "timestamp": "2025-08-04T13:42:32.859Z"
     },
     "FEDFUNDS": {
       "series": "FEDFUNDS",
@@ -114,7 +114,7 @@
       "value": null,
       "change": null,
       "error": "Request failed with status code 400",
-      "timestamp": "2025-08-04T13:38:01.123Z"
+      "timestamp": "2025-08-04T13:42:36.379Z"
     },
     "GDP": {
       "series": "GDP",
@@ -122,7 +122,7 @@
       "value": null,
       "change": null,
       "error": "Request failed with status code 400",
-      "timestamp": "2025-08-04T13:38:04.680Z"
+      "timestamp": "2025-08-04T13:42:39.972Z"
     },
     "PAYEMS": {
       "series": "PAYEMS",
@@ -130,7 +130,7 @@
       "value": null,
       "change": null,
       "error": "Request failed with status code 400",
-      "timestamp": "2025-08-04T13:38:08.300Z"
+      "timestamp": "2025-08-04T13:42:43.549Z"
     }
   },
   "crypto": {
@@ -139,12 +139,12 @@
         "id": "bitcoin",
         "symbol": "BTC",
         "name": "Bitcoin",
-        "price": 114316,
-        "market_cap": 2273279383462,
-        "volume_24h": 25013872058,
-        "change_1h": -0.054688619848533356,
-        "change_24h": 0.36116,
-        "change_7d": -3.7979609051845062,
+        "price": 114419,
+        "market_cap": 2275083616859,
+        "volume_24h": 25236893103,
+        "change_1h": 0.03591883371044411,
+        "change_24h": 0.45214,
+        "change_7d": -3.7107469912030093,
         "sparkline": [
           118804.82575621677,
           118828.90710731824,
@@ -315,18 +315,18 @@
           114442.5495561121,
           114292.1574135517
         ],
-        "timestamp": "2025-08-04T13:38:08.861Z"
+        "timestamp": "2025-08-04T13:42:43.706Z"
       },
       {
         "id": "ethereum",
         "symbol": "ETH",
         "name": "Ethereum",
-        "price": 3576.14,
-        "market_cap": 430624508330,
-        "volume_24h": 20042636293,
-        "change_1h": 0.5219279219633709,
-        "change_24h": 2.33445,
-        "change_7d": -7.621902897162107,
+        "price": 3585.52,
+        "market_cap": 431674277822,
+        "volume_24h": 20203211627,
+        "change_1h": 0.7856179880831436,
+        "change_24h": 2.6029,
+        "change_7d": -7.37957580459006,
         "sparkline": [
           3878.6330241741284,
           3871.197286303615,
@@ -497,18 +497,18 @@
           3547.414831695984,
           3557.304184717086
         ],
-        "timestamp": "2025-08-04T13:38:08.861Z"
+        "timestamp": "2025-08-04T13:42:43.706Z"
       },
       {
         "id": "binancecoin",
         "symbol": "BNB",
         "name": "BNB",
-        "price": 756.92,
-        "market_cap": 105483956935,
-        "volume_24h": 817656539,
-        "change_1h": 0.09122718547598016,
-        "change_24h": 0.8891,
-        "change_7d": -11.145254451282177,
+        "price": 758.07,
+        "market_cap": 105430379310,
+        "volume_24h": 823066174,
+        "change_1h": 0.2159768449013505,
+        "change_24h": 1.02678,
+        "change_7d": -11.01049382151658,
         "sparkline": [
           850.2808164589195,
           851.864686006585,
@@ -679,18 +679,18 @@
           757.932658756107,
           757.3598509536579
         ],
-        "timestamp": "2025-08-04T13:38:08.861Z"
+        "timestamp": "2025-08-04T13:42:43.706Z"
       },
       {
         "id": "solana",
         "symbol": "SOL",
         "name": "Solana",
-        "price": 164.02,
-        "market_cap": 88135888810,
-        "volume_24h": 4351181224,
-        "change_1h": 0.45909270202937286,
-        "change_24h": 1.64821,
-        "change_7d": -14.877654810251894,
+        "price": 164.36,
+        "market_cap": 88375128102,
+        "volume_24h": 3889342104,
+        "change_1h": 0.6666128198234436,
+        "change_24h": 1.85819,
+        "change_7d": -14.701816082013735,
         "sparkline": [
           192.68896920880294,
           190.53947724522845,
@@ -860,18 +860,18 @@
           162.6026384887611,
           162.400685773037
         ],
-        "timestamp": "2025-08-04T13:38:08.861Z"
+        "timestamp": "2025-08-04T13:42:43.706Z"
       },
       {
         "id": "cardano",
         "symbol": "ADA",
         "name": "Cardano",
-        "price": 0.740457,
-        "market_cap": 26720741786,
-        "volume_24h": 1004780492,
-        "change_1h": 0.25709484201780036,
-        "change_24h": 2.28912,
-        "change_7d": -10.638686108018955,
+        "price": 0.742351,
+        "market_cap": 26789513564,
+        "volume_24h": 995735475,
+        "change_1h": 0.24824636082086943,
+        "change_24h": 2.55074,
+        "change_7d": -10.410135710973014,
         "sparkline": [
           0.8274315130152349,
           0.8286107262565626,
@@ -1042,11 +1042,11 @@
           0.735922131929925,
           0.7388875495263397
         ],
-        "timestamp": "2025-08-04T13:38:08.861Z"
+        "timestamp": "2025-08-04T13:42:43.706Z"
       }
     ],
-    "timestamp": "2025-08-04T13:38:08.861Z",
-    "total_market_cap": 2924244479323
+    "timestamp": "2025-08-04T13:42:43.706Z",
+    "total_market_cap": 2927352915657
   },
   "fear_greed": {
     "value": 64,
@@ -1061,17 +1061,17 @@
     ]
   },
   "vix": {
-    "value": 18.959999084472656,
-    "change": -1.4200000762939453,
-    "change_percent": -6.967615970404836,
+    "value": 18.899999618530273,
+    "change": -1.4799995422363281,
+    "change_percent": -7.26201964269687,
     "classification": "Low Volatility",
     "history": [
       {
-        "date": "+057562-01-08",
+        "date": "+057562-01-11",
         "value": 15.979999542236328
       },
       {
-        "date": "+057562-01-08",
+        "date": "+057562-01-11",
         "value": 15.479999542236328
       },
       {
@@ -1084,14 +1084,14 @@
       },
       {
         "date": "2025-07-31",
-        "value": 18.959999084472656
+        "value": 18.899999618530273
       }
     ],
-    "timestamp": "2025-08-04T13:38:09.831Z"
+    "timestamp": "2025-08-04T13:42:44.561Z"
   },
   "metadata": {
-    "last_updated": "2025-08-04T13:38:09.831Z",
-    "fetch_duration": 28844,
+    "last_updated": "2025-08-04T13:42:44.562Z",
+    "fetch_duration": 29028,
     "cache_stats": {
       "keys": 11,
       "hits": 0,

@@ -240,6 +240,18 @@ class APIService {
 
   async getSentimentData(): Promise<APIResponse<SentimentData>> {
     try {
+      // First try to load data from the pre-fetched JSON file (for static deployment)
+      const jsonData = await this.loadPreFetchedData();
+      if (jsonData) {
+        console.log('Using pre-fetched data from JSON file');
+        return {
+          success: true,
+          data: jsonData
+        };
+      }
+
+      // Fall back to direct API calls if JSON data unavailable
+      console.log('JSON data unavailable, falling back to direct API calls');
       const [fearGreed, spy, qqq, iwm, vix, putCall] = await Promise.allSettled([
         this.getFearGreedIndex(),
         this.getStockData('SPY'),
@@ -281,6 +293,54 @@ class APIService {
         data: this.getMockData(),
         error: error instanceof Error ? error.message : 'Unknown error'
       };
+    }
+  }
+
+  private async loadPreFetchedData(): Promise<SentimentData | null> {
+    try {
+      const response = await fetch('/data/market-data.json');
+      if (!response.ok) {
+        console.log('Pre-fetched data file not found or inaccessible');
+        return null;
+      }
+
+      const marketData = await response.json();
+      
+      // Extract relevant data from the JSON structure
+      const stocks = marketData.stocks || {};
+      const vixData = marketData.vix || {};
+      const fearGreedData = marketData.fear_greed || {};
+
+      // Convert to expected SentimentData format
+      const spyChange = stocks.SPY?.change || 0;
+      const spyPrice = stocks.SPY?.price || 500;
+      const qqqChange = stocks.QQQ?.change || 0;
+      const qqqPrice = stocks.QQQ?.price || 400;
+      const iwmChange = stocks.IWM?.change || 0;
+      const iwmPrice = stocks.IWM?.price || 200;
+      const vixLevel = vixData.value || 20;
+      const fearGreedIndex = fearGreedData.value || 50;
+      const putCallRatio = 0.85 + Math.random() * 0.3; // Still generated randomly
+
+      const stockChanges = [spyChange, qqqChange, iwmChange];
+      const overallSentiment = this.calculateSentiment(fearGreedIndex, stockChanges, vixLevel);
+
+      return {
+        fearGreedIndex,
+        spyChange,
+        spyPrice,
+        qqqqChange: qqqChange,
+        qqqPrice,
+        iwmChange,
+        iwmPrice,
+        vixLevel,
+        putCallRatio,
+        overallSentiment,
+        lastUpdated: marketData.metadata?.last_updated || new Date().toISOString()
+      };
+    } catch (error) {
+      console.log('Error loading pre-fetched data:', error);
+      return null;
     }
   }
 
