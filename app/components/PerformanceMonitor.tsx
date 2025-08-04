@@ -156,7 +156,7 @@ const PerformanceMonitor = () => {
             vitalsData.current.lcp = Math.round(lastEntry.startTime);
           });
           lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
-        } catch (_e) {
+        } catch {
           console.log('LCP observer not supported');
         }
 
@@ -171,7 +171,7 @@ const PerformanceMonitor = () => {
             });
           });
           fidObserver.observe({ entryTypes: ['first-input'] });
-        } catch (_e) {
+        } catch {
           console.log('FID observer not supported');
         }
 
@@ -187,7 +187,7 @@ const PerformanceMonitor = () => {
             vitalsData.current.cls = Math.round(clsValue * 10000) / 10000;
           });
           clsObserver.observe({ entryTypes: ['layout-shift'] });
-        } catch (_e) {
+        } catch {
           console.log('CLS observer not supported');
         }
       }
