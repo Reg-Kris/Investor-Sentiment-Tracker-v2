@@ -11,14 +11,21 @@ module.exports = {
     transparent: 'transparent',
     current: 'currentColor',
     screens: {
+      'xs': '475px',
       'sm': '640px',
       'md': '768px',
       'lg': '1024px',
       'xl': '1280px',
       '2xl': '1536px',
-      // Custom breakpoints for laptop optimization
+      // Custom breakpoints for better mobile/tablet experience
+      'mobile': '475px',
+      'tablet': '768px',
       'laptop': '1024px',
-      'laptop-lg': '1440px',
+      'desktop': '1280px',
+      'wide': '1536px',
+      // Touch-specific breakpoints
+      'touch': {'raw': '(hover: none) and (pointer: coarse)'},
+      'mouse': {'raw': '(hover: hover) and (pointer: fine)'},
     },
     extend: {
       colors: {
@@ -337,6 +344,19 @@ module.exports = {
         'dark-tremor-card': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
         'dark-tremor-dropdown': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
       },
+      spacing: {
+        '18': '4.5rem',
+        '88': '22rem',
+        '112': '28rem',
+        '128': '32rem',
+        '144': '36rem',
+      },
+      minHeight: {
+        '44': '2.75rem', // 44px minimum touch target
+      },
+      minWidth: {
+        '44': '2.75rem', // 44px minimum touch target
+      },
       borderRadius: {
         'tremor-small': '0.375rem',
         'tremor-default': '0.5rem',
@@ -347,6 +367,20 @@ module.exports = {
         'tremor-default': ['0.875rem', { lineHeight: '1.25rem' }],
         'tremor-title': ['1.125rem', { lineHeight: '1.75rem' }],
         'tremor-metric': ['1.875rem', { lineHeight: '2.25rem' }],
+        // Responsive font sizes
+        'xs': ['0.75rem', { lineHeight: '1rem' }],
+        'sm': ['0.875rem', { lineHeight: '1.25rem' }],
+        'base': ['1rem', { lineHeight: '1.5rem' }],
+        'lg': ['1.125rem', { lineHeight: '1.75rem' }],
+        'xl': ['1.25rem', { lineHeight: '1.75rem' }],
+        '2xl': ['1.5rem', { lineHeight: '2rem' }],
+        '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
+        '4xl': ['2.25rem', { lineHeight: '2.5rem' }],
+        '5xl': ['3rem', { lineHeight: '1' }],
+        '6xl': ['3.75rem', { lineHeight: '1' }],
+        '7xl': ['4.5rem', { lineHeight: '1' }],
+        '8xl': ['6rem', { lineHeight: '1' }],
+        '9xl': ['8rem', { lineHeight: '1' }],
       },
     },
   },

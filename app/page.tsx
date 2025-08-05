@@ -135,7 +135,7 @@ export default function Home() {
           
           {/* Loading indicator */}
           <motion.div 
-            className="fixed bottom-8 right-8 flex items-center space-x-2 bg-fintech-primary-500 text-white px-4 py-2 rounded-full shadow-lg backdrop-blur-sm"
+            className="fixed bottom-8 right-8 flex items-center space-x-2 bg-fintech-primary-500 text-white px-4 py-2 rounded-full shadow-lg backdrop-blur-sm z-toast"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -168,7 +168,7 @@ export default function Home() {
   return (
     <PageTransition>
       <main className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-6 py-6 lg:py-8 xl:py-10 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-4 sm:py-6 lg:py-8 xl:py-10 relative overflow-hidden stacking-context">
         {/* Hero Section with Giant Sentiment Gauge */}
         <ViewportAnimation animation="bounce" threshold={0.2}>
           <SentimentHero 
@@ -185,20 +185,20 @@ export default function Home() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <Title className="text-gray-900 dark:text-gray-100 text-lg lg:text-xl font-semibold">
+              <Title className="text-gray-900 dark:text-gray-100 text-responsive-xl font-semibold">
                 Market Indicators Explained
               </Title>
-              <Text className="text-gray-600 dark:text-gray-400 mt-1 text-sm lg:text-base">
+              <Text className="text-gray-600 dark:text-gray-400 mt-1 text-responsive-base leading-relaxed-mobile">
                 Each metric tells you what investors are thinking and feeling
               </Text>
             </motion.div>
             <motion.div 
-              className="flex items-center space-x-3"
+              className="flex items-center space-x-3 overlay-safe"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="theme-toggle">
                 <ThemeToggle />
               </motion.div>
               <motion.div
@@ -242,7 +242,7 @@ export default function Home() {
 
         {/* Educational Metric Cards */}
         <ViewportAnimation animation="slideUp" delay={0.1}>
-          <Grid numItemsSm={1} numItemsMd={2} numItemsLg={4} className="gap-4 lg:gap-6">
+          <Grid numItemsSm={1} numItemsMd={2} numItemsLg={4} className="gap-4 sm:gap-5 lg:gap-6">
             {/* Market Price Indicators */}
             <HoverScale className="h-full">
               <Col numColSpan={1}>
@@ -348,71 +348,71 @@ export default function Home() {
         <ViewportAnimation 
           animation="scale" 
           delay={0.3}
-          className="mt-8 lg:mt-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-6 lg:p-8 border border-gray-200/50 dark:border-gray-700/50 shadow-lg"
+          className="mt-6 sm:mt-8 lg:mt-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 sm:p-6 lg:p-8 border border-gray-200/50 dark:border-gray-700/50 shadow-lg card-on-gradient"
         >
           <div className="text-center mb-6 lg:mb-8">
-            <h3 className="text-xl lg:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+            <h3 className="text-responsive-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
               Understanding Market Sentiment: A Beginner&apos;s Guide
             </h3>
-            <p className="text-sm lg:text-base text-gray-600 dark:text-gray-400">
+            <p className="text-responsive-base text-gray-600 dark:text-gray-400 leading-relaxed-mobile">
               Learn how to read the market&apos;s emotional state and what it means for your investments
             </p>
           </div>
           
-          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            <div className="space-y-3 lg:space-y-4 p-4 lg:p-6 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+            <div className="space-y-3 lg:space-y-4 p-4 sm:p-5 lg:p-6 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800 card-on-gradient">
               <div className="text-center">
                 <div className="text-4xl mb-2">🟢</div>
-                <h4 className="font-bold text-green-800 dark:text-green-200 text-base lg:text-lg mb-2">
+                <h4 className="font-bold text-green-800 dark:text-green-200 text-responsive-lg mb-2">
                   Markets Are Calm
                 </h4>
-                <p className="text-xs lg:text-sm text-green-700 dark:text-green-300 mb-2 lg:mb-3">
+                <p className="text-responsive-sm text-green-700 dark:text-green-300 mb-2 lg:mb-3 leading-relaxed-mobile">
                   Low VIX • Balanced Put/Call Ratios • Steady Price Movement
                 </p>
               </div>
-              <p className="text-xs lg:text-sm text-green-800 dark:text-green-200">
+              <p className="text-responsive-sm text-green-800 dark:text-green-200 leading-relaxed-mobile">
                 Investors are confident and trading normally. This is a good time for regular investment strategies. 
                 Prices move predictably based on company earnings and economic fundamentals.
               </p>
-              <div className="bg-green-100 dark:bg-green-900/50 p-2 lg:p-3 rounded text-xs text-green-800 dark:text-green-200">
+              <div className="bg-green-100 dark:bg-green-900/50 p-2 lg:p-3 rounded text-responsive-sm text-green-800 dark:text-green-200">
                 <strong>What to do:</strong> Execute your normal investment plan. Good time for dollar-cost averaging.
               </div>
             </div>
             
-            <div className="space-y-3 lg:space-y-4 p-4 lg:p-6 bg-yellow-50 dark:bg-yellow-950/30 rounded-lg border border-yellow-200 dark:border-yellow-800">
+            <div className="space-y-3 lg:space-y-4 p-4 sm:p-5 lg:p-6 bg-yellow-50 dark:bg-yellow-950/30 rounded-lg border border-yellow-200 dark:border-yellow-800 card-on-gradient">
               <div className="text-center">
                 <div className="text-4xl mb-2">🟡</div>
-                <h4 className="font-bold text-yellow-800 dark:text-yellow-200 text-base lg:text-lg mb-2">
+                <h4 className="font-bold text-yellow-800 dark:text-yellow-200 text-responsive-lg mb-2">
                   Markets Are Nervous
                 </h4>
-                <p className="text-xs lg:text-sm text-yellow-700 dark:text-yellow-300 mb-2 lg:mb-3">
+                <p className="text-responsive-sm text-yellow-700 dark:text-yellow-300 mb-2 lg:mb-3 leading-relaxed-mobile">
                   Moderate VIX • Slightly Elevated Ratios • Some Uncertainty
                 </p>
               </div>
-              <p className="text-xs lg:text-sm text-yellow-800 dark:text-yellow-200">
+              <p className="text-responsive-sm text-yellow-800 dark:text-yellow-200 leading-relaxed-mobile">
                 Some uncertainty is in the air. Investors are more cautious but not panicking. 
                 This is a good time to be patient and avoid making impulsive decisions.
               </p>
-              <div className="bg-yellow-100 dark:bg-yellow-900/50 p-2 lg:p-3 rounded text-xs text-yellow-800 dark:text-yellow-200">
+              <div className="bg-yellow-100 dark:bg-yellow-900/50 p-2 lg:p-3 rounded text-responsive-sm text-yellow-800 dark:text-yellow-200">
                 <strong>What to do:</strong> Stay disciplined. Watch for opportunities but don&apos;t rush into decisions.
               </div>
             </div>
             
-            <div className="space-y-3 lg:space-y-4 p-4 lg:p-6 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200 dark:border-red-800">
+            <div className="space-y-3 lg:space-y-4 p-4 sm:p-5 lg:p-6 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200 dark:border-red-800 card-on-gradient sm:col-span-2 lg:col-span-1">
               <div className="text-center">
                 <div className="text-4xl mb-2">🔴</div>
-                <h4 className="font-bold text-red-800 dark:text-red-200 text-base lg:text-lg mb-2">
+                <h4 className="font-bold text-red-800 dark:text-red-200 text-responsive-lg mb-2">
                   Markets Are Extreme
                 </h4>
-                <p className="text-xs lg:text-sm text-red-700 dark:text-red-300 mb-2 lg:mb-3">
+                <p className="text-responsive-sm text-red-700 dark:text-red-300 mb-2 lg:mb-3 leading-relaxed-mobile">
                   High VIX • Extreme Ratios • Fear or Greed Dominates
                 </p>
               </div>
-              <p className="text-xs lg:text-sm text-red-800 dark:text-red-200">
+              <p className="text-responsive-sm text-red-800 dark:text-red-200 leading-relaxed-mobile">
                 Fear or greed dominates rational thinking. These extreme moments often create 
                 the best opportunities - buying during fear or being cautious during greed.
               </p>
-              <div className="bg-red-100 dark:bg-red-900/50 p-2 lg:p-3 rounded text-xs text-red-800 dark:text-red-200">
+              <div className="bg-red-100 dark:bg-red-900/50 p-2 lg:p-3 rounded text-responsive-sm text-red-800 dark:text-red-200">
                 <strong>What to do:</strong> Consider contrarian moves. When others panic, stay calm. When others are euphoric, be cautious.
               </div>
             </div>
@@ -423,13 +423,13 @@ export default function Home() {
         <ViewportAnimation 
           animation="fadeUp" 
           delay={0.4}
-          className="mt-8 lg:mt-12 p-4 lg:p-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/50 dark:to-purple-950/50 rounded-xl border border-blue-200/50 dark:border-blue-800/50 shadow-md"
+          className="mt-6 sm:mt-8 lg:mt-12 p-4 sm:p-5 lg:p-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/50 dark:to-purple-950/50 rounded-xl border border-blue-200/50 dark:border-blue-800/50 shadow-md card-on-gradient"
         >
           <div className="text-center">
-            <h3 className="text-base lg:text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
+            <h3 className="text-responsive-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
               Remember: Markets are Emotional
             </h3>
-            <p className="text-blue-800 dark:text-blue-200 text-xs lg:text-sm max-w-3xl mx-auto">
+            <p className="text-blue-800 dark:text-blue-200 text-responsive-base max-w-3xl mx-auto leading-relaxed-mobile">
               These indicators show you what other investors are feeling - fear, greed, optimism, or panic. 
               The best investment opportunities often come when others are being too emotional. 
               When everyone is fearful, markets may be oversold. When everyone is greedy, markets may be overpriced.
@@ -450,10 +450,10 @@ export default function Home() {
               transition={{ duration: 0.4, delay: 1.3 }}
               className="text-center lg:text-left"
             >
-              <Text className="text-gray-500 dark:text-gray-400 text-xs lg:text-sm">
+              <Text className="text-gray-500 dark:text-gray-400 text-responsive-sm">
                 Market Sentiment Tracker • Helping Novice Investors Understand Market Emotions
               </Text>
-              <Text className="text-gray-500 dark:text-gray-400 text-xs mt-1">
+              <Text className="text-gray-500 dark:text-gray-400 text-responsive-xs mt-1">
                 Data updates every 5 minutes • Not financial advice - for educational purposes only
               </Text>
             </motion.div>
@@ -473,7 +473,7 @@ export default function Home() {
                   size="xs"
                   icon={Heart}
                   iconPosition="left"
-                  className="text-xs backdrop-blur-sm border border-pink-200/50 dark:border-pink-700/50 hover:bg-pink-50 dark:hover:bg-pink-950"
+                  className="text-responsive-xs backdrop-blur-sm border border-pink-200/50 dark:border-pink-700/50 hover:bg-pink-50 dark:hover:bg-pink-950 min-h-[44px] min-w-[44px] flex items-center justify-center"
                   onClick={() => window.open('https://revolut.me/kristiuo4b', '_blank')}
                 >
                   Buy me a coffee ☕
@@ -484,7 +484,7 @@ export default function Home() {
                 <FloatingAnimation intensity={6} duration={3}>
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                 </FloatingAnimation>
-                <Text className="text-gray-500 dark:text-gray-400 text-xs">
+                <Text className="text-gray-500 dark:text-gray-400 text-responsive-xs">
                   Live Data
                 </Text>
               </div>

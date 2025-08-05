@@ -136,7 +136,7 @@ export default function SentimentHero({ value, lastUpdated }: SentimentHeroProps
                 {sentimentData.icon}
               </motion.div>
             </div>
-            <Text className={clsx(sentimentData.textColor, 'text-lg lg:text-xl font-medium mb-2')}>
+            <Text className={clsx(sentimentData.textColor, 'text-base sm:text-lg lg:text-xl font-medium mb-2 drop-shadow-md')}>
               Market Sentiment Right Now
             </Text>
             <motion.div
@@ -146,31 +146,34 @@ export default function SentimentHero({ value, lastUpdated }: SentimentHeroProps
             >
               <h1 className={clsx(
                 sentimentData.textColor,
-                'text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black mb-2 tracking-tight'
+                'text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-2 tracking-tight',
+                'drop-shadow-lg'
               )}>
                 {sentimentData.label}
               </h1>
             </motion.div>
-            <Text className={clsx(sentimentData.textColor, 'text-lg lg:text-xl xl:text-2xl font-semibold opacity-90')}>
+            <Text className={clsx(sentimentData.textColor, 'text-base sm:text-lg lg:text-xl xl:text-2xl font-semibold opacity-90 drop-shadow-md')}>
               {sentimentData.meaning}
             </Text>
           </motion.div>
 
-          {/* Giant Gauge */}
+          {/* Responsive SVG Gauge */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.8 }}
             className="flex justify-center mb-6 lg:mb-8"
           >
-            <div className="relative w-64 h-32 lg:w-80 lg:h-40">
+            <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl">
               {/* Gauge Background */}
               <svg
                 width="100%"
-                height="100%"
+                height="auto"
                 viewBox="0 0 320 160"
-                className="absolute inset-0"
+                className="w-full h-auto"
                 preserveAspectRatio="xMidYMid meet"
+                role="img"
+                aria-label={`Market sentiment gauge showing ${value} out of 100`}
               >
                 {/* Background Arc */}
                 <path
@@ -273,16 +276,16 @@ export default function SentimentHero({ value, lastUpdated }: SentimentHeroProps
                 transition={{ duration: 0.6, delay: 1.2 }}
                 className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-center"
               >
-                <Metric className={clsx(sentimentData.textColor, 'text-4xl font-black')}>
+                <Metric className={clsx(sentimentData.textColor, 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black')}>
                   {value}
                 </Metric>
-                <Text className={clsx(sentimentData.textColor, 'text-sm opacity-80')}>
+                <Text className={clsx(sentimentData.textColor, 'text-xs sm:text-sm opacity-80')}>
                   out of 100
                 </Text>
               </motion.div>
               
               {/* Zone Labels */}
-              <div className="absolute top-full mt-4 w-full flex justify-between text-sm font-medium">
+              <div className="absolute top-full mt-2 sm:mt-4 w-full flex justify-between text-xs sm:text-sm font-medium px-2">
                 <span className={clsx(sentimentData.textColor, 'opacity-70')}>FEAR</span>
                 <span className={clsx(sentimentData.textColor, 'opacity-70')}>NEUTRAL</span>
                 <span className={clsx(sentimentData.textColor, 'opacity-70')}>GREED</span>
@@ -295,43 +298,43 @@ export default function SentimentHero({ value, lastUpdated }: SentimentHeroProps
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 1.4 }}
-            className="grid sm:grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6"
           >
             {/* What This Means */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 lg:p-4 border border-white/20">
-              <div className="flex items-center mb-2">
-                <span className="text-2xl mr-2">{sentimentData.trafficLight}</span>
-                <Text className={clsx(sentimentData.textColor, 'font-semibold')}>
+            <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4 lg:p-5 border border-white/30 hover:bg-white/25 transition-all duration-200">
+              <div className="flex items-center mb-3">
+                <span className="text-2xl mr-3 flex-shrink-0">{sentimentData.trafficLight}</span>
+                <Text className={clsx(sentimentData.textColor, 'font-semibold text-sm sm:text-base drop-shadow-sm')}>
                   What This Means
                 </Text>
               </div>
-              <Text className={clsx(sentimentData.textColor, 'text-sm opacity-90')}>
+              <Text className={clsx(sentimentData.textColor, 'text-sm sm:text-base opacity-95 drop-shadow-sm leading-relaxed')}>
                 {sentimentData.explanation}
               </Text>
             </div>
 
             {/* For Your Portfolio */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 lg:p-4 border border-white/20">
-              <div className="flex items-center mb-2">
-                <CheckCircle className={clsx(sentimentData.textColor, 'h-5 w-5 mr-2')} />
-                <Text className={clsx(sentimentData.textColor, 'font-semibold')}>
+            <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4 lg:p-5 border border-white/30 hover:bg-white/25 transition-all duration-200">
+              <div className="flex items-center mb-3">
+                <CheckCircle className={clsx(sentimentData.textColor, 'h-5 w-5 mr-3 flex-shrink-0 drop-shadow-sm')} />
+                <Text className={clsx(sentimentData.textColor, 'font-semibold text-sm sm:text-base drop-shadow-sm')}>
                   For Your Portfolio
                 </Text>
               </div>
-              <Text className={clsx(sentimentData.textColor, 'text-sm opacity-90')}>
+              <Text className={clsx(sentimentData.textColor, 'text-sm sm:text-base opacity-95 drop-shadow-sm leading-relaxed')}>
                 {sentimentData.actionHint}
               </Text>
             </div>
 
             {/* Market Outlook */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 lg:p-4 border border-white/20">
-              <div className="flex items-center mb-2">
-                <TrendingUp className={clsx(sentimentData.textColor, 'h-5 w-5 mr-2')} />
-                <Text className={clsx(sentimentData.textColor, 'font-semibold')}>
+            <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4 lg:p-5 border border-white/30 hover:bg-white/25 transition-all duration-200 md:col-span-2 lg:col-span-1">
+              <div className="flex items-center mb-3">
+                <TrendingUp className={clsx(sentimentData.textColor, 'h-5 w-5 mr-3 flex-shrink-0 drop-shadow-sm')} />
+                <Text className={clsx(sentimentData.textColor, 'font-semibold text-sm sm:text-base drop-shadow-sm')}>
                   Market Outlook
                 </Text>
               </div>
-              <Text className={clsx(sentimentData.textColor, 'text-sm opacity-90')}>
+              <Text className={clsx(sentimentData.textColor, 'text-sm sm:text-base opacity-95 drop-shadow-sm leading-relaxed')}>
                 {sentimentData.marketImplication}
               </Text>
             </div>

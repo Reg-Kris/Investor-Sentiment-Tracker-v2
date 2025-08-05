@@ -18,9 +18,9 @@ export default function ThemeToggle({
   const { theme, setTheme, resolvedTheme } = useTheme();
 
   const sizeClasses = {
-    sm: 'h-8 w-8 text-sm',
-    md: 'h-10 w-10 text-base',
-    lg: 'h-12 w-12 text-lg'
+    sm: 'h-10 w-10 text-sm min-w-[44px] min-h-[44px]',
+    md: 'h-12 w-12 text-base min-w-[44px] min-h-[44px]',
+    lg: 'h-14 w-14 text-lg min-w-[44px] min-h-[44px]'
   };
 
   const iconSizes = {
@@ -38,7 +38,7 @@ export default function ThemeToggle({
           className={clsx(
             'appearance-none bg-tremor-background dark:bg-dark-tremor-background',
             'border border-tremor-border dark:border-dark-tremor-border',
-            'rounded-lg px-3 py-2 pr-8 text-sm',
+            'rounded-lg px-4 py-3 pr-10 text-sm min-h-[44px]',
             'text-tremor-content-strong dark:text-dark-tremor-content-strong',
             'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50',
             'cursor-pointer transition-colors duration-200'

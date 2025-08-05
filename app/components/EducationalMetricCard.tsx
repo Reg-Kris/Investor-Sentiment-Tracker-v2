@@ -77,9 +77,9 @@ export default function EducationalMetricCard({
   };
 
   const sizeClasses = {
-    sm: { metric: 'text-lg lg:text-xl', padding: 'p-3 lg:p-4' },
-    md: { metric: 'text-xl lg:text-2xl', padding: 'p-4 lg:p-6' },
-    lg: { metric: 'text-2xl lg:text-3xl', padding: 'p-6 lg:p-8' }
+    sm: { metric: 'text-lg sm:text-xl lg:text-2xl', padding: 'p-4 sm:p-5 lg:p-6' },
+    md: { metric: 'text-xl sm:text-2xl lg:text-3xl', padding: 'p-5 sm:p-6 lg:p-7' },
+    lg: { metric: 'text-2xl sm:text-3xl lg:text-4xl', padding: 'p-6 sm:p-7 lg:p-8' }
   };
 
   return (
@@ -105,7 +105,8 @@ export default function EducationalMetricCard({
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ duration: 0.3, delay: 0.2 }}
-          className="absolute top-3 right-3 lg:top-4 lg:right-4 text-xl lg:text-2xl"
+          className="absolute top-3 right-3 sm:top-4 sm:right-4 lg:top-5 lg:right-5 text-2xl sm:text-3xl lg:text-4xl z-10"
+          aria-label={`Status: ${trafficLight} indicator`}
         >
           {trafficLightData.emoji}
         </motion.div>
@@ -124,7 +125,7 @@ export default function EducationalMetricCard({
           )}
           <div className="flex-1">
             <Text className={clsx(
-              'font-semibold text-lg',
+              'font-semibold text-base sm:text-lg lg:text-xl',
               trafficLightData.textColor
             )}>
               {title}
@@ -135,11 +136,14 @@ export default function EducationalMetricCard({
             whileTap={{ scale: 0.9 }}
             onClick={() => setShowExplanation(!showExplanation)}
             className={clsx(
-              'p-2 rounded-full transition-colors',
+              'min-w-[44px] min-h-[44px] p-3 rounded-full transition-colors flex items-center justify-center',
               showExplanation 
                 ? 'bg-blue-100 dark:bg-blue-900' 
-                : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                : 'hover:bg-gray-100 dark:hover:bg-gray-800',
+              'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
             )}
+            aria-label="Toggle detailed explanation"
+            aria-expanded={showExplanation}
           >
             <HelpCircle className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           </motion.button>

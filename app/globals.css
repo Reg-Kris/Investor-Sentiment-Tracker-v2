@@ -70,6 +70,25 @@ body {
     linear-gradient(135deg, rgb(var(--background-start-rgb)) 0%, rgb(var(--background-end-rgb)) 100%);
   min-height: 100vh;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Responsive typography base */
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+}
+
+@media (min-width: 1280px) {
+  body {
+    font-size: 18px;
+    line-height: 1.7;
+  }
 }
 
 @layer utilities {
@@ -270,6 +289,50 @@ body {
   background-clip: text;
 }
 
+/* Text contrast improvements */
+.text-high-contrast {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  color: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  .text-high-contrast {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    color: #f8fafc;
+  }
+}
+
+.text-readable-light {
+  color: #1f2937;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.text-readable-dark {
+  color: #f9fafb;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Improved gradient backgrounds with better text contrast */
+.gradient-text-safe {
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.95) 0%, 
+    rgba(248, 250, 252, 0.9) 100%);
+  color: #1f2937;
+  backdrop-filter: blur(8px);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  text-shadow: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .gradient-text-safe {
+    background: linear-gradient(135deg, 
+      rgba(15, 23, 42, 0.95) 0%, 
+      rgba(30, 41, 59, 0.9) 100%);
+    color: #f1f5f9;
+  }
+}
+
 /* Chart Container Styling */
 .chart-container {
   position: relative;
@@ -341,6 +404,23 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  /* Fallback for better accessibility */
+  color: rgb(var(--fintech-primary));
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .fintech-text-gradient {
+    -webkit-text-fill-color: unset;
+    background: none;
+    color: #1f2937;
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    .fintech-text-gradient {
+      color: #f8fafc;
+    }
+  }
 }
 
 /* Premium Loading States */
@@ -537,6 +617,122 @@ body {
   animation: pulsePink 2.5s ease-in-out infinite alternate;
 }
 
+/* Focus and accessibility improvements */
+.focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-glow,
+  .pulse-pink,
+  .animate-shimmer,
+  .float,
+  .float-delayed,
+  .float-slow,
+  .float-subtle,
+  .float-card,
+  .float-gentle {
+    animation: none;
+  }
+}
+
+/* Better contrast for cards on gradients */
+.card-on-gradient {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  .card-on-gradient {
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Responsive typography classes */
+.text-responsive-xs {
+  font-size: 0.75rem;
+  line-height: 1.2;
+}
+
+.text-responsive-sm {
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.text-responsive-base {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.text-responsive-lg {
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+
+.text-responsive-xl {
+  font-size: 1.25rem;
+  line-height: 1.6;
+}
+
+.text-responsive-2xl {
+  font-size: 1.5rem;
+  line-height: 1.4;
+}
+
+.text-responsive-3xl {
+  font-size: 1.875rem;
+  line-height: 1.3;
+}
+
+.text-responsive-4xl {
+  font-size: 2.25rem;
+  line-height: 1.2;
+}
+
+@media (max-width: 640px) {
+  .text-responsive-xs { font-size: 0.625rem; }
+  .text-responsive-sm { font-size: 0.75rem; }
+  .text-responsive-base { font-size: 0.875rem; }
+  .text-responsive-lg { font-size: 1rem; }
+  .text-responsive-xl { font-size: 1.125rem; }
+  .text-responsive-2xl { font-size: 1.25rem; }
+  .text-responsive-3xl { font-size: 1.5rem; }
+  .text-responsive-4xl { font-size: 1.875rem; }
+}
+
+@media (min-width: 1280px) {
+  .text-responsive-xs { font-size: 0.875rem; }
+  .text-responsive-sm { font-size: 1rem; }
+  .text-responsive-base { font-size: 1.125rem; }
+  .text-responsive-lg { font-size: 1.25rem; }
+  .text-responsive-xl { font-size: 1.5rem; }
+  .text-responsive-2xl { font-size: 1.75rem; }
+  .text-responsive-3xl { font-size: 2.25rem; }
+  .text-responsive-4xl { font-size: 2.75rem; }
+}
+
+/* Better line height for readability */
+.leading-relaxed-mobile {
+  line-height: 1.5;
+}
+
+@media (min-width: 640px) {
+  .leading-relaxed-mobile {
+    line-height: 1.625;
+  }
+}
+
+@media (min-width: 1024px) {
+  .leading-relaxed-mobile {
+    line-height: 1.75;
+  }
+}
+
 @keyframes pulseGlow {
   from {
     box-shadow: 0 0 20px rgba(var(--fintech-primary), 0.25);
@@ -682,6 +878,26 @@ body {
   margin-bottom: 0;
 }
 
+/* Z-index layering system */
+.z-base { z-index: 1; }
+.z-dropdown { z-index: 1000; }
+.z-sticky { z-index: 1020; }
+.z-fixed { z-index: 1030; }
+.z-modal-backdrop { z-index: 1040; }
+.z-modal { z-index: 1050; }
+.z-popover { z-index: 1060; }
+.z-tooltip { z-index: 1070; }
+.z-toast { z-index: 1080; }
+
+/* Component-specific z-index */
+.hero-content { z-index: 10; }
+.hero-background { z-index: 1; }
+.card-content { z-index: 5; }
+.card-overlay { z-index: 3; }
+.floating-indicator { z-index: 15; }
+.theme-toggle { z-index: 20; }
+.loading-overlay { z-index: 999; }
+
 /* Grid layout improvements */
 .tremor-Grid-root {
   display: grid;
@@ -703,8 +919,27 @@ body {
 /* Card spacing consistency */
 .glass-card {
   margin-bottom: 1rem;
+  position: relative;
+  z-index: var(--z-card, 5);
 }
 
 .glass-card:last-child {
   margin-bottom: 0;
+}
+
+/* Ensure proper stacking context */
+.stacking-context {
+  position: relative;
+  z-index: 0;
+}
+
+/* Overlay protection */
+.overlay-safe {
+  position: relative;
+  z-index: 10;
+}
+
+.background-safe {
+  position: relative;
+  z-index: 1;
 }
