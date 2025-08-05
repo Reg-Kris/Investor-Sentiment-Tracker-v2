@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { RefreshCw, Heart, Activity, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
+import { Heart, Activity, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
 import { Grid, Col, Title, Text, Flex, Button, Callout } from '@tremor/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageTransition, { ViewportAnimation, HoverScale, FloatingAnimation } from './components/PageTransition';
@@ -200,21 +200,6 @@ export default function Home() {
             >
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="theme-toggle">
                 <ThemeToggle />
-              </motion.div>
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Button
-                  onClick={fetchData}
-                  loading={loading}
-                  icon={RefreshCw}
-                  variant="secondary"
-                  size="sm"
-                  className="micro-bounce backdrop-blur-sm"
-                >
-                  Refresh Data
-                </Button>
               </motion.div>
             </motion.div>
           </Flex>
@@ -454,7 +439,7 @@ export default function Home() {
                 Market Sentiment Tracker • Helping Novice Investors Understand Market Emotions
               </Text>
               <Text className="text-gray-500 dark:text-gray-400 text-responsive-xs mt-1">
-                Data updates every 5 minutes • Not financial advice - for educational purposes only
+                Not financial advice - for educational purposes only
               </Text>
             </motion.div>
             
