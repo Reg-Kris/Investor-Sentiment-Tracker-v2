@@ -144,7 +144,7 @@ export default function Home() {
               animate={{ rotate: 360 }}
               transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
             >
-              <RefreshCw className="h-4 w-4" />
+              <Activity className="h-4 w-4" />
             </motion.div>
             <span className="text-sm font-medium">Loading market data...</span>
           </motion.div>
