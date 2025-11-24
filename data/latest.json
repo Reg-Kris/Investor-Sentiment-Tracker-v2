@@ -1,40 +1,40 @@
 {
-  "timestamp": "2025-11-24T08:51:18.986Z",
+  "timestamp": "2025-11-24T20:41:37.554Z",
   "stocks": {
     "SPY": {
       "symbol": "SPY",
-      "price": 659.030029296875,
-      "change": 0.9961227389035241,
-      "timestamp": "2025-11-24T08:51:19.187Z"
+      "price": 669.25,
+      "change": 1.550759487246549,
+      "timestamp": "2025-11-24T20:41:37.720Z"
     },
     "QQQ": {
       "symbol": "QQQ",
-      "price": 590.0700073242188,
-      "change": 0.7512805065062518,
-      "timestamp": "2025-11-24T08:51:20.260Z"
+      "price": 605.6699829101562,
+      "change": 2.643749960564589,
+      "timestamp": "2025-11-24T20:41:38.779Z"
     },
     "IWM": {
       "symbol": "IWM",
-      "price": 235.60000610351562,
-      "change": 2.832702839629268,
-      "timestamp": "2025-11-24T08:51:21.322Z"
+      "price": 239.99000549316406,
+      "change": 1.8633273666892873,
+      "timestamp": "2025-11-24T20:41:39.854Z"
     },
     "^VIX": {
       "symbol": "^VIX",
-      "price": 22.579999923706055,
-      "change": -3.62782915236223,
-      "timestamp": "2025-11-24T08:51:22.359Z"
+      "price": 20.780000686645508,
+      "change": -11.31028418273165,
+      "timestamp": "2025-11-24T20:41:40.891Z"
     }
   },
   "sentiment": {
-    "score": 59,
-    "label": "Neutral",
-    "timestamp": "2025-11-24T08:51:23.359Z"
+    "score": 74,
+    "label": "Bullish",
+    "timestamp": "2025-11-24T20:41:41.891Z"
   },
   "fearGreed": {
     "value": 19,
     "classification": "Extreme Fear",
-    "timestamp": "2025-11-24T08:51:23.461Z"
+    "timestamp": "2025-11-24T20:41:42.085Z"
   },
-  "putCallRatio": 0.9
+  "putCallRatio": 0.8
 }
